@@ -1,5 +1,4 @@
-import psycopg2, hashlib, json
-from Databases import Database
+import psycopg2, hashlib, json, Database
 from flask import Flask, jsonify, abort, request, make_response, url_for
 from flask_cors import CORS, cross_origin
 from psycopg2 import sql
@@ -40,17 +39,21 @@ def createAdmin():
             'fecha_baja': 'NULL'
         }
 
-        db = Database.Database()
-        db.insertUser(user)
+        con.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+        cur = con.cursor()
+        cur.execute("insert into usuario (usuario,contrasena,nombre,apellidos,telefono,fecha_alta,fecha_baja,administrador) values (" + request.json['user'] + "," + request.json['password'] + "," + request.json['name'] + "," + request.json['surnames'] + "," + request.json['phone'] + "," + date.today().strftime("%m/%d/%Y") + "," + NULL + ",False);")
+
+        # db = Database.Database()
+        # db.insertUser(user)
         return 'ok'
 
 @app.route('/login',methods=['GET','POST'])
 def login():
     if request.method == 'POST':
         user = dict()
-        user['usuario'] = request.form["usuario"]
+        request.json['usuario'] = request.form["usuario"]
         h = hashlib.sha1(request.form["contrasena"].encode('utf-8')).hexdigest()
-        user['contrasena'] = h    
+        request.json['contrasena'] = h    
         bd = Database.Database() 
         response = bd.login(user)
         if response == "":
@@ -64,7 +67,7 @@ def get_user(id):
     user = list(filter(lambda t: t['id'] == id, users))
     if len(user) == 0:
         abort(404)
-    return jsonify( { 'user': user[0] } )
+    return jsonify( { 'user': request.json[0] } )
 
 @app.route('/register', methods = ['GET', 'POST'])
 def createUser():
@@ -75,7 +78,7 @@ def createUser():
             'email': request.json['Email'],
             'name': request.json['Name'],
             'surnames': request.json['lastName'],
-            'password': hashlib.sha1(request.json['Password'].encode('utf-8')).hexdigest(),
+            'password': request.json['Password']
             'admin': False,
             'phone': request.json['Phone'],
             'fecha_alta': datetime.now().strftime("%d/%m/%Y"),
@@ -84,6 +87,7 @@ def createUser():
 
         db = Database.Database()
         db.insertUser(user)
+        print(request.json['Email'])
         return 'ok'
 
 @app.route('/admin/<int:id>', methods = ['DELETE'])
@@ -91,7 +95,7 @@ def deleteUser(id):
     user = list(filter(lambda t: t['id'] == id, users))
     if len(user) == 0:
         abort(404)
-    users.remove(user[0])
+    users.remove(request.json[0])
     return jsonify( { 'result': True } )
     
 if __name__ == '__main__':
