@@ -22,11 +22,9 @@ con.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
 
 cur = con.cursor()
 
-
 @app.errorhandler(404)
 def not_found(error):
     return make_response(jsonify({'error': 'Not found'}), 404)
-
 
 @app.route('/admin', methods=['GET', 'POST'])
 def createAdmin():
@@ -58,18 +56,18 @@ def login():
         }
 
         con.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
-
+        sentencia = "select * from usuario where usuario.email = '" + request.json['Email'] + "' and usuario.contrasena = '" + request.json['Password'] + "';"
+        print(sentencia)
         cur = con.cursor()
-        cur.execute("select * from usuario where usuario.email = '" +
-                    request.json['Email'] + "' and usuario.contrasena = '" + request.json['Password'] + "';")
-        response = cur.fetchone()
+        cur.execute(sentencia)
+        response = cur.fetchall()
         print(response)
         cur.close
 
-        if response:
+        if response is not None:
             # auth_token = self.encode_auth_token(row[0])
             # print(auth_token)
-            return 'OK'
+            return jsonify(response)
         else:
             result = 'email y/o contraseña incorrectos'
             return 'KO'
