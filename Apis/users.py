@@ -39,21 +39,17 @@ def createAdmin():
             'fecha_baja': 'NULL'
         }
 
-        con.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
-        cur = con.cursor()
-        cur.execute("insert into usuario (usuario,contrasena,nombre,apellidos,telefono,fecha_alta,fecha_baja,administrador) values (" + request.json['user'] + "," + request.json['password'] + "," + request.json['name'] + "," + request.json['surnames'] + "," + request.json['phone'] + "," + date.today().strftime("%m/%d/%Y") + "," + NULL + ",False);")
-
-        # db = Database.Database()
-        # db.insertUser(user)
+        db = Database.Database()
+        db.insertUser(user)
         return 'ok'
 
 @app.route('/login',methods=['GET','POST'])
 def login():
     if request.method == 'POST':
         user = dict()
-        request.json['usuario'] = request.form["usuario"]
+        user['usuario'] = request.form["usuario"]
         h = hashlib.sha1(request.form["contrasena"].encode('utf-8')).hexdigest()
-        request.json['contrasena'] = h    
+        user['contrasena'] = h    
         bd = Database.Database() 
         response = bd.login(user)
         if response == "":
@@ -67,7 +63,7 @@ def get_user(id):
     user = list(filter(lambda t: t['id'] == id, users))
     if len(user) == 0:
         abort(404)
-    return jsonify( { 'user': request.json[0] } )
+    return jsonify( { 'user': user[0] } )
 
 @app.route('/register', methods = ['GET', 'POST'])
 def createUser():
@@ -78,16 +74,19 @@ def createUser():
             'email': request.json['Email'],
             'name': request.json['Name'],
             'surnames': request.json['lastName'],
-            'password': request.json['Password']
+            'password': request.json['Password'],
             'admin': False,
             'phone': request.json['Phone'],
             'fecha_alta': datetime.now().strftime("%d/%m/%Y"),
             'fecha_baja': 'NULL'
         }
-
-        db = Database.Database()
-        db.insertUser(user)
         print(request.json['Email'])
+        con.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+        cur = con.cursor()
+        cur.execute("insert into usuario (email,contrasena,nombre,apellidos,telefono,fecha_alta,fecha_baja,administrador) values ('" + request.json['Email'] +  "','" + request.json['Password'] + "','" + request.json['Name'] + "','" + request.json['lastName'] + "','" + request.json['Phone'] + "','" + date.today().strftime("%Y-%m-%d") + "', NULL,False);")
+        cur.close
+        # db = Database.Database()
+        # db.insertUser(user)
         return 'ok'
 
 @app.route('/admin/<int:id>', methods = ['DELETE'])
@@ -95,7 +94,7 @@ def deleteUser(id):
     user = list(filter(lambda t: t['id'] == id, users))
     if len(user) == 0:
         abort(404)
-    users.remove(request.json[0])
+    users.remove(user[0])
     return jsonify( { 'result': True } )
     
 if __name__ == '__main__':
