@@ -1,4 +1,5 @@
-import psycopg2, hashlib, json, Database
+import psycopg2, hashlib, json
+from Databases import Database
 from flask import Flask, jsonify, abort, request, make_response, url_for
 from flask_cors import CORS, cross_origin
 from psycopg2 import sql
@@ -67,16 +68,16 @@ def get_user(id):
 
 @app.route('/register', methods = ['GET', 'POST'])
 def createUser():
-    if not request.json or not 'titulo' in request.json:
+    if not request.json or not 'Email' in request.json:
         abort(400)
     if request.method == 'POST':
         user = {
-            'email': request.json['email'],
-            'name': request.json['name'],
-            'surnames': request.json['surnames'],
-            'password': hashlib.sha1(request.json['password'].encode('utf-8')).hexdigest(),
+            'email': request.json['Email'],
+            'name': request.json['Name'],
+            'surnames': request.json['lastName'],
+            'password': hashlib.sha1(request.json['Password'].encode('utf-8')).hexdigest(),
             'admin': False,
-            'phone': request.json['phone'],
+            'phone': request.json['Phone'],
             'fecha_alta': datetime.now().strftime("%d/%m/%Y"),
             'fecha_baja': 'NULL'
         }
