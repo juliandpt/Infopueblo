@@ -1,7 +1,4 @@
-import psycopg2
-import hashlib
-import json
-import Database
+import psycopg2, hashlib, json
 from flask import Flask, jsonify, abort, request, make_response, url_for
 from flask_cors import CORS, cross_origin
 from psycopg2 import sql
@@ -36,14 +33,17 @@ def createAdmin():
             'name': request.json['name'],
             'surnames': request.json['surnames'],
             'password': hashlib.sha1(request.json['password'].encode('utf-8')).hexdigest(),
-            'admin': True,
+            'admin': 'True',
             'phone': request.json['phone'],
             'fecha_alta': datetime.now().strftime("%d/%m/%Y"),
             'fecha_baja': 'NULL'
         }
 
-        db = Database.Database()
-        db.insertUser(user)
+        con.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+        cur = con.cursor()
+        cur.execute("insert into usuario (email,contrasena,nombre,apellidos,telefono,fecha_alta,fecha_baja,administrador) values ('" +
+                    user['email'] + "','" + user['password'] + "','" + user['name'] + "','" + user['lastNames'] + "','" + user['phone'] + "','" + user['fecha_alta'] + "','" + user['fecha_baja'] + "','" + user['admin'] + "');'")
+        cur.close
         return 'ok'
 
 
@@ -51,12 +51,12 @@ def createAdmin():
 def login():
     if request.method == 'POST':
         user = {
-            'email': request.json['Email'],
-            'password': request.json['Password']
+            'email': request.json['email'],
+            'password': request.json['password']
         }
 
         con.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
-        sentencia = "select * from usuario where usuario.email = '" + request.json['Email'] + "' and usuario.contrasena = '" + request.json['Password'] + "';"
+        sentencia = "select * from usuario where usuario.email = '" + user['email'] + "' and usuario.contrasena = '" + user['password'] + "';"
         print(sentencia)
         cur = con.cursor()
         cur.execute(sentencia)
@@ -83,27 +83,25 @@ def get_user(id):
 
 @app.route('/register', methods=['GET', 'POST'])
 def createUser():
-    if not request.json or not 'Email' in request.json:
+    if not request.json or not 'email' in request.json:
         abort(400)
     if request.method == 'POST':
         user = {
-            'email': request.json['Email'],
-            'name': request.json['Name'],
-            'surnames': request.json['lastName'],
-            'password': request.json['Password'],
-            'admin': False,
-            'phone': request.json['Phone'],
+            'email': request.json['email'],
+            'name': request.json['name'],
+            'lastNames': request.json['lastNames'],
+            'password': request.json['password'],
+            'admin': 'False',
+            'phone': request.json['phone'],
             'fecha_alta': datetime.now().strftime("%d/%m/%Y"),
             'fecha_baja': 'NULL'
         }
-        print(request.json['Email'])
+
         con.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
         cur = con.cursor()
         cur.execute("insert into usuario (email,contrasena,nombre,apellidos,telefono,fecha_alta,fecha_baja,administrador) values ('" +
-                    request.json['Email'] + "','" + request.json['Password'] + "','" + request.json['Name'] + "','" + request.json['lastName'] + "','" + request.json['Phone'] + "','" + date.today().strftime("%Y-%m-%d") + "', NULL,False);")
+                    user['email'] + "','" + user['password'] + "','" + user['name'] + "','" + user['lastNames'] + "','" + user['phone'] + "','" + user['fecha_alta'] + "','" + user['fecha_baja'] + "','" + user['admin'] + "');'")
         cur.close
-        # db = Database.Database()
-        # db.insertUser(user)
         return 'ok'
 
 
