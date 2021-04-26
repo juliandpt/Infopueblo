@@ -1,4 +1,4 @@
-import psycopg2, hashlib, json
+import psycopg2, hashlib, json, jwt
 from flask import Flask, jsonify, abort, request, make_response, url_for
 from flask_cors import CORS, cross_origin
 from psycopg2 import sql
@@ -31,21 +31,19 @@ def createAdmin():
         user = {
             'email': request.json['email'],
             'name': request.json['name'],
-            'surnames': request.json['surnames'],
-            'password': hashlib.sha1(request.json['password'].encode('utf-8')).hexdigest(),
-            'admin': 'True',
+            'last_names': request.json['surnames'],
+            'password': request.json['password'],
             'phone': request.json['phone'],
-            'fecha_alta': datetime.now().strftime("%d/%m/%Y"),
-            'fecha_baja': 'NULL'
+            'register_date': datetime.now().strftime("%d/%m/%Y"),
         }
 
         con.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
         cur = con.cursor()
-        cur.execute("insert into usuario (email,contrasena,nombre,apellidos,telefono,fecha_alta,fecha_baja,administrador) values ('" +
-                    user['email'] + "','" + user['password'] + "','" + user['name'] + "','" + user['lastNames'] + "','" + user['phone'] + "','" + user['fecha_alta'] + "','" + user['fecha_baja'] + "','" + user['admin'] + "');'")
+        cur.execute("insert into users (email,password,name,surnames,phone,entry_date,leaving_date,admin,token) values ('" +
+                    user['email'] + "','" + user['password'] + "','" + user['name'] + "','" + user['surnames'] + "','" + user['phone'] + "','" + user['entry_date'] + "',NULL,true,NULL);")
         cur.close
-        return 'ok'
-
+        
+        return jsonify({'message': 'admin registred correctly'})
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -56,22 +54,29 @@ def login():
         }
 
         con.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
-        sentencia = "select * from usuario where usuario.email = '" + user['email'] + "' and usuario.contrasena = '" + user['password'] + "';"
-        print(sentencia)
         cur = con.cursor()
-        cur.execute(sentencia)
+        cur.execute("select * from user where user.email = '" + user['email'] + "' and user.password = '" + user['password'] + "';")
         response = cur.fetchall()
-        print(response)
         cur.close
 
-        if response is not None:
-            # auth_token = self.encode_auth_token(row[0])
-            # print(auth_token)
-            return jsonify(response)
+        if response is None:
+            result = {
+                'message': 'Credenciales incorrectas',
+            }
+            return jsonify(result, status = 400)
         else:
-            result = 'email y/o contraseña incorrectos'
-            return 'KO'
+            payload = {
+                'user_id': user.id,
+                'exp': datetime.time(hour = 1)
+            }
+            token = jwt.encode(payload, 'secret', 'HS256')
 
+            result = {
+                'message': 'Credenciales correctas',
+                'token': token.decode('utf-8')
+            }
+
+            return jsonify(result)
 
 @app.route('/user/<int:id>', methods=['GET'])
 def get_user(id):
@@ -79,7 +84,6 @@ def get_user(id):
     if len(user) == 0:
         abort(404)
     return jsonify({'user': user[0]})
-
 
 @app.route('/register', methods=['GET', 'POST'])
 def createUser():
@@ -89,21 +93,19 @@ def createUser():
         user = {
             'email': request.json['email'],
             'name': request.json['name'],
-            'lastNames': request.json['lastNames'],
+            'surnames': request.json['surnames'],
             'password': request.json['password'],
-            'admin': 'False',
             'phone': request.json['phone'],
-            'fecha_alta': datetime.now().strftime("%d/%m/%Y"),
-            'fecha_baja': 'NULL'
+            'entry_date': datetime.now().strftime("%Y-%m-%d")
         }
 
         con.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
         cur = con.cursor()
-        cur.execute("insert into usuario (email,contrasena,nombre,apellidos,telefono,fecha_alta,fecha_baja,administrador) values ('" +
-                    user['email'] + "','" + user['password'] + "','" + user['name'] + "','" + user['lastNames'] + "','" + user['phone'] + "','" + user['fecha_alta'] + "','" + user['fecha_baja'] + "','" + user['admin'] + "');'")
+        cur.execute("insert into users (email,password,name,surnames,phone,entry_date,leaving_date,admin,token) values ('" +
+                    user['email'] + "','" + user['password'] + "','" + user['name'] + "','" + user['surnames'] + "','" + user['phone'] + "','" + user['entry_date'] + "',NULL,false,NULL);")
         cur.close
-        return 'ok'
 
+        return jsonify({'message': 'user registred correctly'})
 
 @app.route('/admin/<int:id>', methods=['DELETE'])
 def deleteUser(id):
@@ -112,7 +114,6 @@ def deleteUser(id):
         abort(404)
     users.remove(user[0])
     return jsonify({'result': True})
-
 
 if __name__ == '__main__':
     app.run(debug=True)

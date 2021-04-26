@@ -7,7 +7,6 @@ Desarrollo de código de la parte backend del Proyecto de Computación I, II y I
 - Heroku
 - Postgresql
 - Flask
-- Sha 1
 
 # Comandos de instalación
 
@@ -27,10 +26,4 @@ Flask-Cors:
 
 ```sh
 pip install Flask-Cors
-```
-
-Hashlib:
-
-```sh
-pip install hashlib
 ```
