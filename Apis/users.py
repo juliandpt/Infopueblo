@@ -1,4 +1,4 @@
-import psycopg2, hashlib, json, jwt
+import psycopg2, json, jwt
 from flask import Flask, jsonify, abort, request, make_response, url_for
 from flask_cors import CORS, cross_origin
 from psycopg2 import sql
@@ -40,10 +40,9 @@ def createAdmin():
         con.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
         cur = con.cursor()
         cur.execute("insert into users (email,password,name,surnames,phone,entry_date,leaving_date,admin,token) values ('" +
-                    user['email'] + "','" + user['password'] + "','" + user['name'] + "','" + user['surnames'] + "','" + user['phone'] + "','" + user['entry_date'] + "',NULL,true,NULL);")
+                    user['email'] + "','" + user['password'] + "','" + user['name'] + "','" + user['surnames'] + "','" + user['phone'] + "','" + user['entry_date'] + "','" + user['leaving_date'] + "','" + user['admin'] + "','" + user['token'] + "');'")
         cur.close
-        
-        return jsonify({'message': 'admin registred correctly'})
+        return 'ok'
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -55,7 +54,7 @@ def login():
 
         con.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
         cur = con.cursor()
-        cur.execute("select * from user where user.email = '" + user['email'] + "' and user.password = '" + user['password'] + "';")
+        cur.execute("select * from users where users.email = '" + user['email'] + "' and users.password = '" + user['password'] + "';")
         response = cur.fetchall()
         cur.close
 
@@ -98,14 +97,13 @@ def createUser():
             'phone': request.json['phone'],
             'entry_date': datetime.now().strftime("%Y-%m-%d")
         }
-
+        print(user['email'])
         con.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
         cur = con.cursor()
         cur.execute("insert into users (email,password,name,surnames,phone,entry_date,leaving_date,admin,token) values ('" +
                     user['email'] + "','" + user['password'] + "','" + user['name'] + "','" + user['surnames'] + "','" + user['phone'] + "','" + user['entry_date'] + "',NULL,false,NULL);")
         cur.close
-
-        return jsonify({'message': 'user registred correctly'})
+        return 'ok'
 
 @app.route('/admin/<int:id>', methods=['DELETE'])
 def deleteUser(id):
