@@ -1,9 +1,8 @@
-import psycopg2, hashlib, json, jwt
+import psycopg2, hashlib, json, jwt, datetime
 from flask import Flask, jsonify, abort, request, make_response, url_for
 from flask_cors import CORS, cross_origin
 from psycopg2 import sql
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
-from datetime import date, datetime
 
 app = Flask(__name__)
 
@@ -27,16 +26,19 @@ def createAdmin():
         user = {
             'email': request.json['email'],
             'name': request.json['name'],
-            'surnames': request.json['surnames'],
+            'last_names': request.json['surnames'],
             'password': request.json['password'],
+            'admin': 'True',
             'phone': request.json['phone'],
-            'entry_date': datetime.now().strftime("%Y-%m-%d")
+            'register_date': datetime.now().strftime("%d/%m/%Y"),
+            'delete_date': 'NULL',
+            'token': 'NULL'
         }
-        print(user['email'])
+
         con.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
         cur = con.cursor()
         cur.execute("insert into users (email,password,name,surnames,phone,entry_date,leaving_date,admin,token) values ('" +
-                    user['email'] + "','" + user['password'] + "','" + user['name'] + "','" + user['surnames'] + "','" + user['phone'] + "','" + user['entry_date'] + "',NULL,true,NULL);")
+                    user['email'] + "','" + user['password'] + "','" + user['name'] + "','" + user['surnames'] + "','" + user['phone'] + "','" + user['entry_date'] + "','" + user['leaving_date'] + "','" + user['admin'] + "','" + user['token'] + "');'")
         cur.close
         return 'ok'
 
@@ -52,33 +54,67 @@ def login():
         cur = con.cursor()
         cur.execute("select * from users where users.email = '" + user['email'] + "' and users.password = '" + user['password'] + "';")
         response = cur.fetchall()
-        print(response)
         cur.close
 
-        if response is None:
+        if response == []:
             result = {
                 'message': 'Access denied'
             }
+
             return jsonify(result)
         else:
             for row in response:
                 userid = row[0]
-            print(userid)
-            claims = {
-                'userid': userid,
-                "jti": "9cbfbd5b-0ff2-410c-84c4-5f2ab912ae7b",
-                "iat": 1619560577,
-                "exp": 1619564177
-            }
+                token = row[9]
 
-            token = jwt.encode(claims, "secret", "HS256")
+            if token == 'NULL':   
+                claims = {
+                    'userid': userid,
+                    'exp': datetime.datetime.utcnow() + datetime.timedelta(days=20),
+                    'iat': datetime.datetime.utcnow() #Fecha de creación
+                }
 
-            result = {
-                'message': 'Access allowed',
-                'token': token
-            }
+                token = jwt.encode(claims, "secret", "HS256")
 
-            return jsonify(result)
+                con.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+                cur = con.cursor()
+                cur.execute("update users set token = '" + token + "' where id_user =" + str(userid))
+                cur.close
+
+                result = {
+                    'message': 'Access allowed',
+                    'token': token
+                }
+
+                return jsonify(result)
+            elif validateToken(token) == False:
+                claims = {
+                    'userid': userid,
+                    'exp': datetime.datetime.utcnow() + datetime.timedelta(days=20),
+                    'iat': datetime.datetime.utcnow() #Fecha de creación
+                }
+
+                token = jwt.encode(claims, "secret", "HS256")
+
+                con.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+                cur = con.cursor()
+                cur.execute("update users set token = '" + token + "' where id_user =" + str(userid))
+                cur.close
+
+                result = {
+                    'message': 'Access allowed',
+                    'token': token
+                }
+
+                return jsonify(result)
+            else:
+                result = {
+                    'message': 'Access allowed',
+                    'token': token
+                }
+                print('existe')
+
+                return jsonify(result)
 
 @app.route('/user/<int:id>', methods=['GET'])
 def get_user(id):
@@ -115,6 +151,28 @@ def deleteUser(id):
         abort(404)
     users.remove(user[0])
     return jsonify({'result': True})
+
+# FUNCIONES SIN CONEXIÓN
+
+def validateToken(token):
+    try:
+        decodedToken = jwt.decode(token, "secret", "HS256")
+        userid = decodedToken['userid']
+
+        con.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+        cur = con.cursor()
+        cur.execute("select token from users where users.Id_user = '" + str(userid) + "';")
+        response = cur.fetchone()
+        cur.close
+
+        if response[0] == token:
+            return True
+        else:
+            return False
+    except jwt.ExpiredSignatureError:
+        return False
+    except jwt.InvalidTokenError:
+        return False
 
 if __name__ == '__main__':
     app.run(debug=True)
