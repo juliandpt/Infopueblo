@@ -1,4 +1,5 @@
-import psycopg2, hashlib, json, jwt, datetime
+import psycopg2, jwt, datetime
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 from flask import Flask, jsonify, abort, request, make_response, url_for
 from flask_cors import CORS, cross_origin
 from psycopg2 import sql
@@ -17,6 +18,19 @@ con = psycopg2.connect(dbname='d20hkpogjrcusn',
 @app.errorhandler(404)
 def not_found(error):
     return make_response(jsonify({'error': 'Not found'}), 404)
+
+@app.route('/analisis', methods = ['POST'])
+def create_texto():
+    if not request.json or not 'cuerpo' in request.json:
+        abort(400)
+    texto = {
+        'cuerpo': request.json['cuerpo'],
+    }
+
+    sentence = texto['cuerpo']
+    analyzer = SentimentIntensityAnalyzer().polarity_scores(sentence)
+    print(analyzer)
+    return jsonify(analyzer), 201
 
 @app.route('/admin', methods=['GET', 'POST'])
 def createAdmin():
@@ -53,19 +67,18 @@ def login():
         con.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
         cur = con.cursor()
         cur.execute("select * from users where users.email = '" + user['email'] + "' and users.password = '" + user['password'] + "';")
-        response = cur.fetchall()
+        response = cur.fetchone()
         cur.close
 
-        if response == []:
+        if response in None:
             result = {
                 'message': 'Access denied'
             }
 
             return jsonify(result)
         else:
-            for row in response:
-                userid = row[0]
-                token = row[9]
+            userid = response[0]
+            token = response[9]
 
             if token == 'NULL':   
                 claims = {
@@ -102,14 +115,14 @@ def login():
                 cur.close
 
                 result = {
-                    'message': 'Access allowed',
+                    'message': 'access allowed',
                     'token': token
                 }
 
                 return jsonify(result)
             else:
                 result = {
-                    'message': 'Access allowed',
+                    'message': 'access allowed',
                     'token': token
                 }
                 print('existe')
@@ -134,15 +147,25 @@ def createUser():
             'surnames': request.json['surnames'],
             'password': request.json['password'],
             'phone': request.json['phone'],
-            'entry_date': datetime.now().strftime("%Y-%m-%d")
+            'entry_date': datetime.date.today()
         }
-        print(user['email'])
+        print(user['entry_date'])
+
         con.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
         cur = con.cursor()
-        cur.execute("insert into users (email,password,name,surnames,phone,entry_date,leaving_date,admin,token) values ('" +
-                    user['email'] + "','" + user['password'] + "','" + user['name'] + "','" + user['surnames'] + "','" + user['phone'] + "','" + user['entry_date'] + "',NULL,false,NULL);")
+        cur.execute("select email from users where users.email = '" + user['email'] + "';")
+        response = cur.fetchall()
         cur.close
-        return 'ok'
+
+        if response == []:
+            con.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+            cur = con.cursor()
+            cur.execute("insert into users (email,password,name,surnames,phone,entry_date,leaving_date,admin,token) values ('" +
+                        user['email'] + "','" + user['password'] + "','" + user['name'] + "','" + user['surnames'] + "','" + user['phone'] + "','" + str(user['entry_date']) + "',NULL,false,NULL);")
+            cur.close
+            return jsonify({'message': 'user created'})
+        else:
+            return jsonify({'message': 'user not created'})
 
 @app.route('/admin/<int:id>', methods=['DELETE'])
 def deleteUser(id):
