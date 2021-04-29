@@ -6,7 +6,8 @@ Desarrollo de código de la parte backend del Proyecto de Computación I, II y I
 
 - Heroku
 - Postgresql
-- Flask
+- Node.js
+- Express
 
 # Comandos de instalación
 
@@ -19,11 +20,5 @@ pip install psycopg2
 Flask:
 
 ```sh
-pip install Flask
-```
-
-Flask-Cors:
-
-```sh
-pip install Flask-Cors
+npm install express --save
 ```

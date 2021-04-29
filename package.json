@@ -1,0 +1,23 @@
+{
+  "name": "proyectodecomputacion-backend",
+  "version": "1.0.0",
+  "description": "backend proyecto de computacion",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/julidpt/ProyectoDeComputacion-Backend.git"
+  },
+  "author": "Julian de Pablo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/julidpt/ProyectoDeComputacion-Backend/issues"
+  },
+  "homepage": "https://github.com/julidpt/ProyectoDeComputacion-Backend#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1"
+  }
+}
