@@ -108,7 +108,33 @@ app.get('/', (req, res) => {
     .catch((err) => res.json(err));
 });
 
-function authenticateToken(req, res, next) {
+//Middlewares
+
+function authenticateToken(token) {
+    try {
+        decodedToken = jwt.decode(token)
+        var userid = decodedToken.userid
+
+        await client.connect()
+        const query = {
+            text: 'SELECT token FROM users WHERE users.id_user = $1',
+            values: [userid],
+            rowMode: 'array'
+        }
+        const result = await client.query(query)
+        client.end()
+
+        if(result.body.token != 'NULL') {
+            return true
+        } else {
+            return false
+        }
+    } catch {
+        r
+    }
+}
+
+function authenticateToken2(req, res, next) {
     const authHeader = req.headers['authorization']
     const token = authHeader && authHeader.split(' ')[1]
     if (token == null) {
