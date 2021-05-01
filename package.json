@@ -19,6 +19,7 @@
   "homepage": "https://github.com/julidpt/ProyectoDeComputacion-Backend#readme",
   "dependencies": {
     "crypto-js": "^4.0.0",
+    "date-and-time": "^1.0.0",
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
     "pg": "^8.6.0",
