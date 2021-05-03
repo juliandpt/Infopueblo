@@ -2,10 +2,10 @@ const { Pool, Client } = require('pg')
 const express = require('express')
 const jwt = require('jsonwebtoken')
 const sha = require('sha1')
-const date = require('date-and-time')
+const d = require('date-and-time')
 
 const app = express();
-const pool = new Pool({
+const client = new Client({
     user: "amvnwrnjzqtkgh",
     host: "ec2-99-80-200-225.eu-west-1.compute.amazonaws.com",
     database: "d20hkpogjrcusn",
@@ -34,15 +34,21 @@ app.get('/helloworld', (req, res) => {
 });
 
 app.post('/login', async (req, res) => {
-    console.log(req)
-    await pool.connect()
+    console.log(req.body)
+    await client.connect()
     const query = {
         text: 'SELECT * FROM users WHERE users.email = $1 and users.password = $2',
         values: [req.body.email, sha(req.body.password)],
         rowMode: 'array'
     }
-    const result = await pool.query(query)
-    pool.end()
+    const result = await client.query(query)
+    client.end(err => {
+        console.log('client has disconnected')
+        if (err) {
+          console.log('error during disconnection', err.stack)
+        }
+    })
+    console.log(result.rows)
 
     if (result.rowCount == 0) {
         return res.status(400).json({
@@ -51,17 +57,20 @@ app.post('/login', async (req, res) => {
     }
 
     var userid = result.rows[0][0];
+    console.log(userid)
     var password = result.rows[0][2];
+    console.log(password)
 
     const now = new Date();
-    today = date.format(now, 'YYYY-MM-DD')
+    today = d.format(now, 'YYYY-MM-DD')
+    console.log(today)
 
     try{
         if (sha(req.body.password) == password) {
             var claims = {
                 'userid': userid,
-                'exp': today + 24,
-                'iat': today //Fecha de creación
+                'exp': Date.now(),
+                'iat': Date.now() //Fecha de creación
             }
         
             const accessToken = jwt.sign(claims, '3ea3967ae8328f89eda5be264d5af88b83d490afc9218d02e5628e07bf89850e828eef80c4085c20e4a394f5a7792773347e7a6492b0e05e54f321a34b7ed20b')
@@ -77,7 +86,9 @@ app.post('/login', async (req, res) => {
             }); //mirar http valor
         }
     } catch {
-        return res.status(500).send()
+        return res.json({
+            message: 'este'
+        })
     }
 
     // cambiar datetime
@@ -89,16 +100,16 @@ app.post('/register', (req, res) => {
 
         const now = new Date();
         today = date.format(now, 'YYYY-MM-DD')
-        pool.connect().then(() => console.log("Connected to db"));
-        //var query = "INSERT INTO users (email,password,name,surnames,phone,entry_date,leaving_date,admin,token) VALUES ($1,$2,$3,$4,$5,$6,NULL,false,NULL);",[req.body.email, sha(req.body.password), req.body.name, req.body.surnames, req.body.phone, date.getMonth()+1 +'-'+date.getDate()+'-'+date.getFullYear()],
+
+        client.connect().then(() => console.log("Connected to db"));
         var query = {            
             text: "INSERT INTO users (email,password,name,surnames,phone,entry_date,leaving_date,admin,token) VALUES ($1,$2,$3,$4,$5,$6,NULL,false,NULL);",
             values: [req.body.email, sha(req.body.password), req.body.name, req.body.surnames, req.body.phone, today],
             rowMode: 'array'
         }
-        var result = pool.query(query)
-        pool.end();
-        // var result = pool.query("INSERT INTO users(email,password,name,surnames,phone,entry_date,leaving_date,admin,token) VALUES ($1,$2,$3,$4,$5,$6,NULL,false,NULL);",[req.body.email, sha(req.body.password), req.body.name, req.body.surnames, req.body.phone, today]);
+        var result = client.query(query)
+        client.end();
+        // var result = client.query("INSERT INTO users(email,password,name,surnames,phone,entry_date,leaving_date,admin,token) VALUES ($1,$2,$3,$4,$5,$6,NULL,false,NULL);",[req.body.email, sha(req.body.password), req.body.name, req.body.surnames, req.body.phone, today]);
 
         return res.json({
             message: 'ok'
@@ -111,7 +122,7 @@ app.post('/register', (req, res) => {
 })
 
 app.get('/', (req, res) => {
-    pool.query(`SELECT * FROM users;`)
+    client.query(`SELECT * FROM users;`)
     .then((table) => res.json({ data: table.rows }))
     .catch((err) => res.json(err));
 });
@@ -123,14 +134,14 @@ async function authenticateToken(token) {
         decodedToken = jwt.decode(token)
         var userid = decodedToken.userid
 
-        await pool.connect()
+        await client.connect()
         const query = {
             text: 'SELECT token FROM users WHERE users.id_user = $1',
             values: [userid],
             rowMode: 'array'
         }
-        const result = await pool.query(query)
-        pool.end()
+        const result = await client.query(query)
+        client.end()
 
         if(result.body.token != 'NULL') {
             return true
@@ -138,24 +149,8 @@ async function authenticateToken(token) {
             return false
         }
     } catch {
-        r
+        return false
     }
-}
-
-function authenticateToken2(req, res, next) {
-    const authHeader = req.headers['authorization']
-    const token = authHeader && authHeader.split(' ')[1]
-    if (token == null) {
-        return res.sendStatus(401)
-    }
-
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-        if (err) {
-            return res.sendStatus(403)
-        }
-        req.user = user
-        next()
-    })
 }
 
 app.listen(8080, () => console.log(`Server initialized on port ${app.get('port')}`));
