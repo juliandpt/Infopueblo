@@ -17,7 +17,7 @@ const client = new Client({
         rejectUnauthorized: false
     }
 });
-const scraperAirbnb = spawn('python',["path/to/script.py", arg1, arg2])
+const scraperAirbnb = spawn('python',["./WebScrapers/airbnb.py", arg1, arg2])
 
 app.use(express.json())
 app.set('port', process.env.PORT || 8080)
@@ -124,8 +124,11 @@ app.post('/register', (req, res) => {
     }   
 })
 
-app.get('/towns', (req, res)=> {
-    
+app.get('/search', (req, res)=> {
+    const child = spawn('python', ['./WebScrapers/20minutos.py', req.body.text]);
+    child.stdout.on('data', (data) => {
+        console.log(`stdout: ${data}`);
+    });
 })
 
 //Middlewares
@@ -137,7 +140,7 @@ async function authenticateToken(token) {
 
         await client.connect()
         const query = {
-            text: 'SELECT token FROM users WHERE users.id_user = $1',
+            text: 'SELECT token FROM users WHERE users.id_user = ?',
             values: [userid],
             rowMode: 'array'
         }

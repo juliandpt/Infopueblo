@@ -1,10 +1,12 @@
 from bs4 import BeautifulSoup
 import pandas as pd
 import requests
+import sys
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 import time
 import json
 
+textN = sys.argv[1]
 text = input("Introduce un lugar: ")
 num_news = int(input("Introduce el numero de noticias: "))
 place = text.replace(" ", "-")
