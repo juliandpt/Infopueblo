@@ -17,8 +17,8 @@ const client = new Client({
         rejectUnauthorized: false
     }
 });
-// const scraperAirbnb = spawn('python',["path/to/script.py", arg1, arg2])
-client.connect();
+const scraperAirbnb = spawn('python',["./WebScrapers/airbnb.py", arg1, arg2])
+
 app.use(express.json())
 app.set('port', process.env.PORT || 8080)
 app.use((req, res, next) => {
@@ -31,21 +31,19 @@ app.use((req, res, next) => {
 
 app.post('/login', async (req, res) => {
     console.log(req.body)
-
-    // const query = {
-    //     values: [req.body.email, sha(req.body.password)],
-    //     text: 'SELECT * FROM users WHERE users.email = $1 and users.password = $2',
-    //     rowMode: 'array'
-    // }
-    const query = 'SELECT * FROM users WHERE users.email = '+ req.body.email + 'and users.password = ' + sha(req.body.password)
+    await client.connect()
+    const query = {
+        text: 'SELECT * FROM users WHERE users.email = ? and users.password = ?',
+        values: [req.body.email, sha(req.body.password)],
+        rowMode: 'array'
+    }
     const result = await client.query(query)
-    console.log(result)
-    // client.end(err => {
-    //     console.log('client has disconnected')
-    //     if (err) {
-    //       console.log('error during disconnection', err.stack)
-    //     }
-    // })
+    client.end(err => {
+        console.log('client has disconnected')
+        if (err) {
+          console.log('error during disconnection', err.stack)
+        }
+    })
     console.log(result.rows)
 
     if (result.rowCount == 0) {
@@ -54,9 +52,10 @@ app.post('/login', async (req, res) => {
         })
     }
 
-    
-    console.log(result)
-
+    var userid = result.rows[0][0];
+    console.log(userid)
+    var password = result.rows[0][2];
+    console.log(password)
 
     try{
         if (sha(req.body.password) == password) {
@@ -69,13 +68,20 @@ app.post('/login', async (req, res) => {
             const accessToken = jwt.sign(claims, '3ea3967ae8328f89eda5be264d5af88b83d490afc9218d02e5628e07bf89850e828eef80c4085c20e4a394f5a7792773347e7a6492b0e05e54f321a34b7ed20b')
             console.log(accessToken)
 
+            await client.connect()
             const query = {
                 text: 'UPDATE USERS SET token = ? where id_user = ?',
                 values: [token, userid],
                 rowMode: 'array'
             }
-            client.query(query)
-            client.end();
+            await client.query(query)
+            client.end(err => {
+                console.log('client has disconnected')
+                if (err) {
+                console.log('error during disconnection', err.stack)
+                }
+            })
+
             return res.json({
                 message: 'ok',
                 token: accesToken
@@ -90,7 +96,6 @@ app.post('/login', async (req, res) => {
             message: 'este'
         })
     }
-
 })
 
 app.post('/register', (req, res) => {
@@ -99,12 +104,15 @@ app.post('/register', (req, res) => {
 
         const now = new Date();
         today = date.format(now, 'YYYY-MM-DD')
+
+        client.connect().then(() => console.log("Connected to db"));
         var query = {            
             text: "INSERT INTO users (email,password,name,surnames,phone,entry_date,leaving_date,admin,token) VALUES (?,?,?,?,?,?,NULL,false,NULL);",
             values: [req.body.email, sha(req.body.password), req.body.name, req.body.surnames, req.body.phone, today],
             rowMode: 'array'
         }
         var result = client.query(query)
+        client.end();
 
         return res.json({
             message: 'ok'
@@ -116,8 +124,11 @@ app.post('/register', (req, res) => {
     }   
 })
 
-app.get('/towns', (req, res)=> {
-    
+app.get('/search', (req, res)=> {
+    const child = spawn('python', ['./WebScrapers/20minutos.py', req.body.text]);
+    child.stdout.on('data', (data) => {
+        console.log(`stdout: ${data}`);
+    });
 })
 
 //Middlewares
@@ -129,7 +140,7 @@ async function authenticateToken(token) {
 
         await client.connect()
         const query = {
-            text: 'SELECT token FROM users WHERE users.id_user = $1',
+            text: 'SELECT token FROM users WHERE users.id_user = ?',
             values: [userid],
             rowMode: 'array'
         }
@@ -145,6 +156,5 @@ async function authenticateToken(token) {
         return false
     }
 }
-// client.end()
 
 app.listen(8080, () => console.log(`Server initialized on port ${app.get('port')}`));
