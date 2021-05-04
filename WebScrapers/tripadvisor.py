@@ -5,12 +5,12 @@ from random import randint
 from time import sleep 
 
 #Opiniones de hoteles
-html = requests.get('https://www.tripadvisor.es/Tourism-g187427-Spain-Vacations.html')
+html = requests.get('https://www.tripadvisor.es/Hotels')
 bsobj = soup(html.content,'lxml')
 
 linksHotel = []
 
-for review in bsobj.findAll('a',{'class':'_7c6GgQ6n _37QDe3gr'}):
+for review in bsobj.findAll('a',{'class':'item poi_name ui_link'}):
   a = review['href']
   a = 'https://www.tripadvisor.es'+ a
   a = a[:(a.find('Reviews')+7)] + '-or{}' + a[(a.find('Reviews')+7):]
@@ -26,16 +26,16 @@ for link in linksHotel:
   html2 = requests.get(link.format(i for i in range(5,1000,5)),headers=headers)
   sleep(2)
   bsobj2 = soup(html2.content,'lxml')
-  for r in bsobj2.findAll('span',{'class':'_3jEYFo-z'}):
-    reviewsHotel.append(r.q.text.strip())
-    print(r.q.text.strip())
+  for r in bsobj2.findAll('q'):
+    reviewsHotel.append(r.span.text.strip())
+    print(r.span.text.strip())
 
 #Metemos las opiniones obtenidas en un archivo .json
 with open('WebScrapers/resultado/tripAdvisorHoteles.json', 'w', encoding='utf-8') as file:
     json.dump(reviewsHotel, file, ensure_ascii=False, indent=4)  # Guardando salida en formato JSON
 
 # #Opiniones de restaurantes
-# html = requests.get('https://www.tripadvisor.es/Restaurants')
+# html = requests.get('https://www.tripadvisor.es/Hotels')
 # bsobj = soup(html.content,'lxml')
 
 # linksRestaurantes = []
