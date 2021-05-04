@@ -2,6 +2,7 @@ const { Pool, Client } = require('pg')
 const express = require('express')
 const jwt = require('jsonwebtoken')
 const sha = require('sha1')
+const spawn = require('child_process').spawn
 const d = require('date-and-time')
 
 const app = express();
@@ -16,6 +17,7 @@ const client = new Client({
         rejectUnauthorized: false
     }
 });
+const scraperAirbnb = spawn('python',["path/to/script.py", arg1, arg2])
 
 app.use(express.json())
 app.set('port', process.env.PORT || 8080)
@@ -27,17 +29,11 @@ app.use((req, res, next) => {
     next();
 });
 
-app.get('/helloworld', (req, res) => {
-    res.json({
-        message: 'Hello, World'
-    });
-});
-
 app.post('/login', async (req, res) => {
     console.log(req.body)
     await client.connect()
     const query = {
-        text: 'SELECT * FROM users WHERE users.email = $1 and users.password = $2',
+        text: 'SELECT * FROM users WHERE users.email = ? and users.password = ?',
         values: [req.body.email, sha(req.body.password)],
         rowMode: 'array'
     }
@@ -61,20 +57,30 @@ app.post('/login', async (req, res) => {
     var password = result.rows[0][2];
     console.log(password)
 
-    const now = new Date();
-    today = d.format(now, 'YYYY-MM-DD')
-    console.log(today)
-
     try{
         if (sha(req.body.password) == password) {
             var claims = {
-                'userid': userid,
-                'exp': Date.now(),
-                'iat': Date.now() //Fecha de creación
+                userid: userid,
+                exp: Date.now(),
+                iat: Date.now() //Fecha de creación
             }
         
             const accessToken = jwt.sign(claims, '3ea3967ae8328f89eda5be264d5af88b83d490afc9218d02e5628e07bf89850e828eef80c4085c20e4a394f5a7792773347e7a6492b0e05e54f321a34b7ed20b')
             console.log(accessToken)
+
+            await client.connect()
+            const query = {
+                text: 'UPDATE USERS SET token = ? where id_user = ?',
+                values: [token, userid],
+                rowMode: 'array'
+            }
+            await client.query(query)
+            client.end(err => {
+                console.log('client has disconnected')
+                if (err) {
+                console.log('error during disconnection', err.stack)
+                }
+            })
 
             return res.json({
                 message: 'ok',
@@ -90,8 +96,6 @@ app.post('/login', async (req, res) => {
             message: 'este'
         })
     }
-
-    // cambiar datetime
 })
 
 app.post('/register', (req, res) => {
@@ -103,13 +107,12 @@ app.post('/register', (req, res) => {
 
         client.connect().then(() => console.log("Connected to db"));
         var query = {            
-            text: "INSERT INTO users (email,password,name,surnames,phone,entry_date,leaving_date,admin,token) VALUES ($1,$2,$3,$4,$5,$6,NULL,false,NULL);",
+            text: "INSERT INTO users (email,password,name,surnames,phone,entry_date,leaving_date,admin,token) VALUES (?,?,?,?,?,?,NULL,false,NULL);",
             values: [req.body.email, sha(req.body.password), req.body.name, req.body.surnames, req.body.phone, today],
             rowMode: 'array'
         }
         var result = client.query(query)
         client.end();
-        // var result = client.query("INSERT INTO users(email,password,name,surnames,phone,entry_date,leaving_date,admin,token) VALUES ($1,$2,$3,$4,$5,$6,NULL,false,NULL);",[req.body.email, sha(req.body.password), req.body.name, req.body.surnames, req.body.phone, today]);
 
         return res.json({
             message: 'ok'
@@ -121,11 +124,9 @@ app.post('/register', (req, res) => {
     }   
 })
 
-app.get('/', (req, res) => {
-    client.query(`SELECT * FROM users;`)
-    .then((table) => res.json({ data: table.rows }))
-    .catch((err) => res.json(err));
-});
+app.get('/towns', (req, res)=> {
+    
+})
 
 //Middlewares
 
