@@ -1,4 +1,5 @@
-const { Pool, Client } = require('pg')
+const { Pool } = require('pg')
+const { PythonShell } = require('python-shell')
 const express = require('express')
 const jwt = require('jsonwebtoken')
 const sha = require('sha1')
@@ -12,7 +13,6 @@ const pool = new Pool({
         rejectUnauthorized: false
     }
 });
-// const scraperAirbnb = spawn('python',["./WebScrapers/airbnb.py", arg1, arg2])
 
 app.use(express.json())
 app.set('port', process.env.PORT || 8080)
@@ -34,16 +34,10 @@ app.post('/login', async (req, res) => {
     const query = "SELECT * FROM users WHERE users.email ='" + req.body.email +  "' and users.password = '" + sha(req.body.password) + "';"
     console.log(query)
     const result = await pool.query(query)
-    // pool.end(err => {
-    //     console.log('pool has disconnected')
-    //     if (err) {
-    //       console.log('error during disconnection', err.stack)
-    //     }
-    // })
     console.log(result)
 
     if (result.rowCount == 0) {
-        return res.status(400).json({
+        return res.json({
             message: 'ko'
         })
     }
@@ -72,12 +66,6 @@ app.post('/login', async (req, res) => {
             const query = "UPDATE users SET token = '" + accessToken +  "' where id_user = '" + userid + "';"
             const result2 = await pool.query(query)
             console.log(result2)
-            // pool.end(err => {
-            //     console.log('pool has disconnected')
-            //     if (err) {
-            //     console.log('error during disconnection', err.stack)
-            //     }
-            // })
 
             return res.json({
                 message: 'ok',
@@ -120,7 +108,9 @@ app.post('/register', (req, res) => {
 })
 
 app.get('/search', (req, res)=> {
-    const child = spawn('python', ['./WebScrapers/20minutos.py', req.body.text]);
+    console.log(req.body)
+    const child = spawn('python', ['./WebScrapers/prueba.py', req.body.text]);
+    console.log('1')
     child.stdout.on('data', (data) => {
         console.log(`stdout: ${data}`);
     });
