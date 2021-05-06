@@ -108,7 +108,7 @@ app.post('/register', (req, res) => {
     }   
 })
 
-app.get('/search', (req, res)=> {
+app.post('/search', (req, res)=> {
     console.log(req.body)
     const child = spawn('python', ['./WebScrapers/20minutos.py', req.body.text]);
     child.on("close", () => {
@@ -116,8 +116,24 @@ app.get('/search', (req, res)=> {
         
         var jsonContent = JSON.parse(contents)
 
-        console.log(jsonContent[0])
+        res.send(jsonContent[1].title)
     })
+})
+
+app.post('/search2', (req, res)=> {
+    console.log(req.body)
+    const child = spawn('python', ['./WebScrapers/20minutos.py', req.body.text]);
+    child.stdout.on('data', (data) => {
+        var jsonContent = JSON.parse(data.toString());
+        console.log(jsonContent[1].title);
+      });
+    // child.on("close", () => {
+    //     var contents = fs.readFileSync("./WebScrapers/resultado/20minutos.json");
+        
+    //     var jsonContent = JSON.parse(contents)
+
+    //     console.log(jsonContent[1].title)
+    // })
 })
 
 //Middlewares
