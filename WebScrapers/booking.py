@@ -1,6 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from bs4 import BeautifulSoup
+import sys
 import requests
 import time
 import json
@@ -14,7 +15,8 @@ cookies.click()
 time.sleep(1)
 
 search = driver.find_element_by_xpath('//*[@id="ss"]')
-place = input("Introduce un lugar: ")
+place = sys.argv[1]
+#place = input("Introduce un lugar: ")
 numberHotels = int(input("¿Cuántos hoteles quieres ver? "))
 search.send_keys(place)
 time.sleep(1)

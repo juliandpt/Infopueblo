@@ -14,7 +14,6 @@ for review in bsobj.findAll('a',{'class':'item poi_name ui_link'}):
   a = review['href']
   a = 'https://www.tripadvisor.es'+ a
   a = a[:(a.find('Reviews')+7)] + '-or{}' + a[(a.find('Reviews')+7):]
-  # print(a)
   linksHotel.append(a)
 print(linksHotel)
 

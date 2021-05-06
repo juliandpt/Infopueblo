@@ -1,9 +1,11 @@
 from bs4 import *
 import pandas as pd
 import requests
+import sys
 import time
 import json
 
+text = sys.argv[1]
 text = input("Introduce un lugar: ")
 num_offers = int(input("Introduce el numero de ofertas: "))
 place = text.replace(" ", "-")

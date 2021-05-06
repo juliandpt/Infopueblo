@@ -1,7 +1,6 @@
 const { Pool } = require('pg')
 const { PythonShell } = require('python-shell')
 const fs = require('fs')
-const utf8 = require('utf8');
 const express = require('express')
 const jwt = require('jsonwebtoken')
 const sha = require('sha1')
@@ -113,9 +112,11 @@ app.get('/search', (req, res)=> {
     console.log(req.body)
     const child = spawn('python', ['./WebScrapers/20minutos.py', req.body.text]);
     child.on("close", () => {
-        fs.readFile('./WebScrapers/resultado/20minutos.json', 'utf-8', (err, jsonString) => {
-            res.send(jsonString);
-        })
+        var contents = fs.readFileSync("./WebScrapers/resultado/20minutos.json");
+        
+        var jsonContent = JSON.parse(contents)
+
+        console.log(jsonContent[0])
     })
 })
 

@@ -1,13 +1,15 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
+import sys
 import requests
 import time
 import json
 
 apartments= {}
 id = 1
-destiny = input("Introduzca el destino: ")
+destiny = sys.argv[1]
+#destiny = input("Introduzca el destino: ")
 
 url = f'https://www.airbnb.es/s/' +  destiny + '/homes?tab_id=home_tab&refinement_paths%5B%5D=%2Fhomes&flexible_trip_dates%5B%5D=june&flexible_trip_dates%5B%5D=may&flexible_trip_lengths%5B%5D=weekend_trip&date_picker_type=calendar&source=structured_search_input_header&search_type=search_query'
 html = requests.get(url)
