@@ -1,5 +1,7 @@
 const { Pool } = require('pg')
 const { PythonShell } = require('python-shell')
+const fs = require('fs')
+const utf8 = require('utf8');
 const express = require('express')
 const jwt = require('jsonwebtoken')
 const sha = require('sha1')
@@ -109,11 +111,12 @@ app.post('/register', (req, res) => {
 
 app.get('/search', (req, res)=> {
     console.log(req.body)
-    const child = spawn('python', ['./WebScrapers/prueba.py', req.body.text]);
-    console.log('1')
-    child.stdout.on('data', (data) => {
-        console.log(`stdout: ${data}`);
-    });
+    const child = spawn('python', ['./WebScrapers/20minutos.py', req.body.text]);
+    child.on("close", () => {
+        fs.readFile('./WebScrapers/resultado/20minutos.json', 'utf-8', (err, jsonString) => {
+            res.send(jsonString);
+        })
+    })
 })
 
 //Middlewares
