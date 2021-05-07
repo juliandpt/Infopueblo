@@ -129,14 +129,19 @@ app.post('/register', async(req, res) => {
         var result = pool.query(query)
         sendGridMail.setApiKey('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');
         url = 'http://127.0.0.1:8080/validate?email='+ email + '&token=' + accessToken
+        
         function getMessage() {
         const body = 'Haz click en el siguiente link para validar tu cuenta: ' + url;
         return {
             to: email,
             from: 'correoguapisimo@outlook.com',
             subject: 'Valida tu cuenta!',
-            text: body,
-            html: `<strong>${body}</strong>`,
+            templateId: 'd-8170e316f5b542dda528d66c79116be8',
+            dynamicTemplateData: {
+                subject: 'Valida tu cuenta!',
+                user: req.body.name,
+                url: url,
+              },
         };
         }
 
