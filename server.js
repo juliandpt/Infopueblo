@@ -85,6 +85,7 @@ app.post('/login', async (req, res) => {
         })
     }
 })
+
 app.get('/validate', async (req, res) => {
     console.log(req.query)
     // const query = {
@@ -170,6 +171,65 @@ app.post('/register', async(req, res) => {
             message: 'ko'
         });
     }   
+})
+
+app.post('/user', (req, res) => {
+    if (authenticateToken(req.body.token) == false) {
+        res.json({
+            message: "ko"
+        })
+    } else {
+        try {
+            decodedToken = jwt.decode(token)
+            var userid = decodedToken.userid
+
+            const query = "SELECT * FROM users WHERE users.Id_user ='" + userid +  "';"
+            const result = pool.query(query)
+
+            var name = result.rows[0].name;
+            var surnames = result.rows[0].surnames;
+
+            return res.json({
+                message: "ok",
+                name: name,
+                surnames: surnames
+            })
+        } catch {
+            return res.json({
+                message: "ko info",
+            })
+        }
+    }
+})
+
+app.post('/user/delete', (req, res) => {
+    if (authenticateToken(req.body.token) == false) {
+        res.json({
+            message: "ko"
+        })
+    } else {
+        try {
+            decodedToken = jwt.decode(token)
+            var userid = decodedToken.userid
+
+            const query = "DELETE FROM users WHERE users.Id_user ='" + userid +  "';"
+            const result = pool.query(query)
+
+            if (result.rowCount == 0) {
+                return res.json({
+                    message: 'ko'
+                })
+            }
+
+            return res.json({
+                message: "ok"
+            })
+        } catch {
+            return res.json({
+                message: "ko"
+            })
+        }
+    }
 })
 
 app.post('/search', (req, res)=> {
