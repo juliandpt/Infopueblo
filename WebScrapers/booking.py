@@ -17,7 +17,7 @@ time.sleep(1)
 search = driver.find_element_by_xpath('//*[@id="ss"]')
 place = sys.argv[1]
 #place = input("Introduce un lugar: ")
-numberHotels = int(input("¿Cuántos hoteles quieres ver? "))
+numberHotels = 2
 search.send_keys(place)
 time.sleep(1)
 search.send_keys(Keys.ENTER)
@@ -60,11 +60,7 @@ while len(reviewsList) < numberHotels:
     except:
         break
 
-print(reviewsList)
-print('-------------------------------------------------------')
-print('Hay un total de', len(reviewsList), "hoteles en", place)
-
-with open ('./resultado/booking.json', 'w', encoding='utf-8') as file:
+with open ('./WebScrapers/resultado/booking.json', 'w', encoding='utf-8') as file:
     json.dump(reviewsList, file, ensure_ascii=False, indent=4)
 
 driver.quit()

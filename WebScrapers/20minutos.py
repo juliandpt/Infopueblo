@@ -66,6 +66,5 @@ while len(noticias) < num_news:
                 break
     except:
         break
-print(noticias)
 with open('./WebScrapers/resultado/20minutos.json', 'w',  encoding='utf-8') as f:
     json.dump(noticias, f, ensure_ascii=False, indent=4)

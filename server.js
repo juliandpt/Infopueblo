@@ -232,11 +232,12 @@ app.post('/user/delete', (req, res) => {
     }
 })
 
-app.post('/search', (req, res)=> {
+app.post('/search', async(req, res)=> {
     console.log(req.body)
-    const child = spawn('python', ['./WebScrapers/20minutos.py', req.body.text]);
+    const child = spawn('python', ['./WebScrapers/booking.py', req.body.text]);
+    await new Promise(resolve => setTimeout(resolve, 10000));
     child.on("close", () => {
-        var contents = fs.readFileSync("./WebScrapers/resultado/20minutos.json");
+        var contents = fs.readFileSync("./WebScrapers/resultado/booking.json");
         
         var jsonContent = JSON.parse(contents)
 
@@ -267,14 +268,12 @@ async function authenticateToken(token) {
         decodedToken = jwt.decode(token)
         var userid = decodedToken.userid
 
-        // await pool.connect()
         const query = {
             text: 'SELECT token FROM users WHERE users.id_user = ?',
             values: [userid],
             rowMode: 'array'
         }
         const result = await pool.query(query)
-        pool.end()
 
         if(result.body.token != 'NULL') {
             return true
