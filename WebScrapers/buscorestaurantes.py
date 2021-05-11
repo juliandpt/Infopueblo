@@ -5,8 +5,8 @@ import sys
 import time
 import json
 
-text = sys.argv[1]
-#text = input("Introduce un lugar: ")
+#text = sys.argv[1]
+text = input("Introduce un lugar: ")
 num_restaurants = 2
 place = text.replace(" ", "+")
 
@@ -28,11 +28,13 @@ while len(restaurants) < num_restaurants:
                 parsedPage = BeautifulSoup(restaurantPage.text, 'html.parser')
                 item = {}
                 item['id'] = i
-                item['name'] = parsedPage.find("h1").text
+                name = parsedPage.find("h1").text.replace("\n", "").replace("\t", "")
+                item['name'] = name
                 item['comments'] = []
                 comments = parsedPage.find_all("p", {"class": "excerpt"})
                 for comment in comments:
-                    item['comments'].append(comment.text)
+                    text = comment.text.replace("\n", "").replace("\t", "")
+                    item['comments'].append(text)
                 restaurants.append(item)
                 i = i+1
                 if len(restaurants) == num_restaurants:

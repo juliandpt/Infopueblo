@@ -4,6 +4,8 @@ const fs = require('fs')
 const express = require('express')
 const jwt = require('jsonwebtoken')
 const sha = require('sha1')
+const { StringDecoder } = require('string_decoder');
+const utf8 = require('utf8');
 const spawn = require('child_process').spawn
 const date = require('date-and-time')
 
@@ -234,10 +236,9 @@ app.post('/user/delete', (req, res) => {
 
 app.post('/search', async(req, res)=> {
     console.log(req.body)
-    const child = spawn('python', ['./WebScrapers/booking.py', req.body.text]);
-    await new Promise(resolve => setTimeout(resolve, 10000));
+    const child = spawn('python', ['./WebScrapers/jobtoday.py', req.body.text]);
     child.on("close", () => {
-        var contents = fs.readFileSync("./WebScrapers/resultado/booking.json");
+        var contents = fs.readFileSync("./WebScrapers/resultado/jobtoday.json");
         
         var jsonContent = JSON.parse(contents)
 
@@ -246,19 +247,18 @@ app.post('/search', async(req, res)=> {
 })
 
 app.post('/search2', (req, res)=> {
-    console.log(req.body)
-    const child = spawn('python', ['./WebScrapers/20minutos.py', req.body.text]);
+    const decoder = new StringDecoder('utf8');
+    const child = spawn('python', ['./WebScrapers/jobtoday.py', req.body.text]);
+    child.stdout.setEncoding('utf8');
     child.stdout.on('data', (data) => {
-        var jsonContent = JSON.parse(data.toString());
-        console.log(jsonContent[1].title);
-      });
-    // child.on("close", () => {
-    //     var contents = fs.readFileSync("./WebScrapers/resultado/20minutos.json");
+        //console.log(utf8.decode(data))
+        //console.log(decoder.write(data))
+        //console.log(data)
         
-    //     var jsonContent = JSON.parse(contents)
-
-    //     console.log(jsonContent[1].title)
-    // })
+        res.setHeader("Content-Type", "application/json; charset=utf-8");
+        var jsonContent = JSON.parse(data.toString());
+        res.send(jsonContent);
+    });
 })
 
 //Middlewares

@@ -7,11 +7,8 @@ import json
 
 #text = sys.argv[1]
 text = input("Introduce un lugar: ")
-num_offers = 2
+num_offers = 20
 place = text.replace(" ", "-")
-r = requests.get(f'https://jobtoday.com/es/trabajos/' + place + '?page=1')
-content = r.text
-soup = BeautifulSoup(content, 'html.parser')
 
 offers = []
 i = 1
@@ -29,9 +26,10 @@ while len(offers) < num_offers:
                 articlePage = requests.get(offerLink, allow_redirects=False)
                 parsedPage = BeautifulSoup(articlePage.text, 'html.parser')
                 item = {}
-                item['work'] = row.find("h3", {"class": "JobCardLarge-role"}).text
-                item['company'] = parsedPage.find("h3", {"class": "jsx-2275211273"}).text
-                item['description'] = parsedPage.find("div", {"class": "JobPage-description"}).text
+                item["work"] = parsedPage.find("h1", {"class": "JobPage-title"}).text
+                item["company"] = parsedPage.find("h3", {"class": "jsx-186166690"}).text
+                description = parsedPage.find("span", {"class": "JobPage-description-text"}).text.replace("\n", "")
+                item["description"] = description
                 offers.append(item)
                 if len(offers) == num_offers:
                     break
@@ -39,6 +37,6 @@ while len(offers) < num_offers:
                 continue
     except:
         break
-print(len(offers))
+print(offers)
 with open('./WebScrapers/resultado/jobtoday.json', 'w',  encoding='utf-8') as f:
     json.dump(offers, f, ensure_ascii=False, indent=4)

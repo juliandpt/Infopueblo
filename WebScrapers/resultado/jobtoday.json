@@ -1,82 +1,102 @@
 [
     {
-        "id": 2,
-        "name": "\nRestaurante:\nJardín del Príncipe\n"
+        "work": "Ayudante/a de Cocina",
+        "company": "PANDELIRIO",
+        "description": "Cocina y atención al público y en mesas en tienda de pan artesano con cafetería PAN.DELIRIO. En El Corte Inglés de Nuevos Ministerios."
     },
     {
-        "id": 2,
-        "name": "\nRestaurante:\nL'Albufera (Hotel Melia Castilla)\n"
+        "work": "Camarero/a de Restaurante",
+        "company": "Chifa Doromari",
+        "description": "Buscamos camarero o camarera cualificado para tomar las comandas y servir las comidas y bebidas a nuestros clientes.Necesitamos una persona que tenga la paciencia, personalidad y constancia necesarias para progresar en este puesto.Las responsabilidades del camarero/camarera incluyen saludar y servir a los clientes, proporcionar información detallada sobre los menús, realizar diversas tareas del restaurante a la vez y recoger la cuenta. Si eres capaz de trabajar bien en entornos de ritmo rápido, nos gustaría conocerte.Responsabilidades - Informar a los clientes sobre los platos especiales del día- Ofrecer recomendaciones sobre el menú si se solicitan-Tomar las comandas de comida y bebida con precisión, usando software TPV, libretas o memorizándolas.- Comunicar los detalles de las comandas al personal de cocina- Organizar la configuración de las mesas y mantener el comedor ordenado- Entregar la cuenta y cobrar a los clientesLlevar los platos, cubiertos y vasos sucios a la cocina para su limpiezaRequisitos: - Experiencia laboral demostrable como camarero o camarera- Experiencia práctica con sistemas de caja y gestión de comandas- Espíritu de equipo"
     },
     {
-        "id": 2,
-        "name": "\nRestaurante:\nEl Club Allard\n"
+        "work": "Camarero/a",
+        "company": "GRUPO S.L.",
+        "description": "Se busca camarero con experiencia previa 3 años por lo menos trabajo en rango, barra, saber llevar la bandeja, trabajo en equipo. Trabsjo de turno partido en las tablas"
     },
     {
-        "id": 2,
-        "name": "\nRestaurante:\nRamón Freixa\n"
+        "work": "Agente Inmobiliario",
+        "company": "RE/MAX",
+        "description": "Únase a la empresa inmobiliaria líder en el sector, cubriendo dos vacantes para convertirse en miembro de un equipo de éxito, asertivo y con la orientación profesional de una empresa dinámica y en constante crecimiento. El exitoso programa de formación de RE/MAX está comprobado y permite generar ingresos por encima de la media."
     },
     {
-        "id": 2,
-        "name": "\nRestaurante:\nLa Olma\n"
+        "work": "Masajista chica",
+        "company": "masajes y mas",
+        "description": "Si tienes entre 20 y 30 años, es para trabajar en un centro de masajes en e centro de Madrid, metro bilbao,si tienes buena presencia, eres extrovertida, con don de gentes, es para dar todo tipo de masajes,sino sabes te formamos,puedes ganar altos ingresos diariamente, hay seguridad social, hay varios turnos, se trabaja algunos fines de semana, buscamos personas serias y responsables."
     },
     {
-        "id": 2,
-        "name": "\nRestaurante:\nLa Terraza del Casino\n"
+        "work": "Ayudante/a de Contabilidad",
+        "company": "GOLDHOUSE",
+        "description": "Se necesita administrativo contable con experiencia, jornada completa. Zona de trabajo Madrid capital, de Lunes a Viernes."
     },
     {
-        "id": 2,
-        "name": "\nRestaurante:\nDiverXo\n"
+        "work": "Jefe de Cocina / Incorporacion inmediata",
+        "company": "SRW Consultora",
+        "description": "Importante Empresa Gastronómica seleccionará Jefe de Cocina para su próxima apertura en MadridRequisitos:- Experiencia mínima 3 años- Estudios en Gastronomía- Disponibilidad Inmediata Full TimeOfrecemos:- Excelentes condiciones laborales- Oportunidad de crecimiento- Salario competitivo"
     },
     {
-        "id": 2,
-        "name": "\nRestaurante:\nSantCeloni\n"
+        "work": "Instalador/a de vinilos y material publicitario",
+        "company": "Primer Impacto",
+        "description": "Buscamos instaladores/as para trabajar por campañas o días sueltos colocando vinilos y otros materiales publicitarios en comercios de la provincia de MADRID. -Imprescindible coche propio y teléfono smartphone.-Incorporación inmediata-Alta en Seguridad Social-Salario por punto instalado + gastos (km, peajes y parking)"
     },
     {
-        "id": 2,
-        "name": "\nRestaurante:\nEl Rana Verde de Aranjuez\n"
+        "work": "Camarero/a",
+        "company": "Next Cuisine",
+        "description": "Se requiere camarero/a con formación  relacionada con la hostelería. Experiencia demostrable mínimo 3 años como Camarero/a de sala y barra. Saber llevar la bandeja con agilidad y rapidez y saber llevar un rango. Capacidad de organización y trabajo en equipo. Actitud positiva y compromiso"
     },
     {
-        "id": 2,
-        "name": "\nRestaurante:\nAsador Changó\n"
+        "work": "Camarero/a",
+        "company": "La Colmada",
+        "description": "Camarero con experiencia en barra y sala. Además se valorará conocimientos de gastronomía así como la manipulación de embutidos, quesos y conservas."
     },
     {
-        "id": 2,
-        "name": "\nRestaurante:\nFonda Genara\n"
+        "work": "Terapeuta",
+        "company": "Katarsis, Terapias Alternativas",
+        "description": "Se precisa personal autónomo con experiencia comprobada en cualquiera de las siguientes terapias alternativas:-Acupuntura-Osteopatía-Naturopatía,-Reiki,-Psicoanálisis,-Psicoterapia positiva,-Reflexología,-Quiropraxia,-Cupping,-Johrei,-EFTEl nuevo Centro aperturará desde Junio. Los horarios son a convenir, completamente flexibles, con cita previa. El espacio consta de camilla, aseo, ducha, desechables, aclimatación, uniforme. El ingreso será por comisión. Se realizará una preselección del personal y luego, la selección final."
     },
     {
-        "id": 2,
-        "name": "\nRestaurante:\nEl Lavadero de Patones\n"
+        "work": "Recepcionista",
+        "company": "D",
+        "description": "Se necesita recepcionista/ hostess para restaurante . 25/ 30  horas de lunes a viernes. Disponibilidad en las noches también"
     },
     {
-        "id": 2,
-        "name": "\nRestaurante:\nLas Eras\n"
+        "work": "Camarero 20h",
+        "company": "GRUPO HOSTELERIA",
+        "description": "Grupo de hostelería en expansión busca camarero/a y muchas ganas de trabajar para restaurante situado en Madrid centro. Si quieres tener la posibilidad de unirte a una empresa que te proporcione estabilidad y sentimiento de pertenencia inscríbete en esta oferta. Se ruega experiencia de al menos 3 años demostrable para llevar a cabo contrato indefinido. Salario según valía. ¡Te estamos esperando!"
     },
     {
-        "id": 2,
-        "name": "\nRestaurante:\nAsador del Rey\n"
+        "work": "TELEOPERADOR/A VENTA ENERGIA + COMISIONES",
+        "company": "EUROFIRMS ETT",
+        "description": "Desde Eurofirms ETT seleccionamos teleoperadores/as del sector energético para importante Call Center ubicado en zona de Vallecas. Sus funciones serán emisión de llamadas para la comercialización de productos y servicios de luz y gas. Horario de 30 horas semanales en turno de tarde. Salario según convenio + IMPORTANTES COMISIONES POR VENTA. Imprescindible experiencia previa en el sector. Capacitación previa a cargo de la empresa usuaria."
     },
     {
-        "id": 2,
-        "name": "\nRestaurante:\n\nla Hípica de Tres Cantos\n"
+        "work": "Agente Comercial",
+        "company": "Grupo Naviser",
+        "description": "GRUPO NAVISER, como importante fuerza de ventas colaboradora con VIRGIN TELCO, precisa incorporar AGENTES COMERCIALES para su delegación en MADRID.Requisitos:- Actitud- Ambición- Don de gentes- Orientación a objetivos- Trabajo en equipo - Buscamos a perfiles de entre 18 y 24      añosCONTRATO LABORAL - S.S - SUELDO FIJO + IMPORTANTES COMISIONES"
     },
     {
-        "id": 3,
-        "name": "\nRestaurante:\nPalacio del Negralejo\n"
+        "work": "Office de Cocina",
+        "company": "Tori-Key Madrid",
+        "description": "Puntual ,amable ,tiene ganas de trabajar y educado"
     },
     {
-        "id": 3,
-        "name": "\nRestaurante:\nSexto Sentido\n"
+        "work": "Cocinero/a",
+        "company": "Tori-Key Madrid",
+        "description": "Puntual , responsable ,amable , ganas de aprender y trabajar .sonrisa"
     },
     {
-        "id": 3,
-        "name": "\nRestaurante:\nLos Lanceros\n"
+        "work": "Manicurista",
+        "company": "princesas nails and boutique",
+        "description": "Realización de manicura semipermanente, acrílico esculpido, gel, pedicuras y decoraciones a mano alzada."
     },
     {
-        "id": 3,
-        "name": "\nRestaurante:\n\nAlaska\n"
+        "work": "Ayudante o oficial Peluquería",
+        "company": "L. R",
+        "description": "Media jornadaMañanas"
     },
     {
-        "id": 3,
-        "name": "\nRestaurante:\nCostimar (Valdemorillo)\n"
+        "work": "Cocinero/a",
+        "company": "TORO Burger Lounge",
+        "description": "**Por favor LEER toda la oferta antes de apuntarse**Buscamos a personal comprometidos y responsables para aprender a preparar la Mejor Cheeseburger de España y sorprender a cada cliente que le pegue un bocado, en la nueva TORO SALAMANCAPuestos Disponibles:- cocinero jornada completa- ayudante de cocina jornada completa - ayudante de cocina media jornada**turno partidoDirección:Calle del Príncipe de Vergara 83, MADRIDRequisitos:- vivir cerca del trabajo - mucha Experiencia en Plancha/Burgers- Amar las Hamburguesas - Seguir recetas con fidelidad- Responsabilidad y puntualidad - Trabajar de manera limpia y ordenada- trabajar en equipoSueldo:- entre 1150 y 1250€/mesHorario: - de 12-16h y 20-0hBeneficios:- 1 día libre a la semana- 50% de descuento en toda la carta (para si, pareja y hijos)- 1 Burger gratis los domingos- 1 copa gratis los sábados - Horas extras- Propina compartida igualmente entre todos (sala y cocina)Entrevistas y Inicio inmediato Gracias y suerte 🍔❤️🏆Chef Dado Lima - Papá TORO"
     }
 ]
