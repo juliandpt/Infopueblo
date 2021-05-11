@@ -1,21 +1,18 @@
 from bs4 import *
-import pandas as pd
 import requests
 import sys
-import time
 import json
 
-#text = sys.argv[1]
-text = input("Introduce un lugar: ")
-num_restaurants = 2
+text = sys.argv[1]
+#text = input("Introduce un lugar: ")
+num_restaurants = 20
 place = text.replace(" ", "+")
 
 restaurants = []
 page = 1
-i = 1
 while len(restaurants) < num_restaurants:
     try:
-        url = 'http://www.buscorestaurantes.com/search_results.php?keywords=' + place + '&submit_button=buscar&from_pmd=3d41e18c675bad9973fede37acc68644&bot_check=&page=' + str(i)
+        url = 'http://www.buscorestaurantes.com/search_results.php?keywords=' + place + '&submit_button=buscar&from_pmd=3d41e18c675bad9973fede37acc68644&bot_check=&page=' + str(page)
         page = page+1
         r = requests.get(url, allow_redirects=False)
         soup = BeautifulSoup(r.text, 'html.parser')
@@ -27,8 +24,7 @@ while len(restaurants) < num_restaurants:
                 restaurantPage = requests.get(restaurantLink, allow_redirects=False)
                 parsedPage = BeautifulSoup(restaurantPage.text, 'html.parser')
                 item = {}
-                item['id'] = i
-                name = parsedPage.find("h1").text.replace("\n", "").replace("\t", "")
+                name = parsedPage.find("h1").text.replace("Restaurante:", "").replace("\n", "").replace("\t", "")
                 item['name'] = name
                 item['comments'] = []
                 comments = parsedPage.find_all("p", {"class": "excerpt"})
@@ -36,7 +32,6 @@ while len(restaurants) < num_restaurants:
                     text = comment.text.replace("\n", "").replace("\t", "")
                     item['comments'].append(text)
                 restaurants.append(item)
-                i = i+1
                 if len(restaurants) == num_restaurants:
                     break
             except:

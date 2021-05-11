@@ -2,11 +2,7 @@ import psycopg2
 from psycopg2 import sql
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 from bs4 import *
-import pandas as pd
 import requests
-import sys
-import time
-import json
 
 con = psycopg2.connect(dbname='d20hkpogjrcusn',
                        user='amvnwrnjzqtkgh', host='ec2-99-80-200-225.eu-west-1.compute.amazonaws.com',
@@ -25,25 +21,25 @@ i = 0
 for row in rows:
   municipio = {}
   i = i +1
-  municipio['Municipio'] = row.find('td', {"class": "Municipio"}).text.replace("'"," ")
+  municipio['name'] = row.find('td', {"class": "Municipio"}).text.replace("'"," ")
   if row.find('td', {"class": "Comarca"}) is None:
-    municipio['Comarca'] = ''
+    municipio['region'] = ''
   else:
-    municipio['Comarca'] = row.find('td', {"class": "Comarca"}).text.replace("'"," ")
+    municipio['region'] = row.find('td', {"class": "Comarca"}).text.replace("'"," ")
 
-  municipio['Provincia'] = row.find('td', {"class": "Provincia"}).text.replace("'"," ")
-  municipio['CC.AA'] = row.find('td', {"class": "CC.AA."}).text.replace("'"," ")
+  municipio['province'] = row.find('td', {"class": "Provincia"}).text.replace("'"," ")
+  municipio['aacc'] = row.find('td', {"class": "CC.AA."}).text.replace("'"," ")
   if row.find('td', {"class": "Población-(2019)"}) is None:
-    municipio['Poblacion'] = str(0)
+    municipio['population'] = str(0)
   else:
-    municipio['Poblacion'] = row.find('td', {"class": "Población-(2019)"}).text.replace('.','')
+    municipio['population'] = row.find('td', {"class": "Población-(2019)"}).text.replace('.','')
   if row.find('td', {"class": "Densidad-(hab./km²)"}) is None:
-    municipio['Densidad(hab/km)'] = str(0)
+    municipio['density'] = str(0)
   else:
-    municipio['Densidad(hab/km)'] = row.find('td', {"class": "Densidad-(hab./km²)"}).text.replace( '.','').replace(',','.')
+    municipio['density'] = row.find('td', {"class": "Densidad-(hab./km²)"}).text.replace( '.','').replace(',','.')
 
   cur.execute("insert into towns (aacc,density_pob,emptied,name,population,province,region) values ('" +
-                    municipio['CC.AA'] + "'," + municipio['Densidad(hab/km)'] + ",NULL,'" + municipio['Municipio'] + "'," + municipio['Poblacion'] + ",'" + municipio['Provincia'] + "','" + municipio['Comarca'] + "');")
+                    municipio['aacc'] + "'," + municipio['density'] + ",NULL,'" + municipio['name'] + "'," + municipio['population'] + ",'" + municipio['province'] + "','" + municipio['region'] + "');")
   print('municipio ' + str(i) + ' insertado correctamente')
   print(municipio)
 cur.close()

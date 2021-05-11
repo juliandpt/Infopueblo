@@ -1,7 +1,6 @@
 [
     {
-        "id": 1,
-        "name": "Restaurante:Jardín del Príncipe",
+        "name": "Jardín del Príncipe",
         "comments": [
             "El trato recibido fue bueno, pero no se respeto el precio de la web, e intentaron ponernos en la terraza y cobrarnos más caro, aunque hablando nos entendimos.",
             "Cuidado con los menús, lleva a equivocaciones. Infórmate primero de como va. Largo de explicar y poco entendible. Servicio super lento. Positivo. La comida excelente y buena calidad.",
@@ -11,14 +10,170 @@
         ]
     },
     {
-        "id": 2,
-        "name": "Restaurante:L'Albufera (Hotel Melia Castilla)",
+        "name": "L'Albufera (Hotel Melia Castilla)",
         "comments": [
             "Pesimo servicio y malísima calidad. La mesa que nos dieron en el centro de la sala para 7 personas era excesivamente grande y muy incomoda no podíamos hablar, incomodisimo alcanzar los platos. Se confundieron en 3 ocasiones en las bebidas que pedimos, 2 de los vinos que pedimos no los tenían, los entrantes muy escasos y calidad baja. Pero lo peor fue que tardaron 2 horas en servirnos arroz a banda y encima de pésima calidad: estaba seco, insipido y con gambas congeladas. Decepcionante para un restaurante de un hotel de 5 estrellas y nos quejamos de la situación y el metre no estuvo a la altura.",
             "Algo caro pero muy buena calidad. Buen local y servicio, no hay ningún pero al respecto, pero el precio me parece caro.",
             "La reserva fue confirmada por teléfono a pesar de haberla hecho via esta web. Se pidió una mesa más intima y en un discreto lugar, ya que las conversaciones contendrían información muy confidencial de negocios, y se nos dio una mesa justo en el medio y al frente de todo el mundo que pasaba al comedor (justo al lado de la noria). Justo en ese lugar se notaba muchisimo el aire acondicionado ya que como antes he comentado nos asignaron una de las mesas con más exposicion. Mi queja la solucionaron con una respuesta poco conveniente y nada satisfactoria: usted esta sentada en el medio del comedor y es donde justamente más se nota el aire acondicionado. Ninguna solución fue ofrecida en ese momento. Casi cuando estábamos terminando la paella se me ofreció una mantita la cual ayudo a la situación, una pena que no se ofreciese esa solución un pelin antes. El servicio fue lento, escueto y malo. El metre tomo nota de la botella de agua inicial la cual no había sido traida a la mesa pasados al menos 10 mins, cuando de nuevo se acerco unicamente a tomar la nota de la comida sin ni siquiera preguntar por el que vino que habíamos elegido para tomar. El vino elegido fue un rueda y este fue servido correctamente aunque las formas no fueron las deseadas con movimientos demasiado bruscos como si estuviera enfadado o cansado cuando ponia de vuelta la botella de agua o vino dentro de la cubitera. La calidad de la comida era cuestionable. Como entrante tomamos los grill vegetales que estaban como pasados de coción y con poco sabor. El plato principal fue la paella de marisco, pollo y verduras (sin cascaras ni huesos). Verduras no había, y como marisco la variedad era limitada (solo gambas y trocitos de sepia). El arroz estaba a media coción afectando no solo a la textura de la paella sino al sabor de ese plato. Una calidad del plato bastante mejorable, por no decir que la calidad-precio era absolutamente mala. Formalmente, me queje al metre en español ya que mi acompanante solo hablaba en ingles justo cuando la paella fue servida. Mi queja toco todos los puntos: la bebida servida a destiempo y con desganas, no se nos ofreció movernos a ninguna otra mesa debido al aire acondicionado a pesar de haber otras mesas disponibles, la calidad de la comida y sobre todo el estado de la paella. De esta queja, lo único que se obtuvo fue un 'lo siento', lo cual indica lo escaso que fue el servicio al cliente. A la hora de pedir la cuenta, el metre tomo el pago via tarjeta de credito y mi acompañante decidió dar su opinión a este (en ingles) y su reacción fue, de nuevo, pedir disculpas pero no dar ninguna otra solución para hacernos nuestra cena al menos más placentera. Tomo el pago tan pronto pudo para salir de la escena lo antes possible. La cuenta fue excesiva para la calidad de la comida que obtuvimos por no nombrar de nuevo el servicio que recibimos. Mi acompañante, de nacionalidad saudita, no comprendía como tal restaurante emplazado en un hotel como melia castilla, ofrecía un servicio tan malo y desagradable. Menciono que había sido la peor cena que había tomado en todo Madrid durante su estancia, y añadió \"jamas volveré ni lo recomendare\"En conclusión, este restaurante no puede competir en altas ligas ni con restaurantes tipo portobello, la maquina, el molino, txistu, o el asador donostierra.",
             "Comimos en el brunch en el hotel el 1 de enero. La comida buena (sobre todo la paella), y muy buena relación calidad precio teniendo en cuenta la fecha.",
             "La única pega que hacia mucho frío en el comedor y baños. Por lo demás, todo estupendo. Lo recomiendo."
+        ]
+    },
+    {
+        "name": "El Club Allard",
+        "comments": [
+            "Arte servido en un plato. Sin renunciar al sabor que es espectacular en cada plato. Muy recomendable permitirse este lujo de vez en cuando.",
+            "Estuve el verano pasado y es un restaurante buenísimo, espectacular la comida y una atención exquisita. Vale la pena, aunque no es barato, pero merece muchísimo probarlo. Genial."
+        ]
+    },
+    {
+        "name": "Ramón Freixa",
+        "comments": []
+    },
+    {
+        "name": "La Olma",
+        "comments": [
+            "Los asados muy buenos, hay que avisar si los quieres comer antes. Se pasan un poco con los vinos pero hay opciones más económicas. La fachada muy bonita.",
+            "Buenisisma. Llegamos tarde y todo esta a punto y exquisito el trato y los platos. Y somos sibaritas. Deberia ser el nº 1 de pedraza y no el 2º. En el uno no daban flexibilidad y en el segundo turno, no garantizaban, casi aseguraban que tendrías que esperar. Aquí todo daba gusto y el local es una maravilla rustica.",
+            "La comida muy rica y bien presentada y el trato correcto aunque hubo al principio un problema con el nombre a quien iba hecha la reserva.",
+            "Muy aceptable, muy agradable recomendara este restaurante a mis amigos el servicio es muy eficaz y la espera entre platos perfecta",
+            "Este restaurante es muy recomendable. La atención fue estupenda desde el primer momento y la comida increíble. El remate final fueron los postres. Pedimos varios para compartir y hacía tiempo que no probaba nada tan rico. La próxima vez que vaya a pedraza, reservaré allí otra vez."
+        ]
+    },
+    {
+        "name": "La Terraza del Casino",
+        "comments": [
+            "Estuve el pasado 21. 1. 2014. Es decepcionante una atención así, mi amigo llegó 10 minutos tarde, y sin avisar nos dijeron que ya no nos podían servir el menú degustación. De la comida de carta, que voy a decir, lamentable, el vinillo bueno, y el montante de la factura 238,25 €. Nada más. ¡que cada lector saque sus conclusiones!"
+        ]
+    },
+    {
+        "name": "DiverXo",
+        "comments": [
+            "Estuvimos comiendo hace un par de meses en el restaurante \"diverxo\" y salimos encantados, una cocina original acompañado en cada plato por un te dependiendo del estilo de la comida. La verdad es que genial, el trato muy amable y el sitio muy acogedor"
+        ]
+    },
+    {
+        "name": "SantCeloni",
+        "comments": [
+            "Muy buen restaurante, tomamos un menú delicioso, el servicio muy correcto y los vinos estupendos. Por poner un pero, la cuenta nos pareció un poco elevada. Totalmente recomendable."
+        ]
+    },
+    {
+        "name": "El Rana Verde de Aranjuez",
+        "comments": [
+            "El sitio muy bonito y la atención muy buena, una ubicación buenísima para visitar el palacio y los jardines. Nos gustó mucho.",
+            "Ocasión de poder estar en un restaurante diferente y único, la comida espectacular y el menú infantil y de fin de semana muy bueno. El trato del personal muy bueno, no falta de nada, vamos por algo estaba lleno. Volveremos",
+            "Después de leer todos los comentarios que he leído sobre este restaurante, parece que mi familia y yo hayamos estado en otro... Vale que esté un poco pasado de moda el restaurante, pero es que está desde hace 100 años, que queremos que lo modernicen??? El caso es tirar todo lo viejo y poner algo nuevo... Ironías aparte, fuimos en mayo, para ser exactos el día de la madre, estaba repleto ( gente haciendo cola para comer habiendo más restaurantes en los alrededores, eso dice bastante del sitio, no? Soy fumadora y salí a fumar a la calle por eso sé lo de las colas, que luego seguro que dicen que soy el dueño o amigo ( ojalá!! Así hubiera comido gratis) nosotros reservamos con antelación y comimos de menú excepto mi abuela que sólo comió lubina ( al final la tuvimos que ayudar por que no pudo con todo, era bastante grande ). Sólo puedo hablar de los platos que nos pusieron a nosotros, todos comimos bien, vale que no eran elaborados ni parecían cuadros impresionistas, una carrillada de cerdo es en todos los sitios igual ( plato que comí yo ) estaba tierna y jugosa y pude mojar pan, que más puedo pedir? Y de postre yo pedí mousse de chocolate, pues eso mousse de chocolate, que le pregunten a mi hijo de 3 años si le gustó o no, me quitó el postre... En fin que mi familia quedó encantada, que volveremos al restaurante y que fallos cometemos todos, pero... Nadie es perfecto. Que las cosas buenas nos las guardamos, pero las malas las proclamamos a los cuatro vientos. Vuelvo a agradecer de nuevo, al igual que lo hicimos ese mismo día, el trato que nos dieron, la paciencia que tuvieron con nuestros hijos correteando por el salón, a \"nuestro camarero\" luis y al joven que nos atendió al entrar que nos ayudó con la abuela ( 90 años ) para subir las escaleras... Nosotros volveremos y esperemos que todo siga igual. María",
+            "Somos un grupo de Asturias que estuvimos comiendo en el restaurante el sábado 30 de abril. La comida estuvo fabulosa (arroz con setas y calamares al estilo madrileño) nos la hicieron a la hora.. Estaba buenísima y el resto igual. Los camareros muy amables y gregoria encantadora.",
+            "El trato recibido fue bueno, aunque al sentarnos y mientras mirábamos la carta nos preguntaron varias veces si ya sabíamos lo que queríamos."
+        ]
+    },
+    {
+        "name": "Asador Changó",
+        "comments": [
+            "No es la primera vez que acudíamos para tomar el menú calçots y en años anteriores hemos salido muy satisfechos y lo hemos recomendado a familiares y amigos. Por el precio del menú se  permitía repetir de calçots si se quería. Este año para nuestra sorpresa al pedir una nueva ración, se nos comunicó que había que pagar 10 € por ella. Ya no se podía repetir si no era pagando. Nos gusta mucho el restaurante y el servicio es muy bueno pero lamentablemente el éxito ha hecho que se abandone la satisfacción de los clientes y prime la ganancia económica.",
+            "Buenos días pilar. Te pedimos disculpas por la confusión, en changô mantenemos con nuestros clientes la posibilidad de repetir calçots. Es cierto que debido a algunos excesos (como pedir 3 menús para 8 y comer calçots todos ) que no es vuestro caso, hemos dado instrucciones a los camareros para que estén más pendientes ,sentimos el error que ha cometido el camarero  y te invitamos a que vuelvas a visitarnos y a comer todos los calçots que te apetezcan. Saludos",
+            "Muy buena ubicación con una parrilla para hacer calçots en directo y autenticas butifarras artesanas. Vino de la terra altac y  una salsa romescu espectacular",
+            "Muy agradable todo, bonito, personal atento, comida cuidada, entorno bonito... Muy buena experiencia.",
+            "Hicimos el menú calçotada, y estuvo muy bien. Los únicos detalles negativos, son relativos a dos de los platos, el \"pa amb tomaquet\" (son dos tostadas en lugar de pan de pages) y la \"crema catalana\" (estaba muy rica, pero la consistencia era más próxima a la de un flan que a la de una crema). Mi clasificación es de notable alto.",
+            "Desde changô le damos las gracias por sus comentarios, pues nos ayudan a mejorar continuamente.. Hemos atendido sus sugerencias y hemos cambiado la tostada por pan de payés a la brasa y mejorado la consistencia de la crema catalana. Estaremos encantados de atenderle en la pròxima ocasión. Changô - café",
+            "Muy buena calidad pero cantidad un poco escasa, comentario de algunos de los comensales, en mi opinión es un restaurante para recomendar."
+        ]
+    },
+    {
+        "name": "Fonda Genara",
+        "comments": [
+            "Muy buen restaurante, amplio y con una muy buena calidad. Excelente te situación. El horario es amplio y el servicio muy completo.",
+            "Nos gusto a toda la familia, la atención fue inmejorable, el menú de navidad muy satisfactorio y relación calidad precio acertada. Ademas disponen de menú infantil que es de agradecer. Acertamos de pleno con la elección y disfrutamos de una muy agradable comida de navidad. Gracias",
+            "De difícil localización, se entra desde dentro del centro comercial. Queríamos comer rabo de toro que nos habían recomendado pero solo estaba en el menú del día y queríamos otras cosas de la carta pero no nos pusieron problema para servirlo. El resultado es que él menú vale 15 € en total y solo el plato de rabo, exacto al del menú, nos cobraron 18 €. Para mí solo tiene un nombre, engaño. Muy caro para la calidad que ofrece, mi lenguado meunier estaba deshecho prácticamente, no lo recomendaría.",
+            "Fuimos el pasado fin de semana con unos amigos y la verdad es que todo perfecto la carne buenísima el rabo de toro espectacular un poco peor los postres caseros y buenos pero tienen que mejorar comimos el menú y con la bebida salimos por 26 persona",
+            "Muy bien la suave música clásica de fondo. La camarera nos atendió de forma excelente. El servicio en general, muy bueno."
+        ]
+    },
+    {
+        "name": "El Lavadero de Patones",
+        "comments": [
+            "Me pareció un sitio absolutamente recomendable, por el trato, las vistas y la comida. Pasamos un día genial y además tienen menú infantil. Volveremos",
+            "Sitio muy especial en un entorno único. Fuimos un sábado con un tiempo excelente y comimos en la terraza. La comida excelente. Los platos de cuchar altamente recomendables al igual que la carne y las croquetas. Atención muy personal, te hacen sentir como en casa. Un gustazo. Volvere baby",
+            "Patones, pueblo muy bonito, el restaurante el lavadero, tiene unas vistas espectaculares, y la comida estaba muy buena, la carne los judiones las migas todo riquísimo, y en cuanto calidad precio esta bien, seguro que volveremos,"
+        ]
+    },
+    {
+        "name": "Las Eras",
+        "comments": [
+            "Muy amables aunque tardaron en sentarnos una media hora desde la hora de reserva (normal por la fecha). Las migas y la sopa castellana muy ricas. La carne algo pasada. El sitio precioso aunque ni pegaban ni llegamos a entender los cuadros \"modernistas¿? \" de las paredes.",
+            "He ido con mi pareja a comer y puedo decir que le doy a todo un 10!!! La comida estaba buenísima y al relación calidad precio también. Hay otros restaurantes que tienen quizás menús por 2 o 3 euros más barato pero merece la pena pagar aquí 20 y disfrutar de su comida. Comimos una ensalada de frutos secos con px (la recomiendo totalmente se me hace la boca agua con el sabor), unas buenas migas con sus huevos y un entrecorte de buey con patatas caseras (lo recalco porque pocos sitios lo hacen ya). Preguntar por carmen... Es la dueña y es un encanto!!!! No os defraudará!",
+            "La comida estaba muy buena y (migas, croquetas de espinacas y cordero) y el sitio es muy agradable (sobre todo si te toca arriba del todo). La único criticable que tardaron mucho en sentarnos y eso que habíamos reservado para las tres (al final casi nos sentamos a las tres y media); aunque luego la comida vino bastante rápido.",
+            "Un restaurante más de los que te ofrecen una buena decoración, un espacio acogedor pero de que en la fachada. En general la comida más que justa en calidad y algún plato como la carne de buey realmente de baja calidad. Sin ganas de repetir.",
+            "Hola a todos, nosotros fuimos a la boda de un amigo que se celebró allí y quedamos tan encantados con el trato, que celebramos el bautizo de nuestra hija y en cuanto podemos nos acercamos a comer. Es genial¡¡¡¡¡¡¡¡¡¡"
+        ]
+    },
+    {
+        "name": "Asador del Rey",
+        "comments": [
+            "Le que anuncían en tripadvisor, atrapalo etc debe ser de un asador del rey de hace años. El peor restaurante donde he cenado en los últimos años. No tienen ni idea de hacer un solomillo. El camarero era majo pero la comida para no ir jamás más.",
+            "Muy buen servicio, con menú infantil que pudimos compartir, muy bueno el cochinillo, y muy amables con los niños. El restaurante está muy bien ubicado, junto al monasterio",
+            "Quedé sorprendido por el trato recibido y lo bueno que estaba el cochinillo así como el cordero; les felicito",
+            "Perfecto para pasar un día inolvidable en la sierra y disfrutar de unas espectaculares vistas. Los asados estaban inmejorables¡¡¡",
+            "Todo Bien"
+        ]
+    },
+    {
+        "name": "la Hípica de Tres Cantos",
+        "comments": [
+            "Atención estupenda. Comida de calidad y buena presentación. Servicio de mesa bueno. Recomendable. Ideal en tiempo de verano",
+            "Ambiente familiar, trato exquisito y comida de muy buena calidad, en particular los platos de caza (lo mejor, el solomillo de ciervo). Muy recomendable el menú degustación por 30 euros + iva, aunque también hay un menú ejecutivo por 18 euros bastante aceptable. En primavera y verano la terraza esta muy agradable y en invierno, la galería acristalada. Ideal para ir con niños por sus jardines con columpios.",
+            "Hola, quiero dar mi opinión, y espero que ayude para que os decidáis por éste restaurante. Me case en julio del 2010, y os puedo asegurar, que tengo el mejor recuerdo que se puede tener el día de tu boda, no tengo ni una sola queja, salió todo perfecto, empezando por el día que nos hizo. Lo celebré en el jardín y la boda quedo preciosa. Quiero agradecer a arturo, a su mujer, al metre y los camareros la atención recibida. El menú espectacular, la organización perfecta, y todo lo que pedí no me pusieron ninguna pega, evidentemente no pedí imposibles pero todo fue tal y como yo ´quería. Sólo puedo estar agradecida por el recuerdo que tengo´del día de mi boda. Sin ninguna duda fue una gran elección. Muchas gracias.",
+            "Alli fue la boda de mi hermano 4-2010, y todo correcto, sobro comida, tiempo, y a todo el mundo le gusto, por ponerle una pega, al ser la boda en el interior, la barra libre estaba en el bar osea si querías una copa te tenias que andar 20 metros, pero repetiríamos, ya que eso se puede subsanar.",
+            "Lo conocí por la boda de mi hermano, a raíz de aquello lo utilizamos para comidas de empresa, El servicio y la atencion son excelentes al igual que la comida. Muy recomendable el entorno."
+        ]
+    },
+    {
+        "name": "Palacio del Negralejo",
+        "comments": [
+            "Si te vas a casar, esta opción ni te la plantees, atención super desagrable con la gente en gental, muy bordes y no facilitan nada preparar el evento. Trato personal nefasto.",
+            "Hola julian, desde el palacio lamentamos que la experiencia no haya sido de su agrado. La misión de todos los departamentos es conseguir la máxima satisfacción del cliente, por lo que lo habitual es el trato agradable y el esfuerzo por que los invitados se sientan acogidos. En cualquier caso muchas gracias por su opinión, nos ayuda a seguir mejorando. Le invitamos a volver a darnos la oportunidad de demostrar el buen servicio que podemos ofrecer, nuestras puertas siempre quedarán abiertas. Un saludo",
+            "Pésimo. No hay sala de lactancia ni cambiador,  en el lavabo o en el jardín. La comida fría y escasa,  cuatro horas.... Para dos platos y postre. El vino en las copas de agua y el agua... Pues en las del vino! Al solomillo,  frío,  le faltaban las patatas..... Que trajeron cuando acábamos el plato,  eso sí lo único que trajeron caliente pero una por  persona! Y así una detrás de otra......! Lo siento por los novios,  ellos no tienen culpa y posiblemente no se enteraron. En resumen malo,  frío,  mal servido y muy lento!",
+            "El lugar precioso, la comida muy buena. Nos gusto a los cinco. Incluso al niño, que tiene dos años y se porto muy bien ,gracias a la amabilidad de los camareros. El servicio cuidado. Volveremos.",
+            "Sólo tenemos palabras de agradecimiento para el equipo del palacio del negralejo. Nuestra boda fue perfecta. La atención increíble en todo momento y el sitio pues sólo hay que verlo, precioso. La gente quedó encantada y nosostros más aún. Gracias de verdad!!!",
+            "Excelente servicio y calidad de la comida. Aunque es caro merece la pena la experiencia. La verdad es que han reducido personal pero es un hecho que pasa casi desapercibido. Me gusta mucho."
+        ]
+    },
+    {
+        "name": "Sexto Sentido",
+        "comments": [
+            "Estuve  con compañeros comiendo el menú especial de halloween del año pasado.... Un desastre... Caro y poca comida.. Se las dan demasiado. Pasamos mucha hambre, no vuelvo en la vida. No se lo recomendaria a un enemigo",
+            "La comida exquisita, el trato excelente y muy profesional y el ambiente, para ir en pareja, genial!! Volveremos.",
+            "Cocina excelente y diferente trato exquisito y decoración moderna y acogedora. La limpieza impecable desde la cocina hasta los baños. Las tapas increíbles. Una experiencia que recomiendo y con un precio que no váis a creer",
+            "La calidad de la comida excelente y el trato muy bueno. La decoración transmite un ambiente tranquilo y sereno.",
+            "Me encanta este restaurante, es acogedor, romántico y ambiental. El trato es excelente por parte de los camareros. Y la comida es exquisita y la decoración igual. Recomiendo este restaurante al 100%."
+        ]
+    },
+    {
+        "name": "Los Lanceros",
+        "comments": [
+            "Avisé con antelación de que una comensal era celiaca y me aseguraron que no habría ningún problema..... Pues bien, la primera en la frente, no tenían cerveza sin gluten con el calor que hacía.... Cuando fui a pedir el menú, mi única opción era ensalada de primero, así que, comí ensalada, claro.... De segundo pedí un entrecot con patatas y me trajeron un plato hecho en la plancha común y con patatas con gluten.... Así estoy hoy.... Me lo cambiaron y me trajeron otro entrecot pero con \"otra ensalada\" de guarnición.... De postre o fruta o una palmera de chocolate descongelada..... Patético, muy triste.... En fin... Por otro lado, teníamos mesa a las 14:30 y mi hijo de 5 años, hasta las 16 no empezó a comer.... No volvemos ni lo recomendaremos.",
+            "Hace unos días compartí mesa y mantel con una hermandad de San lorenzo. El servicio fue pésimo tuve que sufrir las impertinencias y la mala educación de uno de sus camareros, a quien en ningún momento me dirigí ni intercambie palabra alguna. El tiempo entre plato y plato fue interminable prolongandose la comida demasiado. La carne sin grandes alabanzas. En definitiva restaurante nada recomendable por su pésimo servicio y atención.",
+            "Fuimos un grupo de 15 personas en familia. Debo de destacar el trato del personal. Comida buena y ambiente poco ruidoso. En contra la reserva realizada por internet no la habían visto. Aunque no hubo problema en comer ya que había poca gente. Muy cerca del  monasterio.",
+            "Buena relación calidad precio, la calidad de la comida nos pareció bastante satisfactoria. Ambiente agradable. Muy recomendable.",
+            "La comida no estuvo mal, pero el servicio fue pésimo, nos hicieron esperar media hora para tomarnos nota y otra media hora entre plato y plato."
+        ]
+    },
+    {
+        "name": "Costimar (Valdemorillo)",
+        "comments": [
+            "Muy agradable y buen servicio. Comida buena y bien presentada. Faltó algo más de atención a la mesa de 10 personas",
+            "El sitio es inmejorable con unas vistas impresionantes. Relación calidad-precio muy muy bien. El servicio muy atento y profesional. Volveremos y por supuesto lo recomendaremos.",
+            "Este restaurante es increíble. Las instalaciones son muy buenas y tanto el local como las vistas son increíbles. El trato ha sido muy bueno y la comida espectacular."
+        ]
+    },
+    {
+        "name": "Alaska",
+        "comments": [
+            "Hace unos días comí allí y la verdad que volvería. He de felicitar al jefe por lo bien que me he sentido comiendo allí, la comida es una maravilla y el servicio es excelente. El precio está muy bien y la comida buenísima. Recomiendo que prueben el cochinillo asado, es algo espectacular. Os lo recomiendo, yo cuando pueda... volveré. ¡Felicidades!",
+            "me encontré bastante mal tratado por parte de un camarero en el restaurante de arriba ,tenia acento e extranjero,y un poco cochino a la hora de servir la mesa, no es que sea racista para nada pero creo que no volvere a comer en su restaurante",
+            "La terraza en verano es encantadora y el salón en invierno es acogedor,con el pero de que dejan fumar. Los menús diarios sobre todo de fin de semana son de lo mejor que hay en San Lorenzo en relación precio-calidad.Una mala costumbre que tienen es que los fines de semana tienes que pedir expresamente la carta del menú porque no te la traen con la general.El servicio es atento. Cuando hemos comido a la carta ha estado todo a nuestro gusto. Es un buen sitio que recomiendo",
+            "Tiene publicidad engañosa. No acceso para minusválidos. Se fuma en el restaurante y cámaras en el interior, vamos un desastre. La comida pésima todo un fraude espero me conteste al mail."
         ]
     }
 ]

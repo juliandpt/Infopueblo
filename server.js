@@ -211,7 +211,7 @@ app.post('/user/delete', (req, res) => {
         })
     } else {
         try {
-            decodedToken = jwt.decode(token)
+            decodedToken = jwt.decode(req.body.token)
             var userid = decodedToken.userid
 
             const query = "DELETE FROM users WHERE users.Id_user ='" + userid +  "';"
@@ -234,7 +234,106 @@ app.post('/user/delete', (req, res) => {
     }
 })
 
-app.post('/search', async(req, res)=> {
+app.get('/getTowns', async (req, res) => {
+    try {
+        console.log('1')
+        var query = "SELECT * FROM towns;"
+        var result = await pool.query(query)
+
+        if (result.rowCount == 0) {
+            return res.json({
+                message: 'ko'
+            })
+        } else {
+            var towns = []
+            for (let i = 0; i < result.rows.length; i++) {
+                town = {}
+                town['id'] = result.rows[i].id_town
+                town['name'] = result.rows[i].name
+                towns.push(town)
+            }
+
+            return res.send(towns)
+        }
+    } catch (error){
+        console.log(error)
+        res.json({
+            message: "error",
+            error
+        })
+    }
+})
+
+app.get('/getTown/:id', async (req, res) => {
+    var query = "SELECT * FROM towns WHERE towns.id_town = '" + req.params.id + "';"
+
+    console.log('before promises')
+    var townData = await pool.query(query)
+    console.log(townData.rows)
+    
+    var promiseRestaurants = async () => new Promise((resolve, reject) => {
+        const child = spawn('python', ['./WebScrapers/buscorestaurantes.py', townData.rows[0].name]);
+        child.on("close", () => {
+            var contents = fs.readFileSync("./WebScrapers/resultado/buscorestaurantes.json");
+            var jsonContent = JSON.parse(contents)
+            resolve(jsonContent)
+        })
+        child.on("error", (error) => {
+            reject(error)
+        })
+    })
+    var promiseJobs = async () => new Promise((resolve, reject) => {
+        const child = spawn('python', ['./WebScrapers/jobtoday.py', townData.rows[0].name]);
+        child.on("close", () => {
+            var contents = fs.readFileSync("./WebScrapers/resultado/jobtoday.json");
+            var jsonContent = JSON.parse(contents)
+            resolve(jsonContent)
+        })
+        child.on("error", (error) => {
+            reject(error)
+        })
+    })
+    var promiseNews = async () => new Promise((resolve, reject) => {
+        const child = spawn('python', ['./WebScrapers/20minutos.py', townData.rows[0].name]);
+        child.on("close", () => {
+            var contents = fs.readFileSync("./WebScrapers/resultado/20minutos.json");
+            var jsonContent = JSON.parse(contents)
+            resolve(jsonContent)
+        })
+        child.on("error", (error) => {
+            reject(error)
+        })
+    })
+    if(townData.rowCount !== 0) {
+        try {
+            var responses = await Promise.all([promiseRestaurants(), promiseJobs(), promiseNews()])
+        } catch (error) {
+            console.log(error)
+        }
+        console.log(responses)
+    
+        town = {}
+        town['name'] = townData.rows[0].name
+        town['region'] = townData.rows[0].region
+        town['province'] = townData.rows[0].province
+        town['aacc'] = townData.rows[0].aacc
+        town['density_pob'] = townData.rows[0].density_pob
+        town['population'] = townData.rows[0].population
+        town['emptied'] = townData.rows[0].emptied
+        town['news'] = responses[2]
+        town['jobs'] = responses[1]
+        town['restaurants'] = responses[0]
+        
+        return res.send(town)
+    } else {
+        res.status(404)
+        res.send({
+            status: `No town with ${req.params.id} id found`
+        })
+    }
+})
+
+app.post('/search/jobs', async(req, res)=> {
     console.log(req.body)
     const child = spawn('python', ['./WebScrapers/jobtoday.py', req.body.text]);
     child.on("close", () => {
@@ -246,7 +345,43 @@ app.post('/search', async(req, res)=> {
     })
 })
 
-app.post('/search2', (req, res)=> {
+app.post('/search/news', async(req, res)=> {
+    console.log(req.body)
+    const child = spawn('python', ['./WebScrapers/20minutos.py', req.body.text]);
+    child.on("close", () => {
+        var contents = fs.readFileSync("./WebScrapers/resultado/20minutos.json");
+        
+        var jsonContent = JSON.parse(contents)
+
+        res.send(jsonContent)
+    })
+})
+
+app.post('/search/restaurants', async(req, res)=> {
+    console.log(req.body)
+    const child = spawn('python', ['./WebScrapers/buscorestaurantes.py', req.body.text]);
+    child.on("close", () => {
+        var contents = fs.readFileSync("./WebScrapers/resultado/buscorestaurantes.json");
+        
+        var jsonContent = JSON.parse(contents)
+
+        res.send(jsonContent)
+    })
+})
+
+app.post('/search/municipios', async(req, res)=> {
+    console.log(req.body)
+    const child = spawn('python', ['./WebScrapers/15mpedia.py', req.body.text]);
+    child.on("close", () => {
+        var contents = fs.readFileSync("./WebScrapers/resultado/15mpedia.json");
+        
+        var jsonContent = JSON.parse(contents)
+
+        res.send(jsonContent)
+    })
+})
+
+app.get('/search2', (req, res)=> {
     const decoder = new StringDecoder('utf8');
     const child = spawn('python', ['./WebScrapers/jobtoday.py', req.body.text]);
     child.stdout.setEncoding('utf8');
@@ -256,7 +391,7 @@ app.post('/search2', (req, res)=> {
         //console.log(data)
         
         res.setHeader("Content-Type", "application/json; charset=utf-8");
-        var jsonContent = JSON.parse(data.toString());
+        var jsonContent = JSON.parse(data.toString('utf8'));
         res.send(jsonContent);
     });
 })

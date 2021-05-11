@@ -1,15 +1,13 @@
 from bs4 import BeautifulSoup
-import pandas as pd
 import requests
 import sys
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-import time
 import json
 
-textN = sys.argv[1]
+text = sys.argv[1]
 #text = input("Introduce un lugar: ")
 num_news = 20
-place = textN.replace(" ", "-")
+place = text.replace(" ", "-")
 r = requests.get(f'https://www.20minutos.es/busqueda/?q=' + place)
 contenido = r.text
 soup = BeautifulSoup(r.content.decode('utf-8'), 'html.parser')
@@ -56,7 +54,7 @@ while len(noticias) < num_news:
 
             doc = {}
             doc['title'] = titleClean
-            doc['Lugar'] = textN
+            doc['Lugar'] = text
             doc['tags'] = tags
             doc['noticia'] = articleContent
             doc['Analisis del sentimiento'] = SentimentIntensityAnalyzer().polarity_scores(doc['noticia'])
@@ -66,5 +64,6 @@ while len(noticias) < num_news:
                 break
     except:
         break
+print(noticias)
 with open('./WebScrapers/resultado/20minutos.json', 'w',  encoding='utf-8') as f:
     json.dump(noticias, f, ensure_ascii=False, indent=4)
