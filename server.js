@@ -236,7 +236,6 @@ app.post('/user/delete', (req, res) => {
 
 app.get('/getTowns', async (req, res) => {
     try {
-        console.log('1')
         var query = "SELECT * FROM towns;"
         var result = await pool.query(query)
 
@@ -304,7 +303,9 @@ app.get('/getTown/:id', async (req, res) => {
             reject(error)
         })
     })
+
     if(townData.rowCount !== 0) {
+        console.log('llega')
         try {
             var responses = await Promise.all([promiseRestaurants(), promiseJobs(), promiseNews()])
         } catch (error) {
@@ -314,12 +315,19 @@ app.get('/getTown/:id', async (req, res) => {
     
         town = {}
         town['name'] = townData.rows[0].name
+        console.log(town['name'])
         town['region'] = townData.rows[0].region
+        console.log(town['region'])
         town['province'] = townData.rows[0].province
+        console.log(town['province'])
         town['aacc'] = townData.rows[0].aacc
+        console.log(town['aacc'])
         town['density_pob'] = townData.rows[0].density_pob
+        console.log(town['density_pob'])
         town['population'] = townData.rows[0].population
+        console.log(town['population'])
         town['emptied'] = townData.rows[0].emptied
+        console.log(town['emptied'])
         town['news'] = responses[2]
         town['jobs'] = responses[1]
         town['restaurants'] = responses[0]
@@ -333,7 +341,7 @@ app.get('/getTown/:id', async (req, res) => {
     }
 })
 
-app.post('/search/jobs', async(req, res)=> {
+app.get('/search/jobs', async(req, res)=> {
     console.log(req.body)
     const child = spawn('python', ['./WebScrapers/jobtoday.py', req.body.text]);
     child.on("close", () => {
@@ -345,7 +353,7 @@ app.post('/search/jobs', async(req, res)=> {
     })
 })
 
-app.post('/search/news', async(req, res)=> {
+app.get('/search/news', async(req, res)=> {
     console.log(req.body)
     const child = spawn('python', ['./WebScrapers/20minutos.py', req.body.text]);
     child.on("close", () => {
@@ -355,9 +363,12 @@ app.post('/search/news', async(req, res)=> {
 
         res.send(jsonContent)
     })
+    child.on("error", (error) => {
+        console.log(error)
+    })
 })
 
-app.post('/search/restaurants', async(req, res)=> {
+app.get('/search/restaurants', async(req, res)=> {
     console.log(req.body)
     const child = spawn('python', ['./WebScrapers/buscorestaurantes.py', req.body.text]);
     child.on("close", () => {
@@ -367,9 +378,12 @@ app.post('/search/restaurants', async(req, res)=> {
 
         res.send(jsonContent)
     })
+    child.on("error", (error) => {
+        console.log(error)
+    })
 })
 
-app.post('/search/municipios', async(req, res)=> {
+app.get('/search/municipios', async(req, res)=> {
     console.log(req.body)
     const child = spawn('python', ['./WebScrapers/15mpedia.py', req.body.text]);
     child.on("close", () => {
@@ -379,21 +393,25 @@ app.post('/search/municipios', async(req, res)=> {
 
         res.send(jsonContent)
     })
+    child.on("error", (error) => {
+        console.log(error)
+    })
 })
 
 app.get('/search2', (req, res)=> {
-    const decoder = new StringDecoder('utf8');
+    console.log(req.body.text)
     const child = spawn('python', ['./WebScrapers/jobtoday.py', req.body.text]);
-    child.stdout.setEncoding('utf8');
     child.stdout.on('data', (data) => {
         //console.log(utf8.decode(data))
         //console.log(decoder.write(data))
         //console.log(data)
         
-        res.setHeader("Content-Type", "application/json; charset=utf-8");
         var jsonContent = JSON.parse(data.toString('utf8'));
         res.send(jsonContent);
     });
+    child.on("error", (error) => {
+        console.log(error)
+    })
 })
 
 //Middlewares

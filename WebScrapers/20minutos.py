@@ -36,7 +36,7 @@ while len(noticias) < num_news:
             if articleSection is None:
                 continue
 
-            articleContent = articleSection.find('div', { 'class': 'article-text' }).text
+            articleContent = articleSection.find('div', { 'class': 'article-text' }).text.replace("\n", "").replace("\"", "")
             if articleContent is None:
                 continue
 
@@ -57,12 +57,14 @@ while len(noticias) < num_news:
             doc['Lugar'] = text
             doc['tags'] = tags
             doc['noticia'] = articleContent
-            doc['Analisis del sentimiento'] = SentimentIntensityAnalyzer().polarity_scores(doc['noticia'])
             doc['fecha'] = dateTime.text
             noticias.append(doc)
             if len(noticias) == num_news:
                 break
     except:
+        j = {}
+        j['m'] = 'nada'
+        noticias.append(j)
         break
 print(noticias)
 with open('./WebScrapers/resultado/20minutos.json', 'w',  encoding='utf-8') as f:

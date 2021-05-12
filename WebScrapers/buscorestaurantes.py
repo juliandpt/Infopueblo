@@ -1,4 +1,6 @@
-from bs4 import *
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+from bs4 import BeautifulSoup
+import statistics
 import requests
 import sys
 import json
@@ -21,22 +23,33 @@ while len(restaurants) < num_restaurants:
             hyperLink = row.find('a')
             try:
                 restaurantLink = hyperLink['href']
+                print(restaurantLink)
                 restaurantPage = requests.get(restaurantLink, allow_redirects=False)
                 parsedPage = BeautifulSoup(restaurantPage.text, 'html.parser')
                 item = {}
                 name = parsedPage.find("h1").text.replace("Restaurante:", "").replace("\n", "").replace("\t", "")
+                print(name)
                 item['name'] = name
+                item['place'] = parsedPage.find('div', {'class': 'block-map-header-address'}).text.replace("\n", "").replace("\t", "")
+                sentiments = []
                 item['comments'] = []
                 comments = parsedPage.find_all("p", {"class": "excerpt"})
                 for comment in comments:
-                    text = comment.text.replace("\n", "").replace("\t", "")
-                    item['comments'].append(text)
+                    c = comment.text.replace("\n", "").replace("\t", "")
+                    s = SentimentIntensityAnalyzer().polarity_scores(c)['compound']
+                    item['comments'].append(c)
+                    sentiments.append(s)
+                item['sentiment'] = statistics.median(sentiments)
+                print(item['sentiment'])
                 restaurants.append(item)
                 if len(restaurants) == num_restaurants:
                     break
             except:
                 continue
     except:
+        j = {}
+        j['m'] = 'nada'
+        restaurants.append(j)
         break
 print(restaurants)
 with open('./WebScrapers/resultado/buscorestaurantes.json', 'w',  encoding='utf-8') as f:
