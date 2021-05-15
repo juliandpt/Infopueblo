@@ -270,7 +270,7 @@ app.get('/getTown/:id', async (req, res) => {
     var townData = await pool.query(query)
     console.log(townData.rows)
     
-    var promiseRestaurants = async () => new Promise((resolve, reject) => {
+    let promiseRestaurants = async () => new Promise((resolve, reject) => {
         const child = spawn('python', ['./WebScrapers/buscorestaurantes.py', townData.rows[0].name]);
         child.on("close", () => {
             var contents = fs.readFileSync("./WebScrapers/resultado/buscorestaurantes.json");
@@ -281,7 +281,7 @@ app.get('/getTown/:id', async (req, res) => {
             reject(error)
         })
     })
-    var promiseJobs = async () => new Promise((resolve, reject) => {
+    let promiseJobs = async () => new Promise((resolve, reject) => {
         const child = spawn('python', ['./WebScrapers/jobtoday.py', townData.rows[0].name]);
         child.on("close", () => {
             var contents = fs.readFileSync("./WebScrapers/resultado/jobtoday.json");
@@ -292,7 +292,7 @@ app.get('/getTown/:id', async (req, res) => {
             reject(error)
         })
     })
-    var promiseNews = async () => new Promise((resolve, reject) => {
+    let promiseNews = async () => new Promise((resolve, reject) => {
         const child = spawn('python', ['./WebScrapers/20minutos.py', townData.rows[0].name]);
         child.on("close", () => {
             var contents = fs.readFileSync("./WebScrapers/resultado/20minutos.json");
@@ -306,12 +306,11 @@ app.get('/getTown/:id', async (req, res) => {
 
     if(townData.rowCount !== 0) {
         console.log('llega')
-        try {
-            var responses = await Promise.all([promiseRestaurants(), promiseJobs(), promiseNews()])
-        } catch (error) {
-            console.log(error)
-        }
-        console.log(responses)
+        var responses = await Promise.all([promiseRestaurants(), promiseJobs(), promiseNews()]).then(values => {
+            console.log(values)
+        }).catch(reason => {
+            console.log(reason)
+        });
     
         town = {}
         town['name'] = townData.rows[0].name
@@ -328,9 +327,9 @@ app.get('/getTown/:id', async (req, res) => {
         console.log(town['population'])
         town['emptied'] = townData.rows[0].emptied
         console.log(town['emptied'])
-        town['news'] = responses[2]
-        town['jobs'] = responses[1]
         town['restaurants'] = responses[0]
+        town['jobs'] = responses[1]
+        town['news'] = responses[2]
         
         return res.send(town)
     } else {
