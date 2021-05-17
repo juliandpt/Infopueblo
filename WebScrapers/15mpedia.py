@@ -22,6 +22,13 @@ for row in rows:
   municipio = {}
   i = i +1
   municipio['name'] = row.find('td', {"class": "Municipio"}).text.replace("'"," ")
+  logo = row.find('href', {"class": "Municipio"})
+  r = requests.get(logo)
+  content = r.text
+  soup = BeautifulSoup(content, 'html.parser')
+  image = soup.find_all('a' {"class": "image"})
+  link = requests.get(image['href'])
+  
   if row.find('td', {"class": "Comarca"}) is None:
     municipio['region'] = ''
   else:
