@@ -23,24 +23,19 @@ while len(restaurants) < num_restaurants:
             hyperLink = row.find('a')
             try:
                 restaurantLink = hyperLink['href']
-                print(restaurantLink)
                 restaurantPage = requests.get(restaurantLink, allow_redirects=False)
                 parsedPage = BeautifulSoup(restaurantPage.text, 'html.parser')
                 item = {}
                 name = parsedPage.find("h1").text.replace("Restaurante:", "").replace("\n", "").replace("\t", "")
-                print(name)
                 item['name'] = name
-                item['place'] = parsedPage.find('div', {'class': 'block-map-header-address'}).text.replace("\n", "").replace("\t", "")
+                item['location'] = parsedPage.find('div', {'class': 'block-map-header-address'}).text.replace("\n", "").replace("\t", "")
                 sentiments = []
-                item['comments'] = []
                 comments = parsedPage.find_all("p", {"class": "excerpt"})
                 for comment in comments:
                     c = comment.text.replace("\n", "").replace("\t", "")
                     s = SentimentIntensityAnalyzer().polarity_scores(c)['compound']
-                    item['comments'].append(c)
                     sentiments.append(s)
                 item['sentiment'] = statistics.median(sentiments)
-                print(item['sentiment'])
                 restaurants.append(item)
                 if len(restaurants) == num_restaurants:
                     break

@@ -29,6 +29,10 @@ app.use((req, res, next) => {
     next();
 });
 
+// -------------------------------------------------------------------------------------
+// Gestion de usuarios
+// -------------------------------------------------------------------------------------
+
 app.post('/login', async (req, res) => {
     console.log(req.body)
     // const query = {
@@ -38,7 +42,7 @@ app.post('/login', async (req, res) => {
     // }
     const query = "SELECT * FROM users WHERE users.email ='" + req.body.email +  "' and users.password = '" + sha(req.body.password) + "';"
     console.log(query)
-    const result = await pool.query(query)
+    var result = await pool.query(query)
     console.log(result)
 
     if (result.rowCount == 0) {
@@ -134,36 +138,36 @@ app.post('/register', async(req, res) => {
         url = 'http://127.0.0.1:8080/validate?email='+ email + '&token=' + accessToken
         
         function getMessage() {
-        const body = 'Haz click en el siguiente link para validar tu cuenta: ' + url;
-        return {
-            to: email,
-            from: 'correoguapisimo@outlook.com',
-            subject: 'Valida tu cuenta!',
-            templateId: 'd-8170e316f5b542dda528d66c79116be8',
-            dynamicTemplateData: {
+            const body = 'Haz click en el siguiente link para validar tu cuenta: ' + url;
+            return {
+                to: email,
+                from: 'correoguapisimo@outlook.com',
                 subject: 'Valida tu cuenta!',
-                user: req.body.name,
-                url: url,
-              },
-        };
+                templateId: 'd-8170e316f5b542dda528d66c79116be8',
+                dynamicTemplateData: {
+                    subject: 'Valida tu cuenta!',
+                    user: req.body.name,
+                    url: url,
+                },
+            };
         }
 
         async function sendEmail() {
-        try {
-            await sendGridMail.send(getMessage());
-            console.log('Test email sent successfully');
-        } catch (error) {
-            console.error('Error sending test email');
-            console.error(error);
-            if (error.response) {
-            console.error(error.response.body)
+            try {
+                await sendGridMail.send(getMessage());
+                console.log('Test email sent successfully');
+            } catch (error) {
+                console.error('Error sending test email');
+                console.error(error);
+                if (error.response) {
+                    console.error(error.response.body)
+                }
             }
-        }
         }
 
         (async () => {
-        console.log('Sending test email');
-        await sendEmail();
+            console.log('Sending test email');
+            await sendEmail();
         })();
         return res.json({
             message: 'ok'
@@ -234,9 +238,13 @@ app.post('/user/delete', (req, res) => {
     }
 })
 
+// -------------------------------------------------------------------------------------
+// Obtencion de datos de pueblos
+// -------------------------------------------------------------------------------------
+
 app.get('/getTowns', async (req, res) => {
     try {
-        var query = "SELECT * FROM towns;"
+        const query = "SELECT * FROM towns;"
         var result = await pool.query(query)
 
         if (result.rowCount == 0) {
@@ -263,15 +271,82 @@ app.get('/getTowns', async (req, res) => {
     }
 })
 
-app.get('/getTown/:id', async (req, res) => {
-    var query = "SELECT * FROM towns WHERE towns.id_town = '" + req.params.id + "';"
+app.get('/getTopTowns', async (req, res) => {
+    try {
+        const query = "SELECT * FROM searches WHERE searches.date >= '" + today-7 + "' ORDER BY searches.num_searches DESC LIMIT 10;"
+        var result = await pool.query(query)
 
-    console.log('before promises')
-    var townData = await pool.query(query)
-    console.log(townData.rows)
-    
+        if (result.rowCount == 0) {
+            return res.json({
+                message: 'ko'
+            })
+        } else {
+            var towns = []
+            for (let i = 0; i < result.rows.length; i++) {
+                var townid = result.rows[i].id_town
+                var townQuery = "SELECT * FROM towns WHERE towns.id_town = " + townid + ";"
+                var resultTown = await pool.query(townQuery)
+                town = {}
+                town['id'] = resultTown.rows[0].id_town
+                town['name'] = resultTown.rows[0].name
+                town['image'] = resultTown.rows[0].image_url
+                towns.push(town)
+            }
+
+            return res.send(towns)
+        }
+    } catch (error){
+        console.log(error)
+        res.json({
+            message: "error",
+            error
+        })
+    }
+})
+
+app.get('/getLikedTowns', async (req, res) => {
+    try {
+        const query = "SELECT * FROM towns ORDER BY towns.likes DESC LIMIT 10;"
+        var result = await pool.query(query)
+
+        if (result.rowCount == 0) {
+            return res.json({
+                message: 'ko'
+            })
+        } else {
+            var towns = []
+            for (let i = 0; i < result.rows.length; i++) {
+                town = {}
+                town['id'] = result.rows[0].id_town
+                town['name'] = result.rows[0].name
+                town['image'] = result.rows[0].image_url
+                towns.push(town)
+            }
+
+            return res.send(towns)
+        }
+    } catch (error){
+        console.log(error)
+        res.json({
+            message: "error",
+            error
+        })
+    }
+})
+
+app.get('/getTown/:id', async (req, res) => {
+    var today = Date.now() //cambiar en fecha mejor
+    var townQuery = "SELECT * FROM towns WHERE towns.id_town = " + req.params.id + ";"
+    var searchQuery = "SELECT id_town FROM searches WHERE searches.id_town = " + req.params.id + " AND searches.date >= '" + today-7 + "';" //quitar 7 dias
+
+    var resultSearch = await pool.query(searchQuery)
+    var resultTown = await pool.query(townQuery)
+
+    //MIRAR SI AL FECHA ES CON ALMOHADILLA, CON ' O SIN NADA
+    await pool.query("INSERT INTO searches (id_town, date) VALUES (" + req.params.id + "," + today + ");")
+
     let promiseRestaurants = async () => new Promise((resolve, reject) => {
-        const child = spawn('python', ['./WebScrapers/buscorestaurantes.py', townData.rows[0].name]);
+        const child = spawn('python', ['./WebScrapers/buscorestaurantes.py', resultTown.rows[0].name]);
         child.on("close", () => {
             var contents = fs.readFileSync("./WebScrapers/resultado/buscorestaurantes.json");
             var jsonContent = JSON.parse(contents)
@@ -282,7 +357,7 @@ app.get('/getTown/:id', async (req, res) => {
         })
     })
     let promiseJobs = async () => new Promise((resolve, reject) => {
-        const child = spawn('python', ['./WebScrapers/jobtoday.py', townData.rows[0].name]);
+        const child = spawn('python', ['./WebScrapers/jobtoday.py', resultTown.rows[0].name]);
         child.on("close", () => {
             var contents = fs.readFileSync("./WebScrapers/resultado/jobtoday.json");
             var jsonContent = JSON.parse(contents)
@@ -293,7 +368,7 @@ app.get('/getTown/:id', async (req, res) => {
         })
     })
     let promiseNews = async () => new Promise((resolve, reject) => {
-        const child = spawn('python', ['./WebScrapers/20minutos.py', townData.rows[0].name]);
+        const child = spawn('python', ['./WebScrapers/20minutos.py', resultTown.rows[0].name]);
         child.on("close", () => {
             var contents = fs.readFileSync("./WebScrapers/resultado/20minutos.json");
             var jsonContent = JSON.parse(contents)
@@ -304,40 +379,87 @@ app.get('/getTown/:id', async (req, res) => {
         })
     })
 
-    if(townData.rowCount !== 0) {
-        console.log('llega')
-        var responses = await Promise.all([promiseRestaurants(), promiseJobs(), promiseNews()]).then(values => {
-            console.log(values)
-        }).catch(reason => {
-            console.log(reason)
-        });
-    
+    if (resultSearch.rowCount === 0) {
+        if (townData.rowCount !== 0) {
+            var deleteRestaurants = "DELETE FROM restaurants WHERE id_town = '" + req.params.id + "';" 
+            var deleteJobs = "DELETE FROM jobs WHERE id_town = '" + req.params.id + "';" 
+            var deleteNews = "DELETE FROM news WHERE id_town = '" + req.params.id + "';" 
+
+            var resultDeleteRestaurants = await pool.query(deleteRestaurants)
+            var resultDeleteJobs = await pool.query(deleteJobs)
+            var resultDeleteNews = await pool.query(deleteNews)
+
+            var responses = await Promise.all([promiseRestaurants(), promiseJobs(), promiseNews()]).then(values => {
+                console.log(values)
+            }).catch(reason => {
+                console.log(reason)
+            });
+
+            for (let i = 0; i < responses[0].length; i++) {
+                var townid = req.params.id
+                var name = responses[0][i].name
+                var location = responses[0][i].location
+                var sentiment = responses[0][i].sentiment
+                //var image = responses[0][i].image
+
+                var insertRestaurantQuery = "INSERT INTO restaurants (id_town,name,location,sentiment) VALUES (" + townid + ",'" + name + "','" + location + "'," + sentiment + ");"
+                await pool.query(insertRestaurantQuery)
+            }
+        
+            town = {}
+            town['name'] = townData.rows[0].name
+            town['region'] = townData.rows[0].region
+            town['province'] = townData.rows[0].province
+            town['aacc'] = townData.rows[0].aacc
+            town['density'] = townData.rows[0].density
+            town['population'] = townData.rows[0].population
+            town['emptied'] = townData.rows[0].emptied
+            town['restaurants'] = responses[0]
+            town['jobs'] = responses[1]
+            town['news'] = responses[2]
+            
+            return res.send(town)
+        } else {
+            res.status(404)
+            res.send({
+                status: `No town with ${req.params.id} id found`
+            })
+        }
+    } else {
+        var restaurantsQuery = "SELECT * FROM restaurants WHERE id_town = '" + req.params.id + "';"
+        var jobsQuery = "SELECT * FROM jobs WHERE id_town = '" + req.params.id + "';"
+        var newsQuery = "SELECT * FROM news WHERE id_town = '" + req.params.id + "';"
+
+        var resultRetsaurants = await pool.query(restaurantsQuery)
+        var resultJobs = await pool.query(jobsQuery)
+        var resultNews = await pool.query(newsQuery)
+
+        var restaurants = []
+        var jobs = []
+        var news = []
+
+        for (let i = 0; i < result.rows.length; i++) {
+
+        }
+
         town = {}
         town['name'] = townData.rows[0].name
-        console.log(town['name'])
         town['region'] = townData.rows[0].region
-        console.log(town['region'])
         town['province'] = townData.rows[0].province
-        console.log(town['province'])
         town['aacc'] = townData.rows[0].aacc
-        console.log(town['aacc'])
-        town['density_pob'] = townData.rows[0].density_pob
-        console.log(town['density_pob'])
+        town['density'] = townData.rows[0].density
         town['population'] = townData.rows[0].population
-        console.log(town['population'])
         town['emptied'] = townData.rows[0].emptied
-        console.log(town['emptied'])
         town['restaurants'] = responses[0]
         town['jobs'] = responses[1]
         town['news'] = responses[2]
         
-        return res.send(town)
-    } else {
-        res.status(404)
-        res.send({
-            status: `No town with ${req.params.id} id found`
-        })
     }
+
+    //hacer la busqueda en la tabla busquedas para esa ciudad y fecha.today < fecha.today-7
+        //si no lo encuentra: scrapeo e inserccion en bbdd
+
+    //una vez terminado el scrapeo, consultamos en bbdd
 })
 
 app.get('/search/jobs', async(req, res)=> {
@@ -413,7 +535,9 @@ app.get('/search2', (req, res)=> {
     })
 })
 
-//Middlewares
+// -------------------------------------------------------------------------------------
+// Middlewares
+// -------------------------------------------------------------------------------------
 
 async function authenticateToken(token) {
     try {
