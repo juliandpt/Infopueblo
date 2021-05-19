@@ -1,0 +1,52 @@
+CREATE TABLE IF NOT EXISTS towns (
+  id_town INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  name varchar(70) DEFAULT NULL,
+  region varchar(70) DEFAULT NULL,
+  province varchar(70) DEFAULT NULL,
+  aacc varchar(70) DEFAULT NULL,
+  population int not null,
+  density float not null,
+  image_url varchar(250) DEFAULT NULL,
+  emptied boolean,
+  likes int DEFAULT NULL
+);
+CREATE TABLE IF NOT EXISTS searchs (
+  id_search INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  id_town int DEFAULT NULL,
+  date date DEFAULT NULL
+);
+CREATE TABLE IF NOT EXISTS jobs (
+  id_job INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  id_town int DEFAULT NULL,
+  name varchar(50) DEFAULT NULL,
+  URL varchar(30) DEFAULT NULL,
+  location varchar(100) DEFAULT NULL
+);
+CREATE TABLE IF NOT EXISTS news (
+  id_news INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  id_town int DEFAULT NULL,
+  media varchar(50) DEFAULT NULL,
+  date date DEFAULT NULL,
+  content text DEFAULT NULL,
+  emptied boolean DEFAULT NULL
+);
+CREATE TABLE IF NOT EXISTS restaurants (
+  id_restaurant INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  id_town int DEFAULT NULL,
+  name varchar(50) DEFAULT NULL,
+  url varchar(30) DEFAULT NULL,
+  location varchar(100) DEFAULT NULL,
+  image_url varchar(250) default null
+);
+CREATE TABLE IF NOT EXISTS users (
+  id_user INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  email varchar(50) DEFAULT NULL,
+  password varchar(300) DEFAULT NULL,
+  name varchar(50) DEFAULT NULL,
+  surnames varchar(50) DEFAULT NULL,
+  admin boolean DEFAULT FALSE,
+  token varchar(300) DEFAULT NULL,
+  verificationToken varchar(300) DEFAULT NULL,
+  isActive boolean default false 
+);
+CREATE UNIQUE INDEX in_unique_email ON users (email);

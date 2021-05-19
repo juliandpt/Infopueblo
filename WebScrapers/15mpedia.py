@@ -5,21 +5,17 @@ import sys
 
 # Connect to MariaDB Platform
 try:
-    conn = mariadb.connect(
-        user="pr_grupob",
-        password="PC2-2021",
-        host="2.139.176.212",
-        port=3306,
-        database="prgrupob"
+  conn = mariadb.connect(
+      user="pr_grupob",
+      password="PC2-2021",
+      host="2.139.176.212",
+      port=3306,
+      database="prgrupob"
 
     )
 except mariadb.Error as e:
-    print(f"Error connecting to MariaDB Platform: {e}")
-    sys.exit(1)
-
-
-
-# r = requests.get(f'https://15mpedia.org/w/index.php?title=Especial:Ask&offset=0&limit=8134&q=%5B%5BPage+has+default+form%3A%3AMunicipio%5D%5D+%5B%5Bpa%C3%ADs%3A%3AEspa%C3%B1a%5D%5D&p=format%3Dtable%2Fmainlabel%3DMunicipio&po=%3F%3DMunicipio%23%0A%3FComarca%23-%0A%3FProvincia%0A%3FComunidad+aut%C3%B3noma%3DCC.AA.%0A%3FAltitud%3DAltitud+%28m.s.n.m.%29%0A%3FSuperficie%3DSuperficie+%28km%C2%B2%29%0A%3FPoblaci%C3%B3n+en+2019%3DPoblaci%C3%B3n+%282019%29%0A%3FDensidad+de+poblaci%C3%B3n%3DDensidad+%28hab.%2Fkm%C2%B2%29%0A&sort=nombre&order=asc')
+  print(f"Error connecting to MariaDB Platform: {e}")
+  sys.exit(1)
 
 r = requests.get(f'https://15mpedia.org/w/index.php?title=Especial:Ask&offset=0&limit=2&q=%5B%5BPage+has+default+form%3A%3AMunicipio%5D%5D+%5B%5Bpa%C3%ADs%3A%3AEspa%C3%B1a%5D%5D&p=format%3Dtable%2Fmainlabel%3DMunicipio&po=%3F%3DMunicipio%23%0A%3FComarca%23-%0A%3FProvincia%0A%3FComunidad+aut%C3%B3noma%3DCC.AA.%0A%3FAltitud%3DAltitud+%28m.s.n.m.%29%0A%3FSuperficie%3DSuperficie+%28km%C2%B2%29%0A%3FPoblaci%C3%B3n+en+2019%3DPoblaci%C3%B3n+%282019%29%0A%3FDensidad+de+poblaci%C3%B3n%3DDensidad+%28hab.%2Fkm%C2%B2%29%0A&sort=nombre&order=asc')
 
@@ -55,10 +51,12 @@ for row in rows:
 
   municipio['province'] = row.find('td', {"class": "Provincia"}).text.replace("'"," ")
   municipio['aacc'] = row.find('td', {"class": "CC.AA."}).text.replace("'"," ")
+
   if row.find('td', {"class": "Población-(2019)"}) is None:
     municipio['population'] = str(0)
   else:
     municipio['population'] = row.find('td', {"class": "Población-(2019)"}).text.replace('.','')
+    
   if row.find('td', {"class": "Densidad-(hab./km²)"}) is None:
     municipio['density'] = str(0)
   else:
