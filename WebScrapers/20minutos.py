@@ -11,9 +11,9 @@ place = text.replace(" ", "-")
 r = requests.get(f'https://www.20minutos.es/busqueda/?q=' + place)
 contenido = r.text
 soup = BeautifulSoup(r.content.decode('utf-8'), 'html.parser')
-noticias = []
+news = []
 i = 1
-while len(noticias) < num_news:
+while len(news) < num_news:
     try:
         url = 'https://www.20minutos.es/busqueda/'+ str(i) + '/?q=' + place
         i = i+1
@@ -54,18 +54,16 @@ while len(noticias) < num_news:
 
             doc = {}
             doc['title'] = titleClean
-            doc['Lugar'] = text
+            doc['place'] = text
             doc['tags'] = tags
-            doc['noticia'] = articleContent
-            doc['fecha'] = dateTime.text
-            noticias.append(doc)
-            if len(noticias) == num_news:
+            doc['content'] = articleContent
+            doc['date'] = dateTime.text
+            news.append(doc)
+            if len(news) == num_news:
                 break
     except:
-        j = {}
-        j['m'] = 'nada'
-        noticias.append(j)
         break
-print(noticias)
-with open('./WebScrapers/resultado/20minutos.json', 'w',  encoding='utf-8') as f:
-    json.dump(noticias, f, ensure_ascii=False, indent=4)
+newsJson = json.dumps(news)
+print(newsJson)
+# with open('./WebScrapers/resultado/20minutos.json', 'w',  encoding='utf-8') as f:
+#     json.dump(news, f, ensure_ascii=False, indent=4)

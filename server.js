@@ -13,6 +13,7 @@ const pool = mariadb.createPool({
     host: '2.139.176.212', 
     user:'pr_grupob', 
     password: 'PC2-2021',
+    database: 'prgrupob',
     connectionLimit: 5
 });
 const d = new Date()
@@ -41,9 +42,9 @@ app.post('/login', async (req, res) => {
     //     values: [req.body.email, sha(req.body.password)],
     //     rowMode: 'array'
     // }
-    const query = "SELECT * FROM users WHERE users.email ='" + req.body.email +  "' and users.password = '" + sha(req.body.password) + "';"
+    const query = "SELECT * FROM users WHERE users.email = ? and users.password = ?;"
     console.log(query)
-    var result = await pool.query(query)
+    var result = await pool.query(query, [req.body.email, sha(req.body.password)])
     console.log(result)
 
     if (result.rowCount == 0) {
@@ -71,13 +72,8 @@ app.post('/login', async (req, res) => {
             const accessToken = jwt.sign(claims, '3ea3967ae8328f89eda5be264d5af88b83d490afc9218d02e5628e07bf89850e828eef80c4085c20e4a394f5a7792773347e7a6492b0e05e54f321a34b7ed20b')
             console.log(accessToken)
 
-            // const query = {
-            //     text: 'UPDATE users SET token = ? where id_user = ?',
-            //     values: [accesToken, userid],
-            //     rowMode: 'array'
-            // }
-            const query = "UPDATE users SET token = '" + accessToken +  "' where id_user = '" + userid + "';"
-            const result2 = await pool.query(query)
+            const query = "UPDATE users SET token = ? where id_user = ?;"
+            const result2 = await pool.query(query, [accessToken, userid])
             console.log(result2)
 
             return res.json({
@@ -103,43 +99,38 @@ app.get('/validate', async (req, res) => {
     //     values: [req.body.email, sha(req.body.password)],
     //     rowMode: 'array'
     // }
-    const query = "UPDATE users SET validate=true where email = '" + req.query.email + "' and token='" + req.query.token + "';"
-    console.log(query)
-    const result = await pool.query(query)
+    const query = "UPDATE users SET validate=true where email = ? and token = ?;"
+    const result = await pool.query(query, [req.query.email, req.query.token])
     console.log(result)
 
     if (result.rowCount == 0) {
         return res.json({
             message: 'ko'
         })
-    }
-    else return res.json({
-        message: 'cuenta validada'
-    })
+    } else {
+        return res.json({
+            message: 'cuenta validada'
+        })
+    } 
 })
 
 app.post('/register', async(req, res) => {
     try {
         console.log(req.body);
         email = req.body.email
-        const now = new Date();
-        today = date.format(now, 'YYYY-MM-DD')
         var claims = {
             userid: req.body.name,
-            exp: Date.now(),
-            iat: Date.now() //Fecha de creación
+            exp: tomorrow,
+            iat: today
         }
     
         const accessToken = jwt.sign(claims, '3ea3967ae8328f89eda5be264d5af88b83d490afc9218d02e5628e07bf89850e828eef80c4085c20e4a394f5a7792773347e7a6492b0e05e54f321a34b7ed20b')
 
-        var query = {            
-            text: "INSERT INTO users (email,password,name,surnames,phone,entry_date,leaving_date,admin,token,validate) VALUES ($1,$2,$3,$4,$5,$6,NULL,false,$7,false);",
-            values: [email, sha(req.body.password), req.body.name, req.body.surnames, req.body.phone, today, accessToken],
-            rowMode: 'array'
-        }
-        var result = pool.query(query)
+        const query = "INSERT INTO users (email,password,name,surnames,admin,token,validate) VALUES (?,?,?,?,?,?,?);"
+        var result = await pool.query(query, [email, sha(req.body.password), req.body.name, req.body.surnames, false, accessToken, false])
+        
         sendGridMail.setApiKey('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');
-        url = 'http://127.0.0.1:8080/validate?email='+ email + '&token=' + accessToken
+        url = 'http://localhost:4200/login?email='+ email + '&token=' + accessToken
         
         function getMessage() {
             const body = 'Haz click en el siguiente link para validar tu cuenta: ' + url;
@@ -193,8 +184,8 @@ app.post('/user', (req, res) => {
             decodedToken = jwt.decode(token)
             var userid = decodedToken.userid
 
-            const query = "SELECT * FROM users WHERE users.Id_user ='" + userid +  "';"
-            const result = pool.query(query)
+            const query = "SELECT * FROM users WHERE users.Id_user = ?;"
+            const result = pool.query(query, [userid])
 
             var name = result.rows[0].name;
             var surnames = result.rows[0].surnames;
@@ -222,8 +213,8 @@ app.post('/user/delete', (req, res) => {
             decodedToken = jwt.decode(req.body.token)
             var userid = decodedToken.userid
 
-            const query = "DELETE FROM users WHERE users.Id_user ='" + userid +  "';"
-            const result = pool.query(query)
+            const query = "DELETE FROM users WHERE users.Id_user = ?;"
+            const result = pool.query(query, [userid])
 
             if (result.rowCount == 0) {
                 return res.json({
@@ -248,7 +239,7 @@ app.post('/user/delete', (req, res) => {
 
 app.get('/getTowns', async (req, res) => {
     try {
-        const query = "SELECT * FROM towns;"
+        const query = "SELECT * FROM towns;" //coger datos necesarios
         var result = await pool.query(query)
 
         if (result.rowCount == 0) {
@@ -277,8 +268,8 @@ app.get('/getTowns', async (req, res) => {
 
 app.get('/getTopTowns', async (req, res) => {
     try {
-        //SELECT id_town FROM searches GROUP BY id_town ORDER BY COUNT(*) DESC LIMIT 10;
-        const query = "SELECT * FROM searches WHERE searches.date >= '" + past + "' ORDER BY searches.num_searches DESC LIMIT 10;"
+        //SELECT * FROM searches WHERE searches.date >= ? ORDER BY searches.num_searches DESC LIMIT 10;
+        const query = "SELECT id_town FROM searches GROUP BY id_town ORDER BY COUNT(*) DESC LIMIT 10;"
         var result = await pool.query(query)
 
         if (result.rowCount == 0) {
@@ -288,9 +279,10 @@ app.get('/getTopTowns', async (req, res) => {
         } else {
             var towns = []
             for (let i = 0; i < result.rows.length; i++) {
-                var townid = result.rows[i].id_town
-                var townQuery = "SELECT * FROM towns WHERE towns.id_town = " + townid + ";"
-                var resultTown = await pool.query(townQuery)
+                //var townid = result.rows[i].id_town
+                var townQuery = "SELECT * FROM towns WHERE towns.id_town = ?;"
+                var resultTown = await pool.query(townQuery, [result.rows[i].id_town])
+
                 town = {}
                 town['id'] = resultTown.rows[0].id_town
                 town['name'] = resultTown.rows[0].name
@@ -310,9 +302,9 @@ app.get('/getTopTowns', async (req, res) => {
 })
 
 app.post('/town/like/:id', async (req, res) => {
-    var townid = req.params.id
-    var query = "UPDATE towns SET likes = likes+1 WHERE towns.id_town = " + townid + ";"
-    await pool.query(query)
+    //var townid = req.params.id
+    var query = "UPDATE towns SET likes = likes+1 WHERE towns.id_town = ?;"
+    await pool.query(query, [req.params.id])
 })
 
 app.get('/getLikedTowns', async (req, res) => {
@@ -346,44 +338,40 @@ app.get('/getLikedTowns', async (req, res) => {
 })
 
 app.get('/getTown/:id', async (req, res) => {
-    var townQuery = "SELECT * FROM towns WHERE towns.id_town = " + req.params.id + ";"
-    var searchQuery = "SELECT id_town FROM searches WHERE searches.id_town = " + req.params.id + " AND searches.date >= '" + date + "';"
+    var townQuery = "SELECT * FROM towns WHERE towns.id_town = ?;"
+    var searchQuery = "SELECT id_town FROM searches WHERE searches.id_town = ? AND searches.date >= ?;"
+    var insertQuery = "INSERT INTO searches (id_town, date) VALUES (?,?);"
 
-    var resultSearch = await pool.query(searchQuery)
-    var resultTown = await pool.query(townQuery)
-
-    //MIRAR SI AL FECHA ES CON ALMOHADILLA, CON ' O SIN NADA
-    await pool.query("INSERT INTO searches (id_town, date) VALUES (" + req.params.id + "," + today + ");")
+    var resultSearch = await pool.query(searchQuery, [req.params.id])
+    var resultTown = await pool.query(townQuery, [req.params.id, past])
+    await pool.query(insertQuery, [req.params.id, today])
 
     let promiseRestaurants = new Promise((resolve, reject) => {
         const child = spawn('python', ['./WebScrapers/buscorestaurantes.py', resultTown.rows[0].name]);
-        child.on("close", () => {
-            var contents = fs.readFileSync("./WebScrapers/resultado/buscorestaurantes.json");
-            var jsonContent = JSON.parse(contents)
-            resolve(jsonContent)
-        })
+        child.stdout.on('data', (data) => {
+            var jsonContent = JSON.parse(data);
+            resolve(jsonContent);
+        });
         child.on("error", (error) => {
             reject(error)
         })
     })
     let promiseJobs = new Promise((resolve, reject) => {
         const child = spawn('python', ['./WebScrapers/jobtoday.py', resultTown.rows[0].name]);
-        child.on("close", () => {
-            var contents = fs.readFileSync("./WebScrapers/resultado/jobtoday.json");
-            var jsonContent = JSON.parse(contents)
-            resolve(jsonContent)
-        })
+        child.stdout.on('data', (data) => {
+            var jsonContent = JSON.parse(data);
+            resolve(jsonContent);
+        });
         child.on("error", (error) => {
             reject(error)
         })
     })
     let promiseNews = new Promise((resolve, reject) => {
         const child = spawn('python', ['./WebScrapers/20minutos.py', resultTown.rows[0].name]);
-        child.on("close", () => {
-            var contents = fs.readFileSync("./WebScrapers/resultado/20minutos.json");
-            var jsonContent = JSON.parse(contents)
-            resolve(jsonContent)
-        })
+        child.stdout.on('data', (data) => {
+            var jsonContent = JSON.parse(data);
+            resolve(jsonContent);
+        });
         child.on("error", (error) => {
             reject(error)
         })
@@ -391,13 +379,13 @@ app.get('/getTown/:id', async (req, res) => {
 
     if (resultSearch.rowCount === 0) {
         if (townData.rowCount !== 0) {
-            var deleteRestaurants = "DELETE FROM restaurants WHERE id_town = '" + req.params.id + "';" 
-            var deleteJobs = "DELETE FROM jobs WHERE id_town = '" + req.params.id + "';" 
-            var deleteNews = "DELETE FROM news WHERE id_town = '" + req.params.id + "';" 
+            // var deleteRestaurants = "DELETE FROM restaurants WHERE id_town = '" + req.params.id + "';" 
+            // var deleteJobs = "DELETE FROM jobs WHERE id_town = '" + req.params.id + "';" 
+            // var deleteNews = "DELETE FROM news WHERE id_town = '" + req.params.id + "';" 
 
-            await pool.query(deleteRestaurants)
-            await pool.query(deleteJobs)
-            await pool.query(deleteNews)
+            // await pool.query(deleteRestaurants, [])
+            // await pool.query(deleteJobs)
+            // await pool.query(deleteNews)
 
             var responses = await Promise.all([promiseRestaurants, promiseJobs, promiseNews]).then(values => {
                 console.log(values)
@@ -410,10 +398,10 @@ app.get('/getTown/:id', async (req, res) => {
                 var name = responses[0][i].name
                 var location = responses[0][i].location
                 var sentiment = responses[0][i].sentiment
-                //var image = responses[0][i].image
+                //var image = responses[0][i].image_url
 
-                var insertRestaurantQuery = "INSERT INTO restaurants (id_town,name,location,sentiment) VALUES (" + townid + ",'" + name + "','" + location + "'," + sentiment + ");"
-                await pool.query(insertRestaurantQuery)
+                var insertRestaurantQuery = "INSERT INTO restaurants (id_town,name,location,sentiment) VALUES (?,?,?,?);"
+                await pool.query(insertRestaurantQuery, [townid, name, location, sentiment])
             }
         
             town = {}
@@ -436,13 +424,13 @@ app.get('/getTown/:id', async (req, res) => {
             })
         }
     } else {
-        var restaurantsQuery = "SELECT * FROM restaurants WHERE id_town = '" + req.params.id + "';"
-        var jobsQuery = "SELECT * FROM jobs WHERE id_town = '" + req.params.id + "';"
-        var newsQuery = "SELECT * FROM news WHERE id_town = '" + req.params.id + "';"
+        var restaurantsQuery = "SELECT * FROM restaurants WHERE id_town = ?;"
+        var jobsQuery = "SELECT * FROM jobs WHERE id_town = ?;"
+        var newsQuery = "SELECT * FROM news WHERE id_town = ?;"
 
-        var resultRetsaurants = await pool.query(restaurantsQuery)
-        var resultJobs = await pool.query(jobsQuery)
-        var resultNews = await pool.query(newsQuery)
+        var resultRetsaurants = await pool.query(restaurantsQuery, [req.params.id])
+        var resultJobs = await pool.query(jobsQuery, [req.params.id])
+        var resultNews = await pool.query(newsQuery, [req.params.id])
 
         var restaurants = []
         var jobs = []
@@ -465,89 +453,41 @@ app.get('/getTown/:id', async (req, res) => {
         town['news'] = responses[2]
         
     }
-
-    //hacer la busqueda en la tabla busquedas para esa ciudad y fecha.today < fecha.today-7
-        //si no lo encuentra: scrapeo e inserccion en bbdd
-
-    //una vez terminado el scrapeo, consultamos en bbdd
 })
 
 app.get('/search/jobs', async(req, res)=> {
     console.log(req.body)
     const child = spawn('python', ['./WebScrapers/jobtoday.py', req.body.text]);
-    child.on("close", () => {
-        var contents = fs.readFileSync("./WebScrapers/resultado/jobtoday.json");
-        
-        var jsonContent = JSON.parse(contents)
-
-        res.send(jsonContent)
+    child.stdout.on('data', (data) => {
+        var jsonContent = JSON.parse(data);
+        res.send(jsonContent);
+    });
+    child.on("error", (error) => {
+        res.send(error)
     })
 })
 
 app.get('/search/news', async(req, res)=> {
     console.log(req.body)
     const child = spawn('python', ['./WebScrapers/20minutos.py', req.body.text]);
-    child.on("close", () => {
-        var contents = fs.readFileSync("./WebScrapers/resultado/20minutos.json");
-        
-        var jsonContent = JSON.parse(contents)
-
-        res.send(jsonContent)
-    })
+    child.stdout.on('data', (data) => {
+        var jsonContent = JSON.parse(data);
+        res.send(jsonContent);
+    });
     child.on("error", (error) => {
-        console.log(error)
+        res.send(error)
     })
 })
 
 app.get('/search/restaurants', async(req, res)=> {
     console.log(req.body)
     const child = spawn('python', ['./WebScrapers/buscorestaurantes.py', req.body.text]);
-    child.on("close", () => {
-        var contents = fs.readFileSync("./WebScrapers/resultado/buscorestaurantes.json");
-        
-        var jsonContent = JSON.parse(contents)
-
-        res.send(jsonContent)
-    })
-    child.on("error", (error) => {
-        console.log(error)
-    })
-})
-
-app.get('/search/municipios', async(req, res)=> {
-    console.log(req.body)
-    const child = spawn('python', ['./WebScrapers/15mpedia.py', req.body.text]);
-    child.on("close", () => {
-        var contents = fs.readFileSync("./WebScrapers/resultado/15mpedia.json");
-        
-        var jsonContent = JSON.parse(contents)
-
-        res.send(jsonContent)
-    })
-    child.on("error", (error) => {
-        console.log(error)
-    })
-})
-
-app.get('/date', (req, res)=> {
-    console.log(today)
-    console.log(tomorrow)
-    console.log(past)
-})
-
-app.get('/search2', (req, res)=> {
-    console.log(req.body.text)
-    const child = spawn('python', ['./WebScrapers/jobtoday.py', req.body.text]);
     child.stdout.on('data', (data) => {
-        //console.log(utf8.decode(data))
-        //console.log(decoder.write(data))
-        //console.log(data)
-        
-        var jsonContent = JSON.parse(data.toString('utf8'));
+        var jsonContent = JSON.parse(data);
         res.send(jsonContent);
     });
     child.on("error", (error) => {
-        console.log(error)
+        res.send(error)
     })
 })
 
@@ -560,12 +500,8 @@ async function authenticateToken(token) {
         decodedToken = jwt.decode(token)
         var userid = decodedToken.userid
 
-        const query = {
-            text: 'SELECT token FROM users WHERE users.id_user = ?',
-            values: [userid],
-            rowMode: 'array'
-        }
-        const result = await pool.query(query)
+        const query = "SELECT token FROM users WHERE users.id_user = ?"
+        var result = await pool.query(query, [userid])
 
         if(result.body.token != 'NULL') {
             return true

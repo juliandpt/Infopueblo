@@ -46,6 +46,7 @@ while len(restaurants) < num_restaurants:
         j['m'] = 'nada'
         restaurants.append(j)
         break
-print(restaurants)
-with open('./WebScrapers/resultado/buscorestaurantes.json', 'w',  encoding='utf-8') as f:
-    json.dump(restaurants, f, ensure_ascii=False, indent=4)
+restaurantsJson = json.dumps(restaurants)
+print(restaurantsJson)
+# with open('./WebScrapers/resultado/buscorestaurantes.json', 'w',  encoding='utf-8') as f:
+#     json.dump(restaurants, f, ensure_ascii=False, indent=4)

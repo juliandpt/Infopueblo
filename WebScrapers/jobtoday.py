@@ -35,6 +35,7 @@ while len(offers) < num_offers:
                 continue
     except:
         break
-print(offers)
-with open('./WebScrapers/resultado/jobtoday.json', 'w',  encoding='utf-8') as f:
-    json.dump(offers, f, ensure_ascii=False, indent=4)
+offersJson = json.dumps(offers)
+print(offersJson)
+# with open('./WebScrapers/resultado/jobtoday.json', 'w',  encoding='utf-8') as f:
+#     json.dump(offers, f, ensure_ascii=False, indent=4)
