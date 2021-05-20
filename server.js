@@ -1,23 +1,24 @@
-const { Pool } = require('pg')
-const { PythonShell } = require('python-shell')
+const mariadb = require('mariadb')
 const fs = require('fs')
 const express = require('express')
 const jwt = require('jsonwebtoken')
 const sha = require('sha1')
-const { StringDecoder } = require('string_decoder');
-const utf8 = require('utf8');
+//const { StringDecoder } = require('string_decoder');
+//const utf8 = require('utf8');
 const spawn = require('child_process').spawn
-const date = require('date-and-time')
-
 const sendGridMail = require('@sendgrid/mail');
 
 const app = express();
-const pool = new Pool({
-    connectionString: "postgres://amvnwrnjzqtkgh:e795f9d0a48704ea436bbd5d8efdbc914c9e146aaad730b0aca9c819ebbff0aa@ec2-99-80-200-225.eu-west-1.compute.amazonaws.com:5432/d20hkpogjrcusn",
-    ssl: {
-        rejectUnauthorized: false
-    }
+const pool = mariadb.createPool({
+    host: '2.139.176.212', 
+    user:'pr_grupob', 
+    password: 'PC2-2021',
+    connectionLimit: 5
 });
+const d = new Date()
+const today = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate()
+const tomorrow = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + (d.getDate() + 1)
+const past = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + (d.getDate() - 7)
 
 app.use(express.json())
 app.set('port', process.env.PORT || 8080)
@@ -55,6 +56,9 @@ app.post('/login', async (req, res) => {
     console.log(userid)
     var password = result.rows[0].password;
     console.log(password)
+
+    var today = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate()
+    var date = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + (d.getDate() + 1)
 
     try{
         if (sha(req.body.password) == password) {
@@ -273,7 +277,8 @@ app.get('/getTowns', async (req, res) => {
 
 app.get('/getTopTowns', async (req, res) => {
     try {
-        const query = "SELECT * FROM searches WHERE searches.date >= '" + today-7 + "' ORDER BY searches.num_searches DESC LIMIT 10;"
+        //SELECT id_town FROM searches GROUP BY id_town ORDER BY COUNT(*) DESC LIMIT 10;
+        const query = "SELECT * FROM searches WHERE searches.date >= '" + past + "' ORDER BY searches.num_searches DESC LIMIT 10;"
         var result = await pool.query(query)
 
         if (result.rowCount == 0) {
@@ -302,6 +307,12 @@ app.get('/getTopTowns', async (req, res) => {
             error
         })
     }
+})
+
+app.post('/town/like/:id', async (req, res) => {
+    var townid = req.params.id
+    var query = "UPDATE towns SET likes = likes+1 WHERE towns.id_town = " + townid + ";"
+    await pool.query(query)
 })
 
 app.get('/getLikedTowns', async (req, res) => {
@@ -335,9 +346,8 @@ app.get('/getLikedTowns', async (req, res) => {
 })
 
 app.get('/getTown/:id', async (req, res) => {
-    var today = Date.now() //cambiar en fecha mejor
     var townQuery = "SELECT * FROM towns WHERE towns.id_town = " + req.params.id + ";"
-    var searchQuery = "SELECT id_town FROM searches WHERE searches.id_town = " + req.params.id + " AND searches.date >= '" + today-7 + "';" //quitar 7 dias
+    var searchQuery = "SELECT id_town FROM searches WHERE searches.id_town = " + req.params.id + " AND searches.date >= '" + date + "';"
 
     var resultSearch = await pool.query(searchQuery)
     var resultTown = await pool.query(townQuery)
@@ -345,7 +355,7 @@ app.get('/getTown/:id', async (req, res) => {
     //MIRAR SI AL FECHA ES CON ALMOHADILLA, CON ' O SIN NADA
     await pool.query("INSERT INTO searches (id_town, date) VALUES (" + req.params.id + "," + today + ");")
 
-    let promiseRestaurants = async () => new Promise((resolve, reject) => {
+    let promiseRestaurants = new Promise((resolve, reject) => {
         const child = spawn('python', ['./WebScrapers/buscorestaurantes.py', resultTown.rows[0].name]);
         child.on("close", () => {
             var contents = fs.readFileSync("./WebScrapers/resultado/buscorestaurantes.json");
@@ -356,7 +366,7 @@ app.get('/getTown/:id', async (req, res) => {
             reject(error)
         })
     })
-    let promiseJobs = async () => new Promise((resolve, reject) => {
+    let promiseJobs = new Promise((resolve, reject) => {
         const child = spawn('python', ['./WebScrapers/jobtoday.py', resultTown.rows[0].name]);
         child.on("close", () => {
             var contents = fs.readFileSync("./WebScrapers/resultado/jobtoday.json");
@@ -367,7 +377,7 @@ app.get('/getTown/:id', async (req, res) => {
             reject(error)
         })
     })
-    let promiseNews = async () => new Promise((resolve, reject) => {
+    let promiseNews = new Promise((resolve, reject) => {
         const child = spawn('python', ['./WebScrapers/20minutos.py', resultTown.rows[0].name]);
         child.on("close", () => {
             var contents = fs.readFileSync("./WebScrapers/resultado/20minutos.json");
@@ -385,11 +395,11 @@ app.get('/getTown/:id', async (req, res) => {
             var deleteJobs = "DELETE FROM jobs WHERE id_town = '" + req.params.id + "';" 
             var deleteNews = "DELETE FROM news WHERE id_town = '" + req.params.id + "';" 
 
-            var resultDeleteRestaurants = await pool.query(deleteRestaurants)
-            var resultDeleteJobs = await pool.query(deleteJobs)
-            var resultDeleteNews = await pool.query(deleteNews)
+            await pool.query(deleteRestaurants)
+            await pool.query(deleteJobs)
+            await pool.query(deleteNews)
 
-            var responses = await Promise.all([promiseRestaurants(), promiseJobs(), promiseNews()]).then(values => {
+            var responses = await Promise.all([promiseRestaurants, promiseJobs, promiseNews]).then(values => {
                 console.log(values)
             }).catch(reason => {
                 console.log(reason)
@@ -517,6 +527,12 @@ app.get('/search/municipios', async(req, res)=> {
     child.on("error", (error) => {
         console.log(error)
     })
+})
+
+app.get('/date', (req, res)=> {
+    console.log(today)
+    console.log(tomorrow)
+    console.log(past)
 })
 
 app.get('/search2', (req, res)=> {
