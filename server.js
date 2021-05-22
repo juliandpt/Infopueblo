@@ -49,7 +49,7 @@ app.post('/login', async (req, res) => {
 
     if (result.rowCount == 0) {
         return res.json({
-            message: 'ko'
+            status: 'ko'
         })
     }
 
@@ -77,17 +77,17 @@ app.post('/login', async (req, res) => {
             console.log(result2)
 
             return res.json({
-                message: 'ok',
+                status: 'ok',
                 token: accessToken
             }); //mirar http valor
         } else {
             return res.json({
-                message: 'ko'
+                status: 'ko'
             }); //mirar http valor
         }
     } catch {
         return res.json({
-            message: 'este'
+            status: 'este'
         })
     }
 })
@@ -105,11 +105,11 @@ app.get('/validate', async (req, res) => {
 
     if (result.rowCount == 0) {
         return res.json({
-            message: 'ko'
+            status: 'ko'
         })
     } else {
         return res.json({
-            message: 'cuenta validada'
+            status: 'cuenta validada'
         })
     } 
 })
@@ -165,11 +165,11 @@ app.post('/register', async(req, res) => {
             await sendEmail();
         })();
         return res.json({
-            message: 'ok'
+            status: 'ok'
         });
     } catch {
         return res.json({
-            message: 'ko'
+            status: 'ko'
         });
     }   
 })
@@ -177,7 +177,7 @@ app.post('/register', async(req, res) => {
 app.post('/user', (req, res) => {
     if (authenticateToken(req.body.token) == false) {
         res.json({
-            message: "ko"
+            status: "ko"
         })
     } else {
         try {
@@ -191,13 +191,13 @@ app.post('/user', (req, res) => {
             var surnames = result.rows[0].surnames;
 
             return res.json({
-                message: "ok",
+                status: "ok",
                 name: name,
                 surnames: surnames
             })
         } catch {
             return res.json({
-                message: "ko info",
+                status: "ko info",
             })
         }
     }
@@ -206,7 +206,7 @@ app.post('/user', (req, res) => {
 app.post('/user/delete', (req, res) => {
     if (authenticateToken(req.body.token) == false) {
         res.json({
-            message: "ko"
+            status: "ko"
         })
     } else {
         try {
@@ -218,16 +218,16 @@ app.post('/user/delete', (req, res) => {
 
             if (result.rowCount == 0) {
                 return res.json({
-                    message: 'ko'
+                    status: 'ko'
                 })
             }
 
             return res.json({
-                message: "ok"
+                status: "ok"
             })
         } catch {
             return res.json({
-                message: "ko"
+                status: "ko"
             })
         }
     }
@@ -244,7 +244,7 @@ app.get('/getTowns', async (req, res) => {
 
         if (result.rowCount == 0) {
             return res.json({
-                message: 'ko'
+                status: 'ko'
             })
         } else {
             var towns = []
@@ -260,7 +260,7 @@ app.get('/getTowns', async (req, res) => {
     } catch (error){
         console.log(error)
         res.json({
-            message: "error",
+            status: "error",
             error
         })
     }
@@ -268,43 +268,34 @@ app.get('/getTowns', async (req, res) => {
 
 app.get('/getTopTowns', async (req, res) => {
     try {
-        //SELECT * FROM searches WHERE searches.date >= ? ORDER BY searches.num_searches DESC LIMIT 10;
-        const query = "SELECT id_town FROM searches GROUP BY id_town ORDER BY COUNT(*) DESC LIMIT 10;"
+        const query = "SELECT * FROM searches GROUP BY id_town ORDER BY COUNT(*) DESC LIMIT 10;"
         var result = await pool.query(query)
 
-        if (result.rowCount == 0) {
-            return res.json({
-                message: 'ko'
+        console.log(result)
+
+        if (result == 0) {
+            res.status(404)
+            res.send({
+                status: `No towns in table`
             })
         } else {
-            var towns = []
-            for (let i = 0; i < result.rows.length; i++) {
-                //var townid = result.rows[i].id_town
-                var townQuery = "SELECT * FROM towns WHERE towns.id_town = ?;"
-                var resultTown = await pool.query(townQuery, [result.rows[i].id_town])
-
-                town = {}
-                town['id'] = resultTown.rows[0].id_town
-                town['name'] = resultTown.rows[0].name
-                town['image'] = resultTown.rows[0].image_url
-                towns.push(town)
-            }
-
-            return res.send(towns)
+            res.status(200)
+            res.send(result)
         }
     } catch (error){
         console.log(error)
         res.json({
-            message: "error",
+            status: "error",
             error
         })
     }
 })
 
 app.post('/town/like/:id', async (req, res) => {
-    //var townid = req.params.id
     var query = "UPDATE towns SET likes = likes+1 WHERE towns.id_town = ?;"
-    await pool.query(query, [req.params.id])
+    var result = await pool.query(query, [req.params.id])
+
+    console.log(result)
 })
 
 app.get('/getLikedTowns', async (req, res) => {
@@ -312,39 +303,22 @@ app.get('/getLikedTowns', async (req, res) => {
         const query = "SELECT * FROM towns ORDER BY towns.likes DESC LIMIT 10;"
         var result = await pool.query(query)
 
-        if (result.rowCount == 0) {
-            return res.json({
-                message: 'ko'
-            })
+        if (result == 0) {
+            res.status(200).send(result)
         } else {
-            var towns = []
-            for (let i = 0; i < result.rows.length; i++) {
-                town = {}
-                town['id'] = result.rows[0].id_town
-                town['name'] = result.rows[0].name
-                town['image'] = result.rows[0].image_url
-                towns.push(town)
-            }
-
-            return res.send(towns)
+            res.status(200).send(result)
         }
     } catch (error){
         console.log(error)
-        res.json({
-            message: "error",
-            error
-        })
+        res.status(400).send(error)
     }
 })
 
 app.get('/getTown/:id', async (req, res) => {
-    var townQuery = "SELECT * FROM towns WHERE towns.id_town = ?;"
-    var searchQuery = "SELECT id_town FROM searches WHERE searches.id_town = ? AND searches.date >= ?;"
-    var insertQuery = "INSERT INTO searches (id_town, date) VALUES (?,?);"
+    var resultSearch = await pool.query("SELECT * FROM towns WHERE towns.id_town = ?;", [req.params.id])
+    var resultTown = await pool.query("SELECT id_town FROM searches WHERE searches.id_town = ? AND searches.date >= ?;", [req.params.id, past])
 
-    var resultSearch = await pool.query(searchQuery, [req.params.id])
-    var resultTown = await pool.query(townQuery, [req.params.id, past])
-    await pool.query(insertQuery, [req.params.id, today])
+    await pool.query("INSERT INTO searches (id_town, date) VALUES (?,?);", [req.params.id, today])
 
     let promiseRestaurants = new Promise((resolve, reject) => {
         const child = spawn('python', ['./WebScrapers/buscorestaurantes.py', resultTown.rows[0].name]);
@@ -377,31 +351,32 @@ app.get('/getTown/:id', async (req, res) => {
         })
     })
 
-    if (resultSearch.rowCount === 0) {
-        if (townData.rowCount !== 0) {
-            // var deleteRestaurants = "DELETE FROM restaurants WHERE id_town = '" + req.params.id + "';" 
-            // var deleteJobs = "DELETE FROM jobs WHERE id_town = '" + req.params.id + "';" 
-            // var deleteNews = "DELETE FROM news WHERE id_town = '" + req.params.id + "';" 
-
-            // await pool.query(deleteRestaurants, [])
-            // await pool.query(deleteJobs)
-            // await pool.query(deleteNews)
-
-            var responses = await Promise.all([promiseRestaurants, promiseJobs, promiseNews]).then(values => {
-                console.log(values)
-            }).catch(reason => {
-                console.log(reason)
-            });
+    if (resultSearch === 0) {
+        if (townData !== 0) {
+            var responses = await Promise.all([promiseRestaurants, promiseJobs, promiseNews])
 
             for (let i = 0; i < responses[0].length; i++) {
                 var townid = req.params.id
                 var name = responses[0][i].name
                 var location = responses[0][i].location
                 var sentiment = responses[0][i].sentiment
-                //var image = responses[0][i].image_url
 
-                var insertRestaurantQuery = "INSERT INTO restaurants (id_town,name,location,sentiment) VALUES (?,?,?,?);"
-                await pool.query(insertRestaurantQuery, [townid, name, location, sentiment])
+                await pool.query("INSERT INTO restaurants (id_town,name,location,sentiment,date) VALUES (?,?,?,?,?);", [townid, name, location, sentiment, today])
+            }
+            for (let i = 0; i < responses[1].length; i++) {
+                var townid = req.params.id
+                var work = responses[1][i].work
+                var company = responses[1][i].company
+                var description = responses[1][i].description
+
+                await pool.query("INSERT INTO jobs (id_town,work,company,description,date) VALUES (?,?,?,?,?);", [townid, work, company, description, today])
+            }
+            for (let i = 0; i < responses[2].length; i++) {
+                var townid = req.params.id
+                var name = responses[2][i].title
+                var location = responses[2][i].content
+
+                await pool.query("INSERT INTO news (id_town,title,content,date) VALUES (?,?,?,?);", [townid, title, content, today])
             }
         
             town = {}
@@ -455,39 +430,17 @@ app.get('/getTown/:id', async (req, res) => {
     }
 })
 
-app.get('/search/jobs', async(req, res)=> {
-    console.log(req.body)
-    const child = spawn('python', ['./WebScrapers/jobtoday.py', req.body.text]);
-    child.stdout.on('data', (data) => {
-        var jsonContent = JSON.parse(data);
-        res.send(jsonContent);
-    });
-    child.on("error", (error) => {
-        res.send(error)
+app.get('/town/:id', async (req, res) => {
+    console.log(req.params.id)
+    await pool.query("SELECT * FROM towns WHERE towns.id_town = ?;", [req.params.id])
+    .on("error", err => {
+        console.log(err); //if error
     })
-})
-
-app.get('/search/news', async(req, res)=> {
-    console.log(req.body)
-    const child = spawn('python', ['./WebScrapers/20minutos.py', req.body.text]);
-    child.stdout.on('data', (data) => {
-        var jsonContent = JSON.parse(data);
-        res.send(jsonContent);
-    });
-    child.on("error", (error) => {
-        res.send(error)
+    .on("fields", meta => {
+        console.log(meta); // [ ... ]
     })
-})
-
-app.get('/search/restaurants', async(req, res)=> {
-    console.log(req.body)
-    const child = spawn('python', ['./WebScrapers/buscorestaurantes.py', req.body.text]);
-    child.stdout.on('data', (data) => {
-        var jsonContent = JSON.parse(data);
-        res.send(jsonContent);
-    });
-    child.on("error", (error) => {
-        res.send(error)
+    .on("data", row => {
+        console.log(row);
     })
 })
 

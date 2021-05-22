@@ -35,7 +35,8 @@ while len(restaurants) < num_restaurants:
                     c = comment.text.replace("\n", "").replace("\t", "")
                     s = SentimentIntensityAnalyzer().polarity_scores(c)['compound']
                     sentiments.append(s)
-                item['sentiment'] = statistics.median(sentiments)
+                item['sentiment'] = round(statistics.mean(sentiments),3)
+
                 restaurants.append(item)
                 if len(restaurants) == num_restaurants:
                     break

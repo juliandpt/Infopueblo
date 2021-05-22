@@ -28,9 +28,6 @@ while len(news) < num_news:
             titleClean = articleTitle.strip()
             articlePage = requests.get(articleLink)
             parsedPage = BeautifulSoup(articlePage.text, 'html.parser')
-            dateTime = parsedPage.find('span', { 'class': 'article-date' })
-            if dateTime is None:
-                continue
 
             articleSection = parsedPage.find('article', { 'class': 'article-body' })
             if articleSection is None:
@@ -47,17 +44,9 @@ while len(news) < num_news:
             if articleTagContainer is None:
                 continue
 
-            tags = []
-            for tagItem in articleTagContainer.find_all('li', {'class': 'tag'}):
-                tag = tagItem.find('a').text.strip()
-                tags.append(tag)
-
             doc = {}
             doc['title'] = titleClean
-            doc['place'] = text
-            doc['tags'] = tags
             doc['content'] = articleContent
-            doc['date'] = dateTime.text
             news.append(doc)
             if len(news) == num_news:
                 break
