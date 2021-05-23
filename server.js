@@ -3,8 +3,6 @@ const fs = require('fs')
 const express = require('express')
 const jwt = require('jsonwebtoken')
 const sha = require('sha1')
-//const { StringDecoder } = require('string_decoder');
-//const utf8 = require('utf8');
 const spawn = require('child_process').spawn
 const sendGridMail = require('@sendgrid/mail');
 
@@ -36,75 +34,50 @@ app.use((req, res, next) => {
 // -------------------------------------------------------------------------------------
 
 app.post('/login', async (req, res) => {
-    console.log(req.body)
-    // const query = {
-    //     text: 'SELECT * FROM users WHERE users.email = ? and users.password = ?',
-    //     values: [req.body.email, sha(req.body.password)],
-    //     rowMode: 'array'
-    // }
-    const query = "SELECT * FROM users WHERE users.email = ? and users.password = ?;"
-    console.log(query)
-    var result = await pool.query(query, [req.body.email, sha(req.body.password)])
-    console.log(result)
+    var result = await pool.query("SELECT * FROM users WHERE users.email = ? and users.password = ?;", [req.body.email, sha(req.body.password)])
 
-    if (result.rowCount == 0) {
+    if (result == 0) {
         return res.json({
             status: 'ko'
         })
     }
 
-    var userid = result.rows[0].id_user;
-    console.log(userid)
-    var password = result.rows[0].password;
-    console.log(password)
-
-    var today = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate()
-    var date = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + (d.getDate() + 1)
+    var userid = result[0].id_user;
+    var password = result[0].password;
 
     try{
         if (sha(req.body.password) == password) {
             var claims = {
                 userid: userid,
-                exp: Date.now(),
-                iat: Date.now() //Fecha de creación
+                exp: tomorrow,
+                iat: today
             }
         
             const accessToken = jwt.sign(claims, '3ea3967ae8328f89eda5be264d5af88b83d490afc9218d02e5628e07bf89850e828eef80c4085c20e4a394f5a7792773347e7a6492b0e05e54f321a34b7ed20b')
-            console.log(accessToken)
+            
+            const resultToken = await pool.query("UPDATE users SET token = ? WHERE id_user = ?;", [accessToken, userid])
 
-            const query = "UPDATE users SET token = ? where id_user = ?;"
-            const result2 = await pool.query(query, [accessToken, userid])
-            console.log(result2)
-
-            return res.json({
+            return res.status(200).send({
                 status: 'ok',
                 token: accessToken
-            }); //mirar http valor
+            });
         } else {
-            return res.json({
+            return res.send(401).send({
                 status: 'ko'
-            }); //mirar http valor
+            });
         }
     } catch {
-        return res.json({
-            status: 'este'
+        return res.send(500).send({
+            status: 'ko'
         })
     }
 })
 
 app.get('/validate', async (req, res) => {
-    console.log(req.query)
-    // const query = {
-    //     text: 'SELECT * FROM users WHERE users.email = ? and users.password = ?',
-    //     values: [req.body.email, sha(req.body.password)],
-    //     rowMode: 'array'
-    // }
-    const query = "UPDATE users SET validate=true where email = ? and token = ?;"
-    const result = await pool.query(query, [req.query.email, req.query.token])
-    console.log(result)
+    var result = await pool.query("UPDATE users SET validate=true where email = ? and token = ?;", [req.query.email, req.query.token])
 
-    if (result.rowCount == 0) {
-        return res.json({
+    if (result === 0) {
+        return res.status(401).send({
             status: 'ko'
         })
     } else {
@@ -126,8 +99,7 @@ app.post('/register', async(req, res) => {
     
         const accessToken = jwt.sign(claims, '3ea3967ae8328f89eda5be264d5af88b83d490afc9218d02e5628e07bf89850e828eef80c4085c20e4a394f5a7792773347e7a6492b0e05e54f321a34b7ed20b')
 
-        const query = "INSERT INTO users (email,password,name,surnames,admin,token,validate) VALUES (?,?,?,?,?,?,?);"
-        var result = await pool.query(query, [email, sha(req.body.password), req.body.name, req.body.surnames, false, accessToken, false])
+        var result = await pool.query("INSERT INTO users (email,password,name,surnames,admin,token,validate) VALUES (?,?,?,?,?,?,?);", [email, sha(req.body.password), req.body.name, req.body.surnames, false, accessToken, false])
         
         sendGridMail.setApiKey('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');
         url = 'http://localhost:4200/login?email='+ email + '&token=' + accessToken
@@ -239,209 +211,266 @@ app.post('/user/delete', (req, res) => {
 
 app.get('/getTowns', async (req, res) => {
     try {
-        const query = "SELECT * FROM towns;" //coger datos necesarios
-        var result = await pool.query(query)
+        var result = await pool.query("SELECT id_town, name FROM towns;")
 
-        if (result.rowCount == 0) {
-            return res.json({
-                status: 'ko'
+        if (result === 0) {
+            return res.status(400).send({
+                status: "ko"
             })
         } else {
             var towns = []
-            for (let i = 0; i < result.rows.length; i++) {
+            for (let i = 0; i < result.length; i++) {
                 town = {}
-                town['id'] = result.rows[i].id_town
-                town['name'] = result.rows[i].name
+                town["id"] = result[i].id_town
+                town["name"] = result[i].name
                 towns.push(town)
             }
 
-            return res.send(towns)
+            return res.status(200).send(towns)
         }
     } catch (error){
         console.log(error)
-        res.json({
-            status: "error",
-            error
+        return res.status(500).send({
+            status: "ko"
         })
     }
 })
 
 app.get('/getTopTowns', async (req, res) => {
     try {
-        const query = "SELECT * FROM searches GROUP BY id_town ORDER BY COUNT(*) DESC LIMIT 10;"
-        var result = await pool.query(query)
-
-        console.log(result)
+        var result = await pool.query("SELECT * FROM searches GROUP BY id_town ORDER BY COUNT(*) DESC LIMIT 10;")
 
         if (result == 0) {
-            res.status(404)
-            res.send({
-                status: `No towns in table`
+            res.status(404).send({
+                status: "No data"
             })
         } else {
-            res.status(200)
-            res.send(result)
+            res.status(200).send(result)
         }
     } catch (error){
         console.log(error)
-        res.json({
-            status: "error",
-            error
+        res.status(404).send({
+            status: error
         })
     }
 })
 
 app.post('/town/like/:id', async (req, res) => {
-    var query = "UPDATE towns SET likes = likes+1 WHERE towns.id_town = ?;"
-    var result = await pool.query(query, [req.params.id])
+    var result = await pool.query("UPDATE towns SET likes = likes+1 WHERE towns.id_town = ?;", [req.params.id])
 
-    console.log(result)
+    if (result.affectedRows !== 0) {
+        res.status(200).send({
+            status: 'ok'
+        })
+    } else  {
+        res.status(400).send({
+            status: 'ko'
+        })
+    }
 })
 
 app.get('/getLikedTowns', async (req, res) => {
     try {
-        const query = "SELECT * FROM towns ORDER BY towns.likes DESC LIMIT 10;"
-        var result = await pool.query(query)
+        var result = await pool.query("SELECT * FROM towns ORDER BY towns.likes DESC LIMIT 10;")
 
         if (result == 0) {
             res.status(200).send(result)
         } else {
             res.status(200).send(result)
         }
-    } catch (error){
-        console.log(error)
-        res.status(400).send(error)
+    } catch {
+        return res.status(404).send({
+            status: "No data"
+        })
     }
 })
 
 app.get('/getTown/:id', async (req, res) => {
-    var resultSearch = await pool.query("SELECT * FROM towns WHERE towns.id_town = ?;", [req.params.id])
-    var resultTown = await pool.query("SELECT id_town FROM searches WHERE searches.id_town = ? AND searches.date >= ?;", [req.params.id, past])
+    var resultSearch = await pool.query("SELECT id_town FROM searches WHERE searches.id_town = ? AND searches.date >= ?;", [req.params.id, past])
 
     await pool.query("INSERT INTO searches (id_town, date) VALUES (?,?);", [req.params.id, today])
 
-    let promiseRestaurants = new Promise((resolve, reject) => {
-        const child = spawn('python', ['./WebScrapers/buscorestaurantes.py', resultTown.rows[0].name]);
-        child.stdout.on('data', (data) => {
-            var jsonContent = JSON.parse(data);
-            resolve(jsonContent);
-        });
-        child.on("error", (error) => {
-            reject(error)
-        })
-    })
-    let promiseJobs = new Promise((resolve, reject) => {
-        const child = spawn('python', ['./WebScrapers/jobtoday.py', resultTown.rows[0].name]);
-        child.stdout.on('data', (data) => {
-            var jsonContent = JSON.parse(data);
-            resolve(jsonContent);
-        });
-        child.on("error", (error) => {
-            reject(error)
-        })
-    })
-    let promiseNews = new Promise((resolve, reject) => {
-        const child = spawn('python', ['./WebScrapers/20minutos.py', resultTown.rows[0].name]);
-        child.stdout.on('data', (data) => {
-            var jsonContent = JSON.parse(data);
-            resolve(jsonContent);
-        });
-        child.on("error", (error) => {
-            reject(error)
-        })
-    })
-
     if (resultSearch === 0) {
-        if (townData !== 0) {
-            var responses = await Promise.all([promiseRestaurants, promiseJobs, promiseNews])
+        var resultTown = await pool.query("SELECT * FROM towns WHERE towns.id_town = ?;", [req.params.id])
 
-            for (let i = 0; i < responses[0].length; i++) {
-                var townid = req.params.id
-                var name = responses[0][i].name
-                var location = responses[0][i].location
-                var sentiment = responses[0][i].sentiment
+        if (resultTown !== 0) {
+            try {
+                let promiseRestaurants = new Promise((resolve, reject) => {
+                    const child = spawn('python', ['./WebScrapers/buscorestaurantes.py', resultTown[0].name]);
+                    child.stdout.on('data', (data) => {
+                        var jsonContent = JSON.parse(data);
+                        resolve(jsonContent);
+                    });
+                    child.on("error", (error) => {
+                        reject(error)
+                    })
+                })
+                let promiseJobs = new Promise((resolve, reject) => {
+                    const child = spawn('python', ['./WebScrapers/jobtoday.py', resultTown[0].name]);
+                    child.stdout.on('data', (data) => {
+                        var jsonContent = JSON.parse(data);
+                        resolve(jsonContent);
+                    });
+                    child.on("error", (error) => {
+                        reject(error)
+                    })
+                })
+                let promiseNews = new Promise((resolve, reject) => {
+                    const child = spawn('python', ['./WebScrapers/20minutos.py', resultTown[0].name]);
+                    child.stdout.on('data', (data) => {
+                        var jsonContent = JSON.parse(data);
+                        resolve(jsonContent);
+                    });
+                    child.on("error", (error) => {
+                        reject(error)
+                    })
+                })
 
-                await pool.query("INSERT INTO restaurants (id_town,name,location,sentiment,date) VALUES (?,?,?,?,?);", [townid, name, location, sentiment, today])
-            }
-            for (let i = 0; i < responses[1].length; i++) {
-                var townid = req.params.id
-                var work = responses[1][i].work
-                var company = responses[1][i].company
-                var description = responses[1][i].description
+                var responses = await Promise.all([promiseRestaurants, promiseJobs, promiseNews])
 
-                await pool.query("INSERT INTO jobs (id_town,work,company,description,date) VALUES (?,?,?,?,?);", [townid, work, company, description, today])
-            }
-            for (let i = 0; i < responses[2].length; i++) {
-                var townid = req.params.id
-                var name = responses[2][i].title
-                var location = responses[2][i].content
+                town = {}
+                town['name'] = resultTown[0].name
+                town['region'] = resultTown[0].region
+                town['province'] = resultTown[0].province
+                town['aacc'] = resultTown[0].aacc
+                town['density'] = resultTown[0].density
+                town['population'] = resultTown[0].population
+                town['emptied'] = resultTown[0].emptied
 
-                await pool.query("INSERT INTO news (id_town,title,content,date) VALUES (?,?,?,?);", [townid, title, content, today])
-            }
-        
-            town = {}
-            town['name'] = townData.rows[0].name
-            town['region'] = townData.rows[0].region
-            town['province'] = townData.rows[0].province
-            town['aacc'] = townData.rows[0].aacc
-            town['density'] = townData.rows[0].density
-            town['population'] = townData.rows[0].population
-            town['emptied'] = townData.rows[0].emptied
-            town['restaurants'] = responses[0]
-            town['jobs'] = responses[1]
-            town['news'] = responses[2]
-            
-            return res.send(town)
+                if (responses[0] !== 0) {
+                    for (let i = 0; i < responses[0].length; i++) {
+                        var townid = req.params.id
+                        var name = responses[0][i].name
+                        var location = responses[0][i].location
+                        var sentiment = responses[0][i].sentiment
+    
+                        await pool.query("INSERT INTO restaurants (id_town,name,location,sentiment,date) VALUES (?,?,?,?,?);", [townid, name, location, sentiment, today])
+                    }
+
+                    town['restaurants'] = responses[0]
+                } else {
+                    town['restaurants'] = "No data"
+                }
+                
+                if (responses[1] !== 0){
+                    for (let i = 0; i < responses[1].length; i++) {
+                        var townid = req.params.id
+                        var work = responses[1][i].work
+                        var company = responses[1][i].company
+                        var description = responses[1][i].description
+    
+                        await pool.query("INSERT INTO jobs (id_town,work,company,description,date) VALUES (?,?,?,?,?);", [townid, work, company, description, today])
+                    }
+
+                    town['jobs'] = responses[1]
+                } else {
+                    town['jobs'] = "No data"
+                }
+                
+                if (responses[2] !== 0){
+                    for (let i = 0; i < responses[2].length; i++) {
+                        var townid = req.params.id
+                        var name = responses[2][i].title
+                        var location = responses[2][i].content
+
+                        await pool.query("INSERT INTO news (id_town,title,content,date) VALUES (?,?,?,?);", [townid, title, content, today])
+                    }
+
+                    town['news'] = responses[2]
+                } else {
+                    town['news'] = "No data"
+                }
+                
+                return res.status(200).send(town)
+            } catch {
+                return res.status(500).send({
+                    status: "No data"
+                })
+            }            
         } else {
-            res.status(404)
-            res.send({
+            return res.status(404).send({
                 status: `No town with ${req.params.id} id found`
             })
         }
     } else {
-        var restaurantsQuery = "SELECT * FROM restaurants WHERE id_town = ?;"
-        var jobsQuery = "SELECT * FROM jobs WHERE id_town = ?;"
-        var newsQuery = "SELECT * FROM news WHERE id_town = ?;"
+        try {
+            var resultTown = await pool.query("SELECT * FROM towns WHERE towns.id_town = ?;", [req.params.id])
+            var resultRetsaurants = await pool.query("SELECT * FROM restaurants WHERE id_town = ? and date >= ?;", [req.params.id, past])
+            var resultJobs = await pool.query("SELECT * FROM jobs WHERE id_town = ? and date >= ?;", [req.params.id, past])
+            var resultNews = await pool.query("SELECT * FROM news WHERE id_town = ? and date >= ?;", [req.params.id, past])
 
-        var resultRetsaurants = await pool.query(restaurantsQuery, [req.params.id])
-        var resultJobs = await pool.query(jobsQuery, [req.params.id])
-        var resultNews = await pool.query(newsQuery, [req.params.id])
+            town = {}
+            town['name'] = resultTown[0].name
+            town['region'] = resultTown[0].region
+            town['province'] = resultTown[0].province
+            town['aacc'] = resultTown[0].aacc
+            town['density'] = resultTown[0].density
+            town['population'] = resultTown[0].population
+            town['emptied'] = resultTown[0].emptied
 
-        var restaurants = []
-        var jobs = []
-        var news = []
+            if (resultRetsaurants === 0) {
+                town['restaurants'] = "No data"
+            } else {
+                town['restaurants'] = resultRetsaurants
+            }
 
-        for (let i = 0; i < result.rows.length; i++) {
+            if (resultRetsaurants === 0) {
+                town['jobs'] = "No data"
+            } else {
+                town['jobs'] = resultJobs
+            }
 
+            if (resultRetsaurants === 0) {
+                town['news'] = "No data"
+            } else {
+                town['news'] = resultNews
+            }
+
+            return res.status(200).send(town)
+        } catch {
+            return res.status(404).send({
+                status: "No data"
+            })
         }
-
-        town = {}
-        town['name'] = townData.rows[0].name
-        town['region'] = townData.rows[0].region
-        town['province'] = townData.rows[0].province
-        town['aacc'] = townData.rows[0].aacc
-        town['density'] = townData.rows[0].density
-        town['population'] = townData.rows[0].population
-        town['emptied'] = townData.rows[0].emptied
-        town['restaurants'] = responses[0]
-        town['jobs'] = responses[1]
-        town['news'] = responses[2]
-        
     }
 })
 
-app.get('/town/:id', async (req, res) => {
-    console.log(req.params.id)
-    await pool.query("SELECT * FROM towns WHERE towns.id_town = ?;", [req.params.id])
-    .on("error", err => {
-        console.log(err); //if error
+app.get('/scrapers/:id', async (req, res) => {
+    var resultTown = await pool.query("SELECT * FROM towns WHERE towns.id_town = ?;", [req.params.id])
+    console.log(resultTown[0].name)
+    let promiseRestaurants = new Promise((resolve, reject) => {
+        const child = spawn('python', ['./WebScrapers/buscorestaurantes.py', resultTown[0].name]);
+        child.stdout.on('data', (data) => {
+            var jsonContent = JSON.parse(data);
+            resolve(jsonContent);
+        });
+        child.on("error", (error) => {
+            reject(error)
+        })
     })
-    .on("fields", meta => {
-        console.log(meta); // [ ... ]
-    })
-    .on("data", row => {
-        console.log(row);
-    })
+    // let promiseJobs = new Promise((resolve, reject) => {
+    //     const child = spawn('python', ['./WebScrapers/jobtoday.py', resultTown[0].name]);
+    //     child.stdout.on('data', (data) => {
+    //         var jsonContent = JSON.parse(data);
+    //         resolve(jsonContent);
+    //     });
+    //     child.on("error", (error) => {
+    //         reject(error)
+    //     })
+    // })
+    // let promiseNews = new Promise((resolve, reject) => {
+    //     const child = spawn('python', ['./WebScrapers/20minutos.py', resultTown[0].name]);
+    //     child.stdout.on('data', (data) => {
+    //         var jsonContent = JSON.parse(data);
+    //         resolve(jsonContent);
+    //     });
+    //     child.on("error", (error) => {
+    //         reject(error)
+    //     })
+    // })
+
+    var responses = await Promise.all([promiseRestaurants])
+    res.send(responses)
 })
 
 // -------------------------------------------------------------------------------------

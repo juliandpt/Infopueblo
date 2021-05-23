@@ -3,8 +3,8 @@ import requests
 import sys
 import json
 
-text = sys.argv[1]
-#text = input("Introduce un lugar: ")
+#text = sys.argv[1]
+text = input("Introduce un lugar: ")
 num_offers = 20
 place = text.replace(" ", "-")
 
@@ -16,10 +16,10 @@ while len(offers) < num_offers:
         i = i+1
         r = requests.get(url, allow_redirects=False)
         soup = BeautifulSoup(r.text, 'html.parser')
-        rows = soup.find_all("div", {"class": "Grid-item"})
+        rows = soup.find_all("div", {"class": "JobCardLarge"})
         for row in rows:
-            hyperLink = row.find('a')
             try:
+                hyperLink = row.find('a')
                 offerLink = hyperLink['href']
                 articlePage = requests.get(offerLink, allow_redirects=False)
                 parsedPage = BeautifulSoup(articlePage.text, 'html.parser')
