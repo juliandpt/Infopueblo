@@ -36,8 +36,8 @@ app.use((req, res, next) => {
 app.post('/login', async (req, res) => {
     var result = await pool.query("SELECT * FROM users WHERE users.email = ? and users.password = ?;", [req.body.email, sha(req.body.password)])
 
-    if (result == 0) {
-        return res.json({
+    if (result === 0) {
+        return res.status(401).send({
             status: 'ko'
         })
     }
@@ -55,19 +55,19 @@ app.post('/login', async (req, res) => {
         
             const accessToken = jwt.sign(claims, '3ea3967ae8328f89eda5be264d5af88b83d490afc9218d02e5628e07bf89850e828eef80c4085c20e4a394f5a7792773347e7a6492b0e05e54f321a34b7ed20b')
             
-            const resultToken = await pool.query("UPDATE users SET token = ? WHERE id_user = ?;", [accessToken, userid])
+            await pool.query("UPDATE users SET token = ? WHERE id_user = ?;", [accessToken, userid])
 
             return res.status(200).send({
                 status: 'ok',
                 token: accessToken
             });
         } else {
-            return res.send(401).send({
+            return res.status(401).send({
                 status: 'ko'
             });
         }
     } catch {
-        return res.send(500).send({
+        return res.status(500).send({
             status: 'ko'
         })
     }
@@ -81,8 +81,8 @@ app.get('/validate', async (req, res) => {
             status: 'ko'
         })
     } else {
-        return res.json({
-            status: 'cuenta validada'
+        return res.status(200).send({
+            status: 'ok'
         })
     } 
 })
@@ -148,36 +148,7 @@ app.post('/register', async(req, res) => {
 
 app.post('/user', (req, res) => {
     if (authenticateToken(req.body.token) == false) {
-        res.json({
-            status: "ko"
-        })
-    } else {
-        try {
-            decodedToken = jwt.decode(token)
-            var userid = decodedToken.userid
-
-            const query = "SELECT * FROM users WHERE users.Id_user = ?;"
-            const result = pool.query(query, [userid])
-
-            var name = result.rows[0].name;
-            var surnames = result.rows[0].surnames;
-
-            return res.json({
-                status: "ok",
-                name: name,
-                surnames: surnames
-            })
-        } catch {
-            return res.json({
-                status: "ko info",
-            })
-        }
-    }
-})
-
-app.post('/user/delete', (req, res) => {
-    if (authenticateToken(req.body.token) == false) {
-        res.json({
+        return res.status(401).send({
             status: "ko"
         })
     } else {
@@ -185,20 +156,47 @@ app.post('/user/delete', (req, res) => {
             decodedToken = jwt.decode(req.body.token)
             var userid = decodedToken.userid
 
-            const query = "DELETE FROM users WHERE users.Id_user = ?;"
-            const result = pool.query(query, [userid])
+            var result = pool.query("SELECT * FROM users WHERE users.id_user = ?;", [userid])
 
-            if (result.rowCount == 0) {
-                return res.json({
+            var name = result[0].name;
+            var surnames = result[0].surnames;
+
+            return res.status(200).json({
+                status: "ok",
+                name: name,
+                surnames: surnames
+            })
+        } catch {
+            return res.status(401).json({
+                status: "ko",
+            })
+        }
+    }
+})
+
+app.post('/user/delete', (req, res) => {
+    if (authenticateToken(req.body.token) == false) {
+        res.status(401).send({
+            status: "ko"
+        })
+    } else {
+        try {
+            decodedToken = jwt.decode(req.body.token)
+            var userid = decodedToken.userid
+
+            const result = pool.query("DELETE FROM users WHERE users.Id_user = ?;", [userid])
+
+            if (result == 0) {
+                return res.status(400).json({
                     status: 'ko'
                 })
             }
 
-            return res.json({
+            return res.status(200).json({
                 status: "ok"
             })
         } catch {
-            return res.json({
+            return res.status(500).json({
                 status: "ko"
             })
         }
@@ -245,7 +243,18 @@ app.get('/getTopTowns', async (req, res) => {
                 status: "No data"
             })
         } else {
-            res.status(200).send(result)
+            var towns = []
+            for (let i = 0; i < result.length; i++) {
+                var query = await pool.query("SELECT id_town, name, image_url FROM towns WHERE towns.id_town = ?;", [result[i].id_town])
+
+                town = {}
+                town["id"] = query[0].id_town
+                town["name"] = query[0].name
+                town["image"] = query[0].image_url
+                towns.push(town)
+            }
+
+            res.status(200).send(towns)
         }
     } catch (error){
         console.log(error)
@@ -271,7 +280,7 @@ app.post('/town/like/:id', async (req, res) => {
 
 app.get('/getLikedTowns', async (req, res) => {
     try {
-        var result = await pool.query("SELECT * FROM towns ORDER BY towns.likes DESC LIMIT 10;")
+        var result = await pool.query("SELECT id_town, name, image_url, likes FROM towns ORDER BY towns.likes DESC LIMIT 10;")
 
         if (result == 0) {
             res.status(200).send(result)
