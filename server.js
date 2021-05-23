@@ -306,7 +306,7 @@ app.get('/getTown/:id', async (req, res) => {
                     })
                 })
                 let promiseJobs = new Promise((resolve, reject) => {
-                    const child = spawn('python', ['./WebScrapers/jobtoday.py', resultTown[0].name]);
+                    const child = spawn('python', ['./WebScrapers/cornerjob.py', resultTown[0].name]);
                     child.stdout.on('data', (data) => {
                         var jsonContent = JSON.parse(data);
                         resolve(jsonContent);
@@ -448,28 +448,28 @@ app.get('/scrapers/:id', async (req, res) => {
             reject(error)
         })
     })
-    // let promiseJobs = new Promise((resolve, reject) => {
-    //     const child = spawn('python', ['./WebScrapers/jobtoday.py', resultTown[0].name]);
-    //     child.stdout.on('data', (data) => {
-    //         var jsonContent = JSON.parse(data);
-    //         resolve(jsonContent);
-    //     });
-    //     child.on("error", (error) => {
-    //         reject(error)
-    //     })
-    // })
-    // let promiseNews = new Promise((resolve, reject) => {
-    //     const child = spawn('python', ['./WebScrapers/20minutos.py', resultTown[0].name]);
-    //     child.stdout.on('data', (data) => {
-    //         var jsonContent = JSON.parse(data);
-    //         resolve(jsonContent);
-    //     });
-    //     child.on("error", (error) => {
-    //         reject(error)
-    //     })
-    // })
+    let promiseJobs = new Promise((resolve, reject) => {
+        const child = spawn('python', ['./WebScrapers/cornerjob.py', resultTown[0].name]);
+        child.stdout.on('data', (data) => {
+            var jsonContent = JSON.parse(data);
+            resolve(jsonContent);
+        });
+        child.on("error", (error) => {
+            reject(error)
+        })
+    })
+    let promiseNews = new Promise((resolve, reject) => {
+        const child = spawn('python', ['./WebScrapers/20minutos.py', resultTown[0].name]);
+        child.stdout.on('data', (data) => {
+            var jsonContent = JSON.parse(data);
+            resolve(jsonContent);
+        });
+        child.on("error", (error) => {
+            reject(error)
+        })
+    })
 
-    var responses = await Promise.all([promiseRestaurants])
+    var responses = await Promise.all([promiseRestaurants, promiseJobs, promiseNews])
     res.send(responses)
 })
 
