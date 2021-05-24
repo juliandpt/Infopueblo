@@ -173,6 +173,35 @@ app.post('/user', (req, res) => {
     }
 })
 
+app.get('/user/get', async (req, res) => {
+    try {
+        var result = await pool.query("SELECT id_user, name, surnames, email FROM users;")
+
+        if (result.length === 0) {
+            return res.status(400).send({
+                status: "ko"
+            })
+        } else {
+            var users = []
+            for (let i = 0; i < result.length; i++) {
+                user = {}
+                user["id"] = result[i].id_user
+                user["name"] = result[i].name
+                user["surnames"] = result[i].surnames
+                user["email"] = result[i].email
+                users.push(user)
+            }
+
+            return res.status(200).send(users)
+        }
+    } catch (error){
+        console.log(error)
+        return res.status(500).send({
+            status: "ko"
+        })
+    }
+})
+
 app.post('/user/delete', (req, res) => {
     if (authenticateToken(req.body.token) == false) {
         res.status(401).send({
