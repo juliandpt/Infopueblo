@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS towns (
   emptied boolean,
   likes int DEFAULT NULL
 );
-CREATE TABLE IF NOT EXISTS searchs (
+CREATE TABLE IF NOT EXISTS searches (
   id_search INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   id_town int DEFAULT NULL,
   date date DEFAULT NULL
@@ -18,25 +18,25 @@ CREATE TABLE IF NOT EXISTS searchs (
 CREATE TABLE IF NOT EXISTS jobs (
   id_job INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   id_town int DEFAULT NULL,
-  name varchar(50) DEFAULT NULL,
-  URL varchar(30) DEFAULT NULL,
-  location varchar(100) DEFAULT NULL
+  work varchar(255) DEFAULT NULL,
+  title varchar(255) DEFAULT NULL,
+  description varchar(100) DEFAULT NULL,
+  date date DEFAULT NULL
 );
 CREATE TABLE IF NOT EXISTS news (
   id_news INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   id_town int DEFAULT NULL,
-  media varchar(50) DEFAULT NULL,
-  date date DEFAULT NULL,
+  title varchar(255) DEFAULT NULL,
   content text DEFAULT NULL,
-  emptied boolean DEFAULT NULL
+  date date DEFAULT NULL
 );
 CREATE TABLE IF NOT EXISTS restaurants (
   id_restaurant INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   id_town int DEFAULT NULL,
-  name varchar(50) DEFAULT NULL,
-  url varchar(30) DEFAULT NULL,
-  location varchar(100) DEFAULT NULL,
-  image_url varchar(250) default null
+  name varchar(255) DEFAULT NULL,
+  location varchar(255) DEFAULT NULL,
+  sentiment double DEFAULT NULL,
+  date date DEFAULT NULL
 );
 CREATE TABLE IF NOT EXISTS users (
   id_user INT NOT NULL PRIMARY KEY AUTO_INCREMENT,

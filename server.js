@@ -1,5 +1,4 @@
 const mariadb = require('mariadb')
-const fs = require('fs')
 const express = require('express')
 const jwt = require('jsonwebtoken')
 const sha = require('sha1')
@@ -297,12 +296,11 @@ app.get('/getLikedTowns', async (req, res) => {
 app.get('/getTown/:id', async (req, res) => {
     var resultSearch = await pool.query("SELECT id_town FROM searches WHERE searches.id_town = ? AND searches.date >= ?;", [req.params.id, past])
 
-    await pool.query("INSERT INTO searches (id_town, date) VALUES (?,?);", [req.params.id, today])
-
-    if (resultSearch === 0) {
+    if (resultSearch == 0) {
+        await pool.query("INSERT INTO searches (id_town, date) VALUES (?,?);", [req.params.id, today])
         var resultTown = await pool.query("SELECT * FROM towns WHERE towns.id_town = ?;", [req.params.id])
 
-        if (resultTown !== 0) {
+        if (resultTown != 0) {
             try {
                 let promiseRestaurants = new Promise((resolve, reject) => {
                     const child = spawn('python', ['./WebScrapers/buscorestaurantes.py', resultTown[0].name]);
@@ -354,6 +352,7 @@ app.get('/getTown/:id', async (req, res) => {
                         var sentiment = responses[0][i].sentiment
     
                         await pool.query("INSERT INTO restaurants (id_town,name,location,sentiment,date) VALUES (?,?,?,?,?);", [townid, name, location, sentiment, today])
+                        console.log('inserted restaurant')
                     }
 
                     town['restaurants'] = responses[0]
@@ -365,10 +364,11 @@ app.get('/getTown/:id', async (req, res) => {
                     for (let i = 0; i < responses[1].length; i++) {
                         var townid = req.params.id
                         var work = responses[1][i].work
-                        var company = responses[1][i].company
+                        var title = responses[1][i].title
                         var description = responses[1][i].description
     
-                        await pool.query("INSERT INTO jobs (id_town,work,company,description,date) VALUES (?,?,?,?,?);", [townid, work, company, description, today])
+                        await pool.query("INSERT INTO jobs (id_town,work,title,description,date) VALUES (?,?,?,?,?);", [townid, work, title, description, today])
+                        console.log('inserted job')
                     }
 
                     town['jobs'] = responses[1]
@@ -379,10 +379,11 @@ app.get('/getTown/:id', async (req, res) => {
                 if (responses[2] !== 0){
                     for (let i = 0; i < responses[2].length; i++) {
                         var townid = req.params.id
-                        var name = responses[2][i].title
-                        var location = responses[2][i].content
+                        var title = responses[2][i].title
+                        var content = responses[2][i].content
 
-                        await pool.query("INSERT INTO news (id_town,title,content,date) VALUES (?,?,?,?);", [townid, title, content, today])
+                        await pool.query("INSERT INTO news (id_town,date,content,title) VALUES (?,?,?,?);", [townid, today, content, title])
+                        console.log('inserted new')
                     }
 
                     town['news'] = responses[2]
@@ -402,6 +403,8 @@ app.get('/getTown/:id', async (req, res) => {
             })
         }
     } else {
+        await pool.query("INSERT INTO searches (id_town, date) VALUES (?,?);", [req.params.id, today])
+
         try {
             var resultTown = await pool.query("SELECT * FROM towns WHERE towns.id_town = ?;", [req.params.id])
             var resultRetsaurants = await pool.query("SELECT * FROM restaurants WHERE id_town = ? and date >= ?;", [req.params.id, past])
@@ -442,44 +445,6 @@ app.get('/getTown/:id', async (req, res) => {
             })
         }
     }
-})
-
-app.get('/scrapers/:id', async (req, res) => {
-    var resultTown = await pool.query("SELECT * FROM towns WHERE towns.id_town = ?;", [req.params.id])
-    console.log(resultTown[0].name)
-    let promiseRestaurants = new Promise((resolve, reject) => {
-        const child = spawn('python', ['./WebScrapers/buscorestaurantes.py', resultTown[0].name]);
-        child.stdout.on('data', (data) => {
-            var jsonContent = JSON.parse(data);
-            resolve(jsonContent);
-        });
-        child.on("error", (error) => {
-            reject(error)
-        })
-    })
-    let promiseJobs = new Promise((resolve, reject) => {
-        const child = spawn('python', ['./WebScrapers/cornerjob.py', resultTown[0].name]);
-        child.stdout.on('data', (data) => {
-            var jsonContent = JSON.parse(data);
-            resolve(jsonContent);
-        });
-        child.on("error", (error) => {
-            reject(error)
-        })
-    })
-    let promiseNews = new Promise((resolve, reject) => {
-        const child = spawn('python', ['./WebScrapers/20minutos.py', resultTown[0].name]);
-        child.stdout.on('data', (data) => {
-            var jsonContent = JSON.parse(data);
-            resolve(jsonContent);
-        });
-        child.on("error", (error) => {
-            reject(error)
-        })
-    })
-
-    var responses = await Promise.all([promiseRestaurants, promiseJobs, promiseNews])
-    res.send(responses)
 })
 
 // -------------------------------------------------------------------------------------

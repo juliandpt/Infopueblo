@@ -4,18 +4,21 @@ Desarrollo de código de la parte backend del Proyecto de Computación I, II y I
 
 # Herramientas utilizadas
 
-- Heroku
-- Postgresql
+- Mariadb
+- jsonwebtoken
+- sha1
+- spawn
+- sengrid mail
 - Node.js
 - Express
 - Npm
 
 # Comandos de instalación
 
-Postgresql(conexión):
+Mariadb(conexión con base de datos):
 
 ```sh
-pip install psycopg2
+npm install mariadb
 ```
 
 Express:
@@ -27,6 +30,11 @@ npm install express --save
 Jsonwebtoken:
 ```sh
 npm install jsonwebtoken
+```
+
+Sha1:
+```sh
+npm install sha1
 ```
 
 Nodemon:
