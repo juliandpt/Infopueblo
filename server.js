@@ -235,7 +235,7 @@ app.post('/user/delete', (req, res) => {
 // Obtencion de datos de pueblos
 // -------------------------------------------------------------------------------------
 
-app.get('/getTowns', async (req, res) => {
+app.get('/town/getTowns', async (req, res) => {
     try {
         var result = await pool.query("SELECT id_town, name FROM towns;")
 
@@ -262,7 +262,7 @@ app.get('/getTowns', async (req, res) => {
     }
 })
 
-app.get('/getTopTowns', async (req, res) => {
+app.get('/town/getTopTowns', async (req, res) => {
     try {
         var result = await pool.query("SELECT * FROM searches GROUP BY id_town ORDER BY COUNT(*) DESC LIMIT 10;")
 
@@ -276,9 +276,9 @@ app.get('/getTopTowns', async (req, res) => {
                 var query = await pool.query("SELECT id_town, name, image_url FROM towns WHERE towns.id_town = ?;", [result[i].id_town])
 
                 town = {}
-                town["id"] = query[0].id_town
+                town["id_town"] = query[0].id_town
                 town["name"] = query[0].name
-                town["image"] = query[0].image_url
+                town["image_url"] = query[0].image_url
                 towns.push(town)
             }
 
@@ -306,7 +306,7 @@ app.post('/town/like/:id', async (req, res) => {
     }
 })
 
-app.get('/getLikedTowns', async (req, res) => {
+app.get('/town/getLikedTowns', async (req, res) => {
     try {
         var result = await pool.query("SELECT id_town, name, image_url, likes FROM towns ORDER BY towns.likes DESC LIMIT 10;")
 
@@ -322,7 +322,7 @@ app.get('/getLikedTowns', async (req, res) => {
     }
 })
 
-app.get('/getTown/:id', async (req, res) => {
+app.get('/town/getTown/:id', async (req, res) => {
     var resultSearch = await pool.query("SELECT id_town FROM searches WHERE searches.id_town = ? AND searches.date >= ?;", [req.params.id, past])
 
     if (resultSearch == 0) {
