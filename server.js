@@ -89,14 +89,14 @@ app.get('/validate', async (req, res) => {
 app.post('/user/register', async(req, res) => {
     try {
         console.log(req.body);
-        var claims = {
+        var payload = {
             userid: req.body.email,
-            exp: tomorrow,
-            iat: today
+            exp: Math.floor(Date.now() / 1000) + (60 * 60),
+            iat: Date.now()
         }
-        console.log(claims);
+        console.log(payload);
         
-        const accessToken = jwt.sign(claims, '3ea3967ae8328f89eda5be264d5af88b83d490afc9218d02e5628e07bf89850e828eef80c4085c20e4a394f5a7792773347e7a6492b0e05e54f321a34b7ed20b')
+        const accessToken = jwt.sign(payload, '3ea3967ae8328f89eda5be264d5af88b83d490afc9218d02e5628e07bf89850e828eef80c4085c20e4a394f5a7792773347e7a6492b0e05e54f321a34b7ed20b')
         console.log(accessToken)
 
         var result = await pool.query("INSERT INTO users (email,password,name,surnames,admin,verificationToken) VALUES (?,?,?,?,0,?);", [req.body.email, sha(req.body.password), req.body.name, req.body.surnames, accessToken])
