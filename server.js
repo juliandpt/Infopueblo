@@ -32,7 +32,7 @@ app.use((req, res, next) => {
 // Gestion de usuarios
 // -------------------------------------------------------------------------------------
 
-app.post('/login', async (req, res) => {
+app.post('/user/login', async (req, res) => {
     var result = await pool.query("SELECT * FROM users WHERE users.email = ? and users.password = ?;", [req.body.email, sha(req.body.password)])
 
     if (result === 0) {
@@ -86,22 +86,23 @@ app.get('/validate', async (req, res) => {
     } 
 })
 
-app.post('/register', async(req, res) => {
+app.post('/user/register', async(req, res) => {
     try {
         console.log(req.body);
-        email = req.body.email
         var claims = {
-            userid: req.body.name,
+            userid: req.body.email,
             exp: tomorrow,
             iat: today
         }
-    
+        console.log(claims);
+        
         const accessToken = jwt.sign(claims, '3ea3967ae8328f89eda5be264d5af88b83d490afc9218d02e5628e07bf89850e828eef80c4085c20e4a394f5a7792773347e7a6492b0e05e54f321a34b7ed20b')
+        console.log(accessToken)
 
-        var result = await pool.query("INSERT INTO users (email,password,name,surnames,admin,token,validate) VALUES (?,?,?,?,?,?,?);", [email, sha(req.body.password), req.body.name, req.body.surnames, false, accessToken, false])
+        var result = await pool.query("INSERT INTO users (email,password,name,surnames,admin,verificationToken) VALUES (?,?,?,?,0,?);", [req.body.email, sha(req.body.password), req.body.name, req.body.surnames, accessToken])
         
         sendGridMail.setApiKey('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');
-        url = 'http://localhost:4200/login?email='+ email + '&token=' + accessToken
+        url = 'http://localhost:4200/confirmation?email='+ email + '&token=' + accessToken
         
         function getMessage() {
             const body = 'Haz click en el siguiente link para validar tu cuenta: ' + url;
@@ -135,17 +136,17 @@ app.post('/register', async(req, res) => {
             console.log('Sending test email');
             await sendEmail();
         })();
-        return res.json({
-            status: 'ok'
+        return res.status(200).send({
+            status: "ok"
         });
     } catch {
-        return res.json({
-            status: 'ko'
+        return res.status(400).send({
+            status: "ko"
         });
     }   
 })
 
-app.post('/user', (req, res) => {
+app.post('/user/get', (req, res) => {
     if (authenticateToken(req.body.token) == false) {
         return res.status(401).send({
             status: "ko"
@@ -173,7 +174,7 @@ app.post('/user', (req, res) => {
     }
 })
 
-app.get('/user/get', async (req, res) => {
+app.get('/user/getUsers', async (req, res) => {
     try {
         var result = await pool.query("SELECT id_user, name, surnames, email FROM users;")
 
