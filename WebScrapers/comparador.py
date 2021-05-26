@@ -1,11 +1,12 @@
 #Introduccion de la información y pre-procesamiento
 import pandas as pd
 import numpy as np
+import json
 import os
 import nltk
-nltk.download('stopwords')
 from nltk.corpus import stopwords
 import glob
+nltk.download('stopwords')
 
 #Exploracion de datos
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -21,7 +22,7 @@ from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import train_test_split
 
 #Introduccion de la información y pre-procesamiento
-ruta = ['WebScrapers/resultado/20minutos.json']
+ruta = pd.read_json('WebScrapers/resultado/20minutos.json', orient='columns')
 
 txt=list(map(lambda x:glob.glob(x), ruta))
 
@@ -31,44 +32,40 @@ titulo = []
 lugar = []
 tags = []
 noticia = []
-population = []
-density = []
-image = []
-url = []
 categorias = []
 
 #Revisar esta parte
 for i in txt:
-  if i.startswith(ruta):
-    categoria = 'Despoblacion'
-  else:
+  if i.startswith('WebScrapers/resultado/20minutos.json'):
     categoria = 'No Despoblacion'
+  else:
+    categoria = 'Despoblacion'
   categorias.append(categoria)
 
   texto = open(i,"r", encoding='latin-1').read()
   for j in texto.split('\n\n'):
     textoFinal = j.split('\n####\n')
-    if textoFinal[0] == 'title':
+    if textoFinal[0] == 'Titulo':
       titulo.append(textoFinal[1])
     elif textoFinal[0] == 'Lugar':
       lugar.append(textoFinal[1])
-    elif textoFinal[0] == 'tags':
+    elif textoFinal[0] == 'Tags':
       tags.append(textoFinal[1])
-    elif textoFinal[0] == 'noticia':
+    elif textoFinal[0] == 'Noticia':
       noticia.append(textoFinal[1])
 
 df = pd.DataFrame({
-    'title': titulo,
+    'Titulo': titulo,
     'Lugar': lugar,
-    'tags': tags,
-    'noticia': noticia,
-    'Categoria': categoria
+    'Tags': tags,
+    'Noticia': noticia,
+    'Categoria': categorias
     })
 
 print(df)
 
 df.to_json('WebScrapers/resultado/clasificacion.json')
-df = pd.read_json('WebScrapers/resultado/clasificacion.json')
+df = pd.read_json('WebScrapers/resultado/clasificacion.json', orient='columns')
 
 print(df)
 df['category_id'] = df['Categoria'].factorize()[0]
@@ -80,7 +77,7 @@ id_to_category = dict(category_id_df[['category_id', 'Categoria']].values)
 #Exploracion de datos
 tfidf = TfidfVectorizer(sublinear_tf=True, min_df=5, norm='l2', encoding='UTF-8', ngram_range=(1, 2), stop_words=stopwords.words('spanish'))
 
-features = tfidf.fit_transform(df.Cuerpo)
+features = tfidf.fit_transform(df.Noticia)
 labels = df.category_id
 features.shape
 
