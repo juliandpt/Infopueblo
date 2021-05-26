@@ -9,6 +9,7 @@ const tomorrow = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + (d.getDate()
 const past = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + (d.getDate() - 7)
 
 router.get('/getTowns', async function(req, res) {
+    console.log('GET /town/getTowns')
     try {
         var result = await pool.query("SELECT id_town, name FROM towns;")
 
@@ -36,6 +37,7 @@ router.get('/getTowns', async function(req, res) {
 })
 
 router.get('/getTopTowns', async (req, res) => {
+    console.log('GET /town/getTopTowns')
     try {
         var result = await pool.query("SELECT * FROM searches GROUP BY id_town ORDER BY COUNT(*) DESC LIMIT 10;")
 
@@ -66,6 +68,7 @@ router.get('/getTopTowns', async (req, res) => {
 })
 
 router.post('/like/:id', async (req, res) => {
+    console.log('POST /town/like')
     var result = await pool.query("UPDATE towns SET likes = likes+1 WHERE towns.id_town = ?;", [req.params.id])
 
     if (result.affectedRows !== 0) {
@@ -80,6 +83,7 @@ router.post('/like/:id', async (req, res) => {
 })
 
 router.get('/getLikedTowns', async (req, res) => {
+    console.log('GET /town/getLikedTowns')
     try {
         var result = await pool.query("SELECT id_town, name, image_url, likes FROM towns ORDER BY towns.likes DESC LIMIT 10;")
 
@@ -89,13 +93,14 @@ router.get('/getLikedTowns', async (req, res) => {
             res.status(200).send(result)
         }
     } catch {
-        return res.status(404).send({
+        return res.status(500).send({
             status: "No data"
         })
     }
 })
 
 router.get('/getTown/:id', async (req, res) => {
+    console.log('GET /town/getTown')
     var resultSearch = await pool.query("SELECT id_town FROM searches WHERE searches.id_town = ? AND searches.date >= ?;", [req.params.id, past])
 
     if (resultSearch == 0) {

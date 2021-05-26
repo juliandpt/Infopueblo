@@ -234,4 +234,22 @@ router.post('/delete', (req, res) => {
     }
 })
 
+async function authenticateToken(token) {
+    try {
+        decodedToken = jwt.decode(token)
+        var userid = decodedToken.userid
+
+        const query = "SELECT token FROM users WHERE users.id_user = ?"
+        var result = await pool.query(query, [userid])
+
+        if(result.body.token != 'NULL') {
+            return true
+        } else {
+            return false
+        }
+    } catch {
+        return false
+    }
+}
+
 module.exports = router;
