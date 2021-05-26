@@ -176,6 +176,35 @@ router.get('/getUsers', async (req, res) => {
     }
 })
 
+router.post('/edit', async (req, res) => {
+    if (authenticateToken(req.body.token) == false) {
+        res.status(401).send({
+            status: "ko"
+        })
+    } else {
+        try {
+            decodedToken = jwt.decode(req.body.token)
+            var userid = decodedToken.userid
+
+            const result = pool.query("UPDATE users SET name = ?, surnames = ? WHERE id = ?;", [req.body.name, req.body.surnames, [userid]])
+
+            if (result == 0) {
+                return res.status(400).json({
+                    status: 'ko'
+                })
+            }
+
+            return res.status(200).json({
+                status: "ok"
+            })
+        } catch {
+            return res.status(500).json({
+                status: "ko"
+            })
+        }
+    }
+})
+
 router.post('/delete', (req, res) => {
     if (authenticateToken(req.body.token) == false) {
         res.status(401).send({
