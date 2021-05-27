@@ -1,7 +1,7 @@
 const express = require('express')
 const colors = require("colors")
 const router = express.Router()
-const pool = require('../helpers/database')
+const pool = require('../database')
 const spawn = require('child_process').spawn
 
 const d = new Date()
@@ -106,7 +106,7 @@ router.get('/colors', async (req, res) => {
 })
 
 router.get('/getTown/:id', async (req, res) => {
-    console.log('GET /town/getTown/', req.params.id)
+    console.log('GET /town/getTown/',req.params.id)
     var resultSearch = await pool.query("SELECT id_town FROM searches WHERE searches.id_town = ? AND searches.date >= ?;", [req.params.id, past])
 
     if (resultSearch.length === 0) {
