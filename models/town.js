@@ -1,4 +1,5 @@
 const express = require('express')
+const colors = require("colors")
 const router = express.Router()
 const pool = require('../helpers/database')
 const spawn = require('child_process').spawn
@@ -13,7 +14,7 @@ router.get('/getTowns', async function(req, res) {
     try {
         var result = await pool.query("SELECT id_town, name FROM towns;")
 
-        if (result === 0) {
+        if (result.length === 0) {
             return res.status(400).send({
                 status: "ko"
             })
@@ -41,7 +42,7 @@ router.get('/getTopTowns', async (req, res) => {
     try {
         var result = await pool.query("SELECT * FROM searches GROUP BY id_town ORDER BY COUNT(*) DESC LIMIT 10;")
 
-        if (result == 0) {
+        if (result.length == 0) {
             res.status(404).send({
                 status: "No data"
             })
@@ -87,7 +88,7 @@ router.get('/getLikedTowns', async (req, res) => {
     try {
         var result = await pool.query("SELECT id_town, name, image_url, likes FROM towns ORDER BY towns.likes DESC LIMIT 10;")
 
-        if (result == 0) {
+        if (result.length === 0) {
             res.status(200).send(result)
         } else {
             res.status(200).send(result)
@@ -99,11 +100,16 @@ router.get('/getLikedTowns', async (req, res) => {
     }
 })
 
+router.get('/colors', async (req, res) => {
+    var i = 1
+    console.log(('caca' + i).red)
+})
+
 router.get('/getTown/:id', async (req, res) => {
-    console.log('GET /town/getTown')
+    console.log('GET /town/getTown/', req.params.id)
     var resultSearch = await pool.query("SELECT id_town FROM searches WHERE searches.id_town = ? AND searches.date >= ?;", [req.params.id, past])
 
-    if (resultSearch == 0) {
+    if (resultSearch.length === 0) {
         await pool.query("INSERT INTO searches (id_town, date) VALUES (?,?);", [req.params.id, today])
         var resultTown = await pool.query("SELECT * FROM towns WHERE towns.id_town = ?;", [req.params.id])
 
@@ -146,6 +152,7 @@ router.get('/getTown/:id', async (req, res) => {
                 town['name'] = resultTown[0].name
                 town['region'] = resultTown[0].region
                 town['province'] = resultTown[0].province
+                town['image_url'] = resultTown[0].image_url
                 town['aacc'] = resultTown[0].aacc
                 town['density'] = resultTown[0].density
                 town['population'] = resultTown[0].population
@@ -153,13 +160,18 @@ router.get('/getTown/:id', async (req, res) => {
 
                 if (responses[0] !== 0) {
                     for (let i = 0; i < responses[0].length; i++) {
-                        var townid = req.params.id
-                        var name = responses[0][i].name
-                        var location = responses[0][i].location
-                        var sentiment = responses[0][i].sentiment
-    
-                        await pool.query("INSERT INTO restaurants (id_town,name,location,sentiment,date) VALUES (?,?,?,?,?);", [townid, name, location, sentiment, today])
-                        console.log('inserted restaurant')
+                        try {
+                            var townid = req.params.id
+                            var name = responses[0][i].name
+                            var location = responses[0][i].location
+                            var image_url = responses[0][i].image_url
+                            var sentiment = responses[0][i].sentiment
+        
+                            await pool.query("INSERT INTO restaurants (id_town,name,location,image_url,sentiment,date) VALUES (?,?,?,?,?,?);", [townid, name, location, image_url, sentiment, today])
+                            console.log(('INSERTED RESTAURANT ' + i).green)
+                        } catch {
+                            console.log(('NOT INSERTED RESTAURANT ' + i).red)
+                        }                       
                     }
 
                     town['restaurants'] = responses[0]
@@ -169,13 +181,17 @@ router.get('/getTown/:id', async (req, res) => {
                 
                 if (responses[1] !== 0){
                     for (let i = 0; i < responses[1].length; i++) {
-                        var townid = req.params.id
-                        var work = responses[1][i].work
-                        var title = responses[1][i].title
-                        var description = responses[1][i].description
-    
-                        await pool.query("INSERT INTO jobs (id_town,work,title,description,date) VALUES (?,?,?,?,?);", [townid, work, title, description, today])
-                        console.log('inserted job')
+                        try {
+                            var townid = req.params.id
+                            var work = responses[1][i].work
+                            var title = responses[1][i].title
+                            var description = responses[1][i].description
+        
+                            await pool.query("INSERT INTO jobs (id_town,work,title,description,date) VALUES (?,?,?,?,?);", [townid, work, title, description, today])
+                            console.log(('INSERTED JOB ' + i).green)
+                        } catch {
+                            console.log(('NOT INSERTED JOB ' + i).red)
+                        } 
                     }
 
                     town['jobs'] = responses[1]
@@ -185,12 +201,16 @@ router.get('/getTown/:id', async (req, res) => {
                 
                 if (responses[2] !== 0){
                     for (let i = 0; i < responses[2].length; i++) {
-                        var townid = req.params.id
-                        var title = responses[2][i].title
-                        var content = responses[2][i].content
+                        try {
+                            var townid = req.params.id
+                            var title = responses[2][i].title
+                            var content = responses[2][i].content
 
-                        await pool.query("INSERT INTO news (id_town,date,content,title) VALUES (?,?,?,?);", [townid, today, content, title])
-                        console.log('inserted new')
+                            await pool.query("INSERT INTO news (id_town,date,content,title) VALUES (?,?,?,?);", [townid, today, content, title])
+                            console.log(('INSERTED NEW ' + i).green)
+                        } catch {
+                            console.log(('NOT INSERTED NEW ' + i).red)
+                        } 
                     }
 
                     town['news'] = responses[2]

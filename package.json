@@ -19,6 +19,7 @@
   "homepage": "https://github.com/julidpt/ProyectoDeComputacion-Backend#readme",
   "dependencies": {
     "@sendgrid/mail": "^7.4.4",
+    "colors": "^1.4.0",
     "crypto-js": "^4.0.0",
     "date-and-time": "^1.0.0",
     "dotenv": "^9.0.2",

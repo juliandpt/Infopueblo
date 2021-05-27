@@ -6,8 +6,8 @@ import requests
 import sys
 import json
 
-#text = sys.argv[1]
-text = input("Introduce un lugar: ")
+text = sys.argv[1]
+#text = input("Introduce un lugar: ")
 place = text.replace(" ", "+")
 
 restaurants = []
@@ -20,7 +20,7 @@ try:
     for row in rows:
         try:
             item = {}
-            item['image'] = row.find('img')['src']
+            item['image_url'] = row.find('img')['src']
             restaurantLink = row.find('a')['href']            
             restaurantPage = requests.get(restaurantLink, allow_redirects=False)
             parsedPage = BeautifulSoup(restaurantPage.text, 'html.parser')

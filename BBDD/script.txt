@@ -35,6 +35,7 @@ CREATE TABLE IF NOT EXISTS restaurants (
   id_town int DEFAULT NULL,
   name varchar(255) DEFAULT NULL,
   location varchar(255) DEFAULT NULL,
+  image_url varchar(250) DEFAULT NULL,
   sentiment double DEFAULT NULL,
   date date DEFAULT NULL
 );
