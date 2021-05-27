@@ -20,8 +20,8 @@ try:
             offerLink = 'https://www.cornerjob.com' + hyperLink['href']
             articlePage = requests.get(offerLink, allow_redirects=False)
             parsedPage = BeautifulSoup(articlePage.text, 'html.parser')
-            item = {}
             title = parsedPage.find("h1", {"class": "offer-title"}).text
+            item = {}
             item["title"] = title.strip()
             item["work"] = parsedPage.find("p", {"class": "collapse-onload"}).text
             description = parsedPage.find("p", {"class": "offer-description"}).text.replace("\n", "")
@@ -30,12 +30,10 @@ try:
             offers.append(item)
         except:
             continue
+    offersJson = json.dumps(offers)
 except:
-    item = {}
-    item['error'] = "No data"
-    offers.append(item)
+    offers = []
 
-offersJson = json.dumps(offers)
 print(offersJson)
 # with open('./WebScrapers/resultado/jobtoday.json', 'w',  encoding='utf-8') as f:
 #     json.dump(offers, f, ensure_ascii=False, indent=4)

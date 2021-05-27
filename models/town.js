@@ -222,6 +222,7 @@ router.get('/getTown/:id', async (req, res) => {
             town['name'] = resultTown[0].name
             town['region'] = resultTown[0].region
             town['province'] = resultTown[0].province
+            town['image'] = resultTown[0].image_url
             town['aacc'] = resultTown[0].aacc
             town['density'] = resultTown[0].density
             town['population'] = resultTown[0].population

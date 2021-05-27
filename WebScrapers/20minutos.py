@@ -44,12 +44,10 @@ try:
         doc['content'] = articleContent
 
         news.append(doc)
+    newsJson = json.dumps(news)
 except:
-    item = {}
-    item['error'] = "No data"
-    news.append(item)
+    news = []
 
-newsJson = json.dumps(news)
 print(newsJson)
 # with open('./WebScrapers/resultado/20minutos.json', 'w',  encoding='utf-8') as f:
 #     json.dump(news, f, ensure_ascii=False, indent=4)
