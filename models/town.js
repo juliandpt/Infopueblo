@@ -1,12 +1,12 @@
 const express = require('express')
+const spawn = require('child_process').spawn
 const colors = require("colors")
 const router = express.Router()
 const pool = require('../database')
-const spawn = require('child_process').spawn
+const middleware = require('../controllers/middleware')
 
 const d = new Date()
 const today = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate()
-const tomorrow = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + (d.getDate() + 1)
 const past = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + (d.getDate() - 7)
 
 router.get('/getTowns', async function(req, res) {
@@ -15,7 +15,8 @@ router.get('/getTowns', async function(req, res) {
         var result = await pool.query("SELECT id_town, name FROM towns;")
 
         if (result.length === 0) {
-            return res.status(400).send({
+            console.log('BAD RESPONSE'.red)
+            return res.status(500).send({
                 status: "ko"
             })
         } else {
@@ -27,9 +28,11 @@ router.get('/getTowns', async function(req, res) {
                 towns.push(town)
             }
 
+            console.log('GOOD RESPONSE'.green)
             return res.status(200).send(towns)
         }
     } catch (error){
+        console.log('BAD RESPONSE'.red)
         console.log(error)
         return res.status(500).send({
             status: "ko"
@@ -42,8 +45,9 @@ router.get('/getTopTowns', async (req, res) => {
     try {
         var result = await pool.query("SELECT * FROM searches GROUP BY id_town ORDER BY COUNT(*) DESC LIMIT 10;")
 
-        if (result.length == 0) {
-            res.status(404).send({
+        if (result.length === 0) {
+            console.log('BAD RESPONSE'.red)
+            res.status(500).send({
                 status: "No data"
             })
         } else {
@@ -58,11 +62,13 @@ router.get('/getTopTowns', async (req, res) => {
                 towns.push(town)
             }
 
-            res.status(200).send(towns)
+            console.log('GOOD RESPONSE'.green)
+            return res.status(200).send(towns)
         }
     } catch (error){
+        console.log('BAD RESPONSE'.red)
         console.log(error)
-        res.status(404).send({
+        return res.status(500).send({
             status: error
         })
     }
@@ -73,12 +79,14 @@ router.post('/like/:id', async (req, res) => {
     var result = await pool.query("UPDATE towns SET likes = likes+1 WHERE towns.id_town = ?;", [req.params.id])
 
     if (result.affectedRows !== 0) {
+        console.log('GOOD RESPONSE'.green)
         res.status(200).send({
-            status: 'ok'
+            status: "ok"
         })
     } else  {
+        console.log('BAD RESPONSE'.red)
         res.status(400).send({
-            status: 'ko'
+            status: "ko"
         })
     }
 })
@@ -89,27 +97,26 @@ router.get('/getLikedTowns', async (req, res) => {
         var result = await pool.query("SELECT id_town, name, image_url, likes FROM towns ORDER BY towns.likes DESC LIMIT 10;")
 
         if (result.length === 0) {
-            res.status(200).send(result)
+            console.log('BAD RESPONSE'.red)
+            return res.status(500).send({
+                status: "No data"
+            })
         } else {
+            console.log('GOOD RESPONSE'.green)
             res.status(200).send(result)
         }
     } catch {
+        console.log('BAD RESPONSE'.red)
         return res.status(500).send({
             status: "No data"
         })
     }
 })
 
-router.get('/colors', async (req, res) => {
-    var i = 1
-    console.log(('caca' + i).red)
-})
-
 router.get('/getTown/:id', async (req, res) => {
-    console.log('GET /town/getTown/',req.params.id)
-    var resultSearch = await pool.query("SELECT id_town FROM searches WHERE searches.id_town = ? AND searches.date >= ?;", [req.params.id, past])
+    console.log('GET /town/getTown/', req.params.id)
 
-    if (resultSearch.length === 0) {
+    if (await !middleware.existsTown(req.params.id)) {
         await pool.query("INSERT INTO searches (id_town, date) VALUES (?,?);", [req.params.id, today])
         var resultTown = await pool.query("SELECT * FROM towns WHERE towns.id_town = ?;", [req.params.id])
 
@@ -196,7 +203,7 @@ router.get('/getTown/:id', async (req, res) => {
 
                     town['jobs'] = responses[1]
                 } else {
-                    town['jobs'] = "No data"
+                    town['jobs'] = []
                 }
                 
                 if (responses[2] !== 0){
@@ -215,17 +222,20 @@ router.get('/getTown/:id', async (req, res) => {
 
                     town['news'] = responses[2]
                 } else {
-                    town['news'] = "No data"
+                    town['news'] = []
                 }
                 
+                console.log('GOOD RESPONSE'.green)
                 return res.status(200).send(town)
             } catch {
+                console.log('BAD RESPONSE'.red)
                 return res.status(500).send({
                     status: "No data"
                 })
             }            
         } else {
-            return res.status(404).send({
+            console.log('BAD RESPONSE'.red)
+            return res.status(500).send({
                 status: `No town with ${req.params.id} id found`
             })
         }
@@ -234,9 +244,9 @@ router.get('/getTown/:id', async (req, res) => {
 
         try {
             var resultTown = await pool.query("SELECT * FROM towns WHERE towns.id_town = ?;", [req.params.id])
-            var resultRetsaurants = await pool.query("SELECT * FROM restaurants WHERE id_town = ? and date >= ?;", [req.params.id, past])
-            var resultJobs = await pool.query("SELECT * FROM jobs WHERE id_town = ? and date >= ?;", [req.params.id, past])
-            var resultNews = await pool.query("SELECT * FROM news WHERE id_town = ? and date >= ?;", [req.params.id, past])
+            var resultRetsaurants = await pool.query("SELECT id_restaurant, name, location, image_url, sentiment FROM restaurants WHERE id_town = ? and date >= ?;", [req.params.id, past])
+            var resultJobs = await pool.query("SELECT id_job, work, title, description FROM jobs WHERE id_town = ? and date >= ?;", [req.params.id, past])
+            var resultNews = await pool.query("SELECT id_new, title, content FROM news WHERE id_town = ? and date >= ?;", [req.params.id, past])
 
             town = {}
             town['name'] = resultTown[0].name
@@ -248,26 +258,28 @@ router.get('/getTown/:id', async (req, res) => {
             town['population'] = resultTown[0].population
             town['emptied'] = resultTown[0].emptied
 
-            if (resultRetsaurants === 0) {
-                town['restaurants'] = "No data"
+            if (resultRetsaurants.length === 0) {
+                town['restaurants'] = []
             } else {
                 town['restaurants'] = resultRetsaurants
             }
 
-            if (resultRetsaurants === 0) {
-                town['jobs'] = "No data"
+            if (resultRetsaurants.length === 0) {
+                town['jobs'] = []
             } else {
                 town['jobs'] = resultJobs
             }
 
-            if (resultRetsaurants === 0) {
-                town['news'] = "No data"
+            if (resultRetsaurants.length === 0) {
+                town['news'] = []
             } else {
                 town['news'] = resultNews
             }
 
+            console.log('GOOD RESPONSE'.green)
             return res.status(200).send(town)
         } catch {
+            console.log('BAD RESPONSE'.red)
             return res.status(404).send({
                 status: "No data"
             })

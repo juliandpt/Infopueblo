@@ -8,18 +8,18 @@ const sendGridMail = require('@sendgrid/mail')
 require('dotenv').config()
 
 router.post('/login', async (req, res) => {
-    var result = await pool.query("SELECT * FROM users WHERE users.email = ? and users.password = ?;", [req.body.email, service.encyptPassword(req.body.password)])
+    var query = await pool.query("SELECT * FROM users WHERE users.email = ? and users.password = ?;", [req.body.email, service.encyptPassword(req.body.password)])
 
-    if (result.length === 0) {
+    if (query.length === 0) {
         return res.status(401).send({
             status: "ko"
         })
     }
 
     try{
-        const accessToken = service.createToken(result[0].id_user)
+        const accessToken = service.createToken(query[0].id_user)
         
-        await pool.query("UPDATE users SET token = ? WHERE id_user = ?;", [accessToken, result[0].id_user])
+        await pool.query("UPDATE users SET token = ? WHERE id_user = ?;", [accessToken, query[0].id_user])
 
         return res.status(200).send({
             status: "ok",
@@ -33,24 +33,15 @@ router.post('/login', async (req, res) => {
 })
 
 router.get('/prueba', async (req, res) => {
-    console.log(await middleware.validateEmail(req.body.email))
-    if(await middleware.validateEmail(req.body.email)) {
-        res.send('no existe')
+    if (await middleware.authenticateToken(req.body.token) == true) {
+        res.send('acseso consedido')
     } else {
-        res.send('existe')
+        res.send('acseso denegado')
     }
-    
-    // var length = await middleware.validateEmail(req.body.email)
-    // console.log('este' + length)
-    // if(length === 0) {
-    //     res.send('si')
-    // } else {
-    //     res.send('no')
-    // }
 })
 
 router.post('/register', async(req, res) => {
-    if(await middleware.validateEmail(req.body.email)) {
+    if(await middleware.existsEmail(req.body.email) == false) {
         try {
             const registerToken = service.createToken(req.body.email)
             
@@ -109,7 +100,7 @@ router.post('/register', async(req, res) => {
 router.get('/validate', async (req, res) => {
     var result = await pool.query("UPDATE users SET validate=true where email = ? and token = ?;", [req.query.email, req.query.token])
 
-    if (result === 0) {
+    if (result.length === 0) {
         return res.status(401).send({
             status: "ko"
         })
