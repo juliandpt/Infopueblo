@@ -1,6 +1,7 @@
 const express = require('express')
 const spawn = require('child_process').spawn
 const colors = require("colors")
+
 const router = express.Router()
 const pool = require('../database')
 const middleware = require('../controllers/middleware')
@@ -11,6 +12,7 @@ const past = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + (d.getDate() - 7
 
 router.get('/getTowns', async function(req, res) {
     console.log('GET /town/getTowns')
+
     try {
         var result = await pool.query("SELECT id_town, name FROM towns;")
 
@@ -40,10 +42,46 @@ router.get('/getTowns', async function(req, res) {
     }
 })
 
+router.get('/getTopWeekTowns', async (req, res) => {
+    console.log('GET /town/getTopWeekTowns')
+
+    try {
+        var result = await pool.query("SELECT * FROM searches WHERE searches.date >= ? GROUP BY id_town ORDER BY COUNT(*) DESC LIMIT 10;", [past])
+
+        if (result.length === 0) {
+            console.log('BAD RESPONSE'.red)
+            res.status(500).send({
+                status: "No data"
+            })
+        } else {
+            var towns = []
+            for (let i = 0; i < result.length; i++) {
+                var query = await pool.query("SELECT id_town, name, image_url FROM towns WHERE towns.id_town = ?;", [result[i].id_town])
+
+                town = {}
+                town["id_town"] = query[0].id_town
+                town["name"] = query[0].name
+                town["image_url"] = query[0].image_url
+                towns.push(town)
+            }
+
+            console.log('GOOD RESPONSE'.green)
+            return res.status(200).send(towns)
+        }
+    } catch (error){
+        console.log('BAD RESPONSE'.red)
+        console.log(error)
+        return res.status(500).send({
+            status: error
+        })
+    }
+})
+
 router.get('/getTopTowns', async (req, res) => {
     console.log('GET /town/getTopTowns')
+
     try {
-        var result = await pool.query("SELECT * FROM searches GROUP BY id_town ORDER BY COUNT(*) DESC LIMIT 10;")
+        var result = await pool.query("SELECT * FROM searches GROUP BY id_town ORDER BY COUNT(*) DESC LIMIT 10;", [past])
 
         if (result.length === 0) {
             console.log('BAD RESPONSE'.red)
@@ -76,6 +114,7 @@ router.get('/getTopTowns', async (req, res) => {
 
 router.post('/like/:id', async (req, res) => {
     console.log('POST /town/like')
+
     var result = await pool.query("UPDATE towns SET likes = likes+1 WHERE towns.id_town = ?;", [req.params.id])
 
     if (result.affectedRows !== 0) {
@@ -93,6 +132,7 @@ router.post('/like/:id', async (req, res) => {
 
 router.get('/getLikedTowns', async (req, res) => {
     console.log('GET /town/getLikedTowns')
+
     try {
         var result = await pool.query("SELECT id_town, name, image_url, likes FROM towns ORDER BY towns.likes DESC LIMIT 10;")
 

@@ -41,8 +41,6 @@ async function authenticateToken(token) {
                 return false
             } else {
                 decodedDatabaseToken = service.decodeToken(query[0].token)
-                console.log(moment().unix())
-                console.log(decodedDatabaseToken.exp)
 
                 if(moment().unix() > decodedDatabaseToken.exp) {
                     return false
