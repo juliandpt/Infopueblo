@@ -22,16 +22,16 @@ router.get('/getTowns', async function(req, res) {
                 status: "ko"
             })
         } else {
-            var towns = []
-            for (let i = 0; i < result.length; i++) {
-                town = {}
-                town["id"] = result[i].id_town
-                town["name"] = result[i].name
-                towns.push(town)
-            }
+            // var towns = []
+            // for (let i = 0; i < result.length; i++) {
+            //     town = {}
+            //     town["id"] = result[i].id_town
+            //     town["name"] = result[i].name
+            //     towns.push(town)
+            // }
 
             console.log('GOOD RESPONSE'.green)
-            return res.status(200).send(towns)
+            return res.status(200).send(result)
         }
     } catch {
         console.log('BAD RESPONSE'.red)
@@ -45,7 +45,7 @@ router.get('/getTopWeekTowns', async (req, res) => {
     console.log('GET /town/getTopWeekTowns')
 
     try {
-        var result = await pool.query("SELECT searches.id_town, name, image_url date FROM searches, towns WHERE searches.id_town = towns.id_town AND searches.date >= ? GROUP BY id_town ORDER BY COUNT(*) DESC LIMIT 10;", [past])
+        var result = await pool.query("SELECT searches.id_town, name, image_url FROM searches, towns WHERE searches.id_town = towns.id_town AND searches.date >= ? GROUP BY id_town ORDER BY COUNT(*) DESC LIMIT 10;", [past])
 
         if (result.length === 0) {
             console.log('BAD RESPONSE'.red)

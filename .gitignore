@@ -1,6 +1,5 @@
 node_modules
 build
 npm-debug.log
-.env
 .DS_Store"sendgrid.env" 
 .DS_Store
