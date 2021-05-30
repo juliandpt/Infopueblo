@@ -50,20 +50,9 @@ router.get('/getTopWeekTowns', async (req, res) => {
         if (result.length === 0) {
             console.log('BAD RESPONSE'.red)
             res.status(500).send({
-                status: "No data"
+                status: "ko"
             })
         } else {
-            // var towns = []
-            // for (let i = 0; i < result.length; i++) {
-            //     var query = await pool.query("SELECT id_town, name, image_url FROM towns WHERE towns.id_town = ?;", [result[i].id_town])
-
-            //     town = {}
-            //     town["id_town"] = query[0].id_town
-            //     town["name"] = query[0].name
-            //     town["image_url"] = query[0].image_url
-            //     towns.push(town)
-            // }
-
             console.log('GOOD RESPONSE'.green)
             return res.status(200).send(result)
         }
@@ -87,17 +76,6 @@ router.get('/getTopTowns', async (req, res) => {
                 status: "ko"
             })
         } else {
-            // var towns = []
-            // for (let i = 0; i < result.length; i++) {
-            //     var query = await pool.query("SELECT id_town, name, image_url FROM towns WHERE towns.id_town = ?;", [result[i].id_town])
-
-            //     town = {}
-            //     town["id_town"] = query[0].id_town
-            //     town["name"] = query[0].name
-            //     town["image_url"] = query[0].image_url
-            //     towns.push(town)
-            // }
-
             console.log('GOOD RESPONSE'.green)
             return res.status(200).send(result)
         }
@@ -325,40 +303,6 @@ router.get('/getTown/:id', async (req, res) => {
                 status: "ko"
             })
         }
-    }
-})
-
-router.get('/prueba/:id', async (req,  res) => {
-    console.log('GET /town/getTopTowns')
-
-    try {
-        var result = await pool.query("SELECT name, location, image_url, sentiment FROM restaurants WHERE restaurants.id_town = ? ORDER BY restaurants.sentiment DESC LIMIT 6;", [req.params.id])
-
-        if (result.length === 0) {
-            console.log('BAD RESPONSE'.red)
-            res.status(500).send({
-                status: "ko"
-            })
-        } else {
-            // var towns = []
-            // for (let i = 0; i < result.length; i++) {
-            //     var query = await pool.query("SELECT id_town, name, image_url FROM towns WHERE towns.id_town = ?;", [result[i].id_town])
-
-            //     town = {}
-            //     town["id_town"] = query[0].id_town
-            //     town["name"] = query[0].name
-            //     town["image_url"] = query[0].image_url
-            //     towns.push(town)
-            // }
-
-            console.log('GOOD RESPONSE'.green)
-            return res.status(200).send(result)
-        }
-    } catch {
-        console.log('BAD RESPONSE'.red)
-        return res.status(500).send({
-            status: "ko"
-        })
     }
 })
 
