@@ -82,7 +82,7 @@ router.get('/getTopTowns', async (req, res) => {
         var result = await pool.query("SELECT searches.id_town, name, date FROM searches, towns WHERE searches.id_town = towns.id_town GROUP BY id_town ORDER BY COUNT(*) DESC")
 
         if (result.length === 0) {
-            console.log('BAD RESPONSE'.red)
+            console.log('BAD RESPONSE: Database returned no records'.red)
             res.status(500).send({
                 status: "ko"
             })
@@ -101,8 +101,8 @@ router.get('/getTopTowns', async (req, res) => {
             console.log('GOOD RESPONSE'.green)
             return res.status(200).send(result)
         }
-    } catch {
-        console.log('BAD RESPONSE'.red)
+    } catch(error) {
+        console.log(`BAD RESPONSE: ${error.message}`.red)
         return res.status(500).send({
             status: "ko"
         })
