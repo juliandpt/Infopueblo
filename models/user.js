@@ -241,20 +241,10 @@ router.get('/getUsers', async (req, res) => {
                     status: "ko"
                 })
             } else {
-                var users = []
-                for (let i = 0; i < result.length; i++) {
-                    user = {}
-                    user["id"] = result[i].id_user
-                    user["name"] = result[i].name
-                    user["surnames"] = result[i].surnames
-                    user["email"] = result[i].email
-                    users.push(user)
-                }
-    
                 console.log('GOOD RESPONSE'.green)
                 return res.status(200).send({
                     status: "ok",
-                    users: users
+                    users: result
                 })
             }
         } catch {
@@ -264,11 +254,6 @@ router.get('/getUsers', async (req, res) => {
             })
         }
     }
-})
-
-router.get('/prueba', async (req, res) => {
-    var query = await pool.query("SELECT id_town, (SELECT name FROM towns WHERE towns.id_town IN (SELECT id_town FROM searches)) AS name, date FROM searches LIMIT 10;")
-    res.send(query)
 })
 
 module.exports = router;

@@ -22,14 +22,6 @@ router.get('/getTowns', async function(req, res) {
                 status: "ko"
             })
         } else {
-            // var towns = []
-            // for (let i = 0; i < result.length; i++) {
-            //     town = {}
-            //     town["id"] = result[i].id_town
-            //     town["name"] = result[i].name
-            //     towns.push(town)
-            // }
-
             console.log('GOOD RESPONSE'.green)
             return res.status(200).send(result)
         }
