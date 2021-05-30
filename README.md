@@ -2,7 +2,7 @@
 
 Desarrollo de código de la parte backend del Proyecto de Computación I, II y III
 
-# Herramientas utilizadas
+## Herramientas utilizadas
 
 - Mariadb
 - jsonwebtoken
@@ -13,7 +13,17 @@ Desarrollo de código de la parte backend del Proyecto de Computación I, II y I
 - Express
 - Npm
 
-# Comandos de instalación
+## Configurar entorno
+En el directorio raíz del proyecto hay que crear el siguiente fichero `.env`
+
+```.env
+DB_HOST=2.139.176.212
+DB_USER=pr_grupob
+DB_PASS=PC2-2021
+DB_NAME=prgrupob
+```
+
+## Comandos de instalación
 
 Mariadb(conexión con base de datos):
 
@@ -42,7 +52,7 @@ Nodemon:
 npm install -g nodemon
 ```
 
-# Uso de herramientas
+## Uso de herramientas
 
 Node:
 - creacion del entorno: npm init --yes
