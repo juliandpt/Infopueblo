@@ -3,7 +3,7 @@ const colors = require("colors")
 const sendGridMail = require('@sendgrid/mail')
 
 const router = express.Router()
-const pool = require('../database')
+const pool = require('../database/database')
 const middleware = require('../controllers/middleware')
 const service = require('../services')
 

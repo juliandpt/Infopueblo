@@ -1,4 +1,4 @@
-const pool = require('../database')
+const pool = require('../database/database')
 const service = require('../services')
 const moment = require('moment')
 require('dotenv').config()

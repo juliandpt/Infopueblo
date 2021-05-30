@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS jobs (
   id_town int DEFAULT NULL,
   work varchar(255) DEFAULT NULL,
   title varchar(255) DEFAULT NULL,
-  description varchar(100) DEFAULT NULL,
+  description varchar(1000) DEFAULT NULL,
   date date DEFAULT NULL
 );
 CREATE TABLE IF NOT EXISTS news (
