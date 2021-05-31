@@ -1,14 +1,12 @@
-const pool = require('../database')
+const pool = require('../database/database')
 const service = require('../services')
 const moment = require('moment')
 require('dotenv').config()
 
-const d = new Date()
-const today = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate()
-const tomorrow = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + (d.getDate() + 1)
-const past = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + (d.getDate() - 7)
-
 async function existsTown(town) {
+    const d = new Date()
+    const past = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + (d.getDate() - 7)
+
     var sql = await pool.query("SELECT id_town FROM searches WHERE searches.id_town = ? AND searches.date >= ?;", [town, past])
 
     if(sql.length === 0) {
@@ -41,8 +39,6 @@ async function authenticateToken(token) {
                 return false
             } else {
                 decodedDatabaseToken = service.decodeToken(query[0].token)
-                console.log(moment().unix())
-                console.log(decodedDatabaseToken.exp)
 
                 if(moment().unix() > decodedDatabaseToken.exp) {
                     return false
