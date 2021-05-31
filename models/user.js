@@ -60,7 +60,7 @@ router.post('/register', async(req, res) => {
                 function getMessage() {
                     const body = 'Haz click en el siguiente link para validar tu cuenta: ' + url;
                     return {
-                        to: email,
+                        to: req.body.name,
                         from: 'correoguapisimo@outlook.com',
                         subject: 'Valida tu cuenta!',
                         templateId: 'd-8170e316f5b542dda528d66c79116be8',
@@ -161,17 +161,17 @@ router.put('/edit', async (req, res) => {
     }
 })
 
-router.delete('/delete/:id', (req, res) => {
+router.delete('/delete/:id', async (req, res) => {
     console.log('DELETE /user/delete/', req.params.id)
 
-    if (authenticateToken(req.body.token) === false) {
+    if (await middleware.authenticateToken(req.body.token) === false) {
         console.log('BAD RESPONSE'.red)
         res.status(401).send({
             status: "ko"
         })
     } else {
         try {
-            var query = pool.query("DELETE FROM users WHERE users.Id_user = ?;", [req.params.id])
+            var query = await pool.query("DELETE FROM users WHERE users.id_user = ?;", [req.params.id])
 
             if (query.affectedRows === 0) {
                 console.log('BAD RESPONSE'.red)

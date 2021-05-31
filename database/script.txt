@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS towns (
   population int not null,
   density float not null,
   image_url varchar(250) DEFAULT NULL,
-  emptied boolean,
+  emptied boolean DEFAULT NULL,
   likes int DEFAULT NULL
 );
 CREATE TABLE IF NOT EXISTS searches (
@@ -28,7 +28,8 @@ CREATE TABLE IF NOT EXISTS news (
   id_town int DEFAULT NULL,
   title varchar(255) DEFAULT NULL,
   content text DEFAULT NULL,
-  date date DEFAULT NULL
+  date date DEFAULT NULL,
+  emptied boolean DEFAULT NULL
 );
 CREATE TABLE IF NOT EXISTS restaurants (
   id_restaurant INT NOT NULL PRIMARY KEY AUTO_INCREMENT,

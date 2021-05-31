@@ -9,11 +9,9 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 import pickle
 from sklearn.feature_extraction.text import TfidfVectorizer
+import sys
 
 cat = ['Despoblacion','No Despoblacion']
-
-# Commented out IPython magic to ensure Python compatibility.
-# %ls
 try:
     conn = mariadb.connect(
         user="pr_grupob",
@@ -21,16 +19,13 @@ try:
         host="2.139.176.212",
         port=3306,
         database="prgrupob"
-
     )
 except mariadb.Error as e:
     print(f"Error connecting to MariaDB Platform: {e}")
     sys.exit(1)
 
-
-# Get Cursor
 cur = conn.cursor()
-cur.execute('select emptied, title, content from news')
+cur.execute('SELECT emptied, title, content FROM news')
 
 news = []
 
@@ -49,12 +44,10 @@ df = pd.DataFrame({
     'Contenido': news[1],
     'Categoria': news[2]
     })
-print(df.Contenido)
 
-df.to_csv('resultado.csv')
+df.to_csv('./MLModel/responses/resultado.csv')
 
-df = pd.read_csv('resultado.csv')
-print(df)
+df = pd.read_csv('./MLModel/responses/resultado.csv')
 df['category_id'] = df['Categoria'].factorize()[0]
 
 category_id_df = df[['Categoria', 'category_id']].drop_duplicates().sort_values('category_id')
@@ -63,13 +56,14 @@ id_to_category = dict(category_id_df[['category_id', 'Categoria']].values)
 
 tfidf = TfidfVectorizer(sublinear_tf=True, min_df=2, norm='l2', encoding='UTF-8', ngram_range=(1, 2), stop_words=stopwords.words('spanish'))
 features = tfidf.fit_transform(df.Contenido)
-file_name = "D:\Documentos\Descargas\codigo\dictionary.gay"
+
+file_name = "./MLModel/responses/dictionary.pkl"
 f = open(file_name, 'wb')
 pickle.dump(tfidf,f)
 f.close()
+
 labels = df.category_id
 features.shape
-
 
 N = 3
 for category, category_id in sorted(category_to_id.items()):
@@ -86,8 +80,8 @@ model = LogisticRegression(random_state=0)
 
 X_train, X_test, y_train, y_test, indices_train, indices_test = train_test_split(features, labels, df.index, test_size=0.33, random_state=0)
 entrenado = model.fit(X_train, y_train)
-print(entrenado)
-file_name = "D:\Documentos\Descargas\codigo\model.gay"
+
+file_name = "./MLModel/responses/model.pkl"
 f = open(file_name, 'wb')
 pickle.dump(entrenado,f)
 f.close()

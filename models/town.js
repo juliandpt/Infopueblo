@@ -170,7 +170,6 @@ router.get('/getTown/:id', async (req, res) => {
                 town['aacc'] = resultTown[0].aacc
                 town['density'] = resultTown[0].density
                 town['population'] = resultTown[0].population
-                town['emptied'] = resultTown[0].emptied
 
                 if (responses[0] !== 0) {
                     for (let i = 0; i < responses[0].length; i++) {
@@ -221,17 +220,25 @@ router.get('/getTown/:id', async (req, res) => {
                             var townid = req.params.id
                             var title = responses[2][i].title
                             var content = responses[2][i].content
+                            var emptied = ""
 
-                            await pool.query("INSERT INTO news (id_town,date,content,title) VALUES (?,?,?,?);", [townid, today, content, title])
+                            const child = spawn('python',  ['./MLModel/sorter.py', responses[2][i].content])
+                            child.stdout.on('data', (data) => {
+                                var jsonContent = JSON.parse(data);
+                                emptied = jsonContent.predict
+                            });
+                            child.on("error", (error) => {
+                                emptied = "0"
+                                console.log(error)
+                            })
+
+                            await pool.query("INSERT INTO news (id_town,date,content,title,emptied) VALUES (?,?,?,?,?);", [townid, today, content, title, emptied])
+                            pool.query("select poblation from towns where id_town = ?;", [townid])
                             console.log(('INSERTED NEW ' + i).green)
                         } catch {
                             console.log(('NOT INSERTED NEW ' + i).red)
                         } 
                     }
-
-                    town['news'] = responses[2]
-                } else {
-                    town['news'] = []
                 }
                 
                 console.log('GOOD RESPONSE'.green)
@@ -279,12 +286,6 @@ router.get('/getTown/:id', async (req, res) => {
                 town['jobs'] = []
             } else {
                 town['jobs'] = resultJobs
-            }
-
-            if (resultRetsaurants.length === 0) {
-                town['news'] = []
-            } else {
-                town['news'] = resultNews
             }
 
             console.log('GOOD RESPONSE'.green)
