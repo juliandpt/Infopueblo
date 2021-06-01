@@ -233,7 +233,7 @@ router.get('/getTown/:id', async (req, res) => {
                             })
 
                             await pool.query("INSERT INTO news (id_town,date,content,title,emptied) VALUES (?,?,?,?,?);", [townid, today, content, title, emptied])
-                            pool.query("select poblation from towns where id_town = ?;", [townid])
+                            pool.query("SELECT poblation FROM towns WHERE id_town = ?;", [townid])
                             console.log(('INSERTED NEW ' + i).green)
                         } catch {
                             console.log(('NOT INSERTED NEW ' + i).red)

@@ -29,7 +29,6 @@ async function existsEmail(email) {
 async function authenticateToken(token) {
     try {
         var decodedToken = service.decodeToken(token)
-
         var query = await pool.query("SELECT token FROM users WHERE users.id_user = ?", [decodedToken.sub])
 
         if (query.length === 0) {
