@@ -215,6 +215,10 @@ router.get('/getTown/:id', async (req, res) => {
                 }
                 
                 if (responses[2] !== 0){
+                    var classification = []
+                    classification[0] = 0
+                    classification[1] = 0
+
                     for (let i = 0; i < responses[2].length; i++) {
                         try {
                             var townid = req.params.id
@@ -226,6 +230,7 @@ router.get('/getTown/:id', async (req, res) => {
                             child.stdout.on('data', (data) => {
                                 var jsonContent = JSON.parse(data);
                                 emptied = jsonContent.predict
+                                classification[parseInt(emptied)] += 1
                             });
                             child.on("error", (error) => {
                                 emptied = "0"
@@ -233,7 +238,6 @@ router.get('/getTown/:id', async (req, res) => {
                             })
 
                             await pool.query("INSERT INTO news (id_town,date,content,title,emptied) VALUES (?,?,?,?,?);", [townid, today, content, title, emptied])
-                            pool.query("SELECT poblation FROM towns WHERE id_town = ?;", [townid])
                             console.log(('INSERTED NEW ' + i).green)
                         } catch {
                             console.log(('NOT INSERTED NEW ' + i).red)
@@ -296,6 +300,69 @@ router.get('/getTown/:id', async (req, res) => {
             })
         }
     }
+})
+
+router.get('/prueba/:id', async (req, res) => {
+    console.log('GET /prueba')
+
+    try {
+        let promiseNews = new Promise((resolve, reject) => {
+            const child = spawn('python', ['./WebScrapers/20minutos.py', req.body.town]);
+            child.stdout.on('data', (data) => {
+                var jsonContent = JSON.parse(data);
+                resolve(jsonContent);
+            });
+            child.on("error", (error) => {
+                reject(error)
+            })
+        })
+
+        var responses = await Promise.all([promiseNews])
+
+        if (responses[0] !== 0){
+            var classification = []
+            classification[0] = 0
+            classification[1] = 0
+            numClass = 0
+
+            for (let i = 0; i < responses[0].length; i++) {
+                try {
+                    //var townid = req.params.id
+                    var emptied = ""
+
+                    let promiseNews = new Promise((resolve, reject) => {
+                        const child = spawn('python',  ['./MLModel/sorter.py', responses[0][i].content])
+                        child.stdout.on('data', (data) => {
+                            var jsonContent = JSON.parse(data);
+                            resolve(parseInt(jsonContent.predict))
+                            classification[parseInt(jsonContent.predict)] += 1
+                        });
+                        child.on("error", (error) => {
+                            reject(error)
+                        })
+                    })
+
+                    var r = await Promise.all([promiseNews])
+                    console.log(r[0])
+
+                    //await pool.query("INSERT INTO news (id_town,date,content,title,emptied) VALUES (?,?,?,?,?);", [townid, today, responses[2].content, responses[2].title, r[0]])
+                    console.log(('INSERTED NEW ' + i).green)
+                } catch {
+                    console.log(('NOT INSERTED NEW ' + i).red)
+                } 
+            }
+
+            //var res = await pool.query("UPDATE towns SET emptied = ? WHERE id_town = ?", [classification[0] > classification[1], req.params.id])
+
+            //console.log(res)
+        }
+    } catch {
+        console.log('BAD RESPONSE'.red)
+        return res.status(500).send({
+            status: "ko"
+        })
+    }
+    //console.log(classification)
 })
 
 module.exports = router;

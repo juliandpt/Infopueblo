@@ -20,8 +20,8 @@ tfidf = TfidfVectorizer(sublinear_tf=True, min_df=5, norm='l2', encoding='UTF-8'
 text_features = leido.transform(news)
 
 predictions = model.predict(text_features)
-json = json.dumps({"predict": str(predictions[0])})
+result = json.dumps({"predict": str(predictions[0])})
 # for text, predicted in zip(news, predictions):
 #   json = json.dumps({"predict": cat[predicted]})
 
-print(json)
+print(result)
