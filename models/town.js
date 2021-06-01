@@ -262,7 +262,6 @@ router.get('/getTown/:id', async (req, res) => {
             var resultTown = await pool.query("SELECT * FROM towns WHERE towns.id_town = ?;", [req.params.id])
             var resultRetsaurants = await pool.query("SELECT name, location, image_url, sentiment FROM restaurants WHERE id_town = ? AND date >= ?;", [req.params.id, past])
             var resultJobs = await pool.query("SELECT work, title, description FROM jobs WHERE id_town = ? AND date >= ?;", [req.params.id, past])
-            var resultNews = await pool.query("SELECT title, content FROM news WHERE id_town = ? AND date >= ?;", [req.params.id, past])
 
             town = {}
             town['name'] = resultTown[0].name
