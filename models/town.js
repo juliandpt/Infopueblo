@@ -174,13 +174,7 @@ router.get('/getTown/:id', async (req, res) => {
                 if (responses[0] !== 0) {
                     for (let i = 0; i < responses[0].length; i++) {
                         try {
-                            var townid = req.params.id
-                            var name = responses[0][i].name
-                            var location = responses[0][i].location
-                            var image_url = responses[0][i].image_url
-                            var sentiment = responses[0][i].sentiment
-        
-                            await pool.query("INSERT INTO restaurants (id_town,name,location,image_url,sentiment,date) VALUES (?,?,?,?,?,?);", [townid, name, location, image_url, sentiment, today])
+                            await pool.query("INSERT INTO restaurants (id_town,name,location,image_url,sentiment,date) VALUES (?,?,?,?,?,?);", [req.params.id, responses[0][i].name, responses[0][i].location, responses[0][i].image_url, responses[0][i].sentiment, today])
                             console.log(('INSERTED RESTAURANT ' + i).green)
                         } catch {
                             console.log(('NOT INSERTED RESTAURANT ' + i).red)
@@ -197,12 +191,7 @@ router.get('/getTown/:id', async (req, res) => {
                 if (responses[1] !== 0){
                     for (let i = 0; i < responses[1].length; i++) {
                         try {
-                            var townid = req.params.id
-                            var work = responses[1][i].work
-                            var title = responses[1][i].title
-                            var description = responses[1][i].description
-        
-                            await pool.query("INSERT INTO jobs (id_town,work,title,description,date) VALUES (?,?,?,?,?);", [townid, work, title, description, today])
+                            await pool.query("INSERT INTO jobs (id_town,work,title,description,date) VALUES (?,?,?,?,?);", [req.params.id, responses[1][i].work, responses[1][i].title, responses[1][i].description, today])
                             console.log(('INSERTED JOB ' + i).green)
                         } catch {
                             console.log(('NOT INSERTED JOB ' + i).red)
@@ -218,31 +207,34 @@ router.get('/getTown/:id', async (req, res) => {
                     var classification = []
                     classification[0] = 0
                     classification[1] = 0
-
+                    numClass = 0
+        
                     for (let i = 0; i < responses[2].length; i++) {
                         try {
-                            var townid = req.params.id
-                            var title = responses[2][i].title
-                            var content = responses[2][i].content
-                            var emptied = ""
-
-                            const child = spawn('python',  ['./MLModel/sorter.py', responses[2][i].content])
-                            child.stdout.on('data', (data) => {
-                                var jsonContent = JSON.parse(data);
-                                emptied = jsonContent.predict
-                                classification[parseInt(emptied)] += 1
-                            });
-                            child.on("error", (error) => {
-                                emptied = "0"
-                                console.log(error)
+                            let promiseNews = new Promise((resolve, reject) => {
+                                const child = spawn('python',  ['./MLModel/sorter.py', responses[2][i].content])
+                                child.stdout.on('data', (data) => {
+                                    var jsonContent = JSON.parse(data)
+                                    classification[parseInt(jsonContent.predict)] += 1
+                                    resolve(parseInt(jsonContent.predict))
+                                });
+                                child.on("error", (error) => {
+                                    reject(error)
+                                })
                             })
-
-                            await pool.query("INSERT INTO news (id_town,date,content,title,emptied) VALUES (?,?,?,?,?);", [townid, today, content, title, emptied])
+        
+                            var emptied = await Promise.all([promiseNews])
+        
+                            await pool.query("INSERT INTO news (id_town,date,content,title,emptied) VALUES (?,?,?,?,?);", [req.params.id, today, responses[2].content, responses[2].title, emptied[0]])
                             console.log(('INSERTED NEW ' + i).green)
                         } catch {
                             console.log(('NOT INSERTED NEW ' + i).red)
                         } 
                     }
+        
+                    await pool.query("UPDATE towns SET emptied = ? WHERE id_town = ?", [classification[0] > classification[1], req.params.id])
+
+                    town['emptied'] = classification[0] > classification[1]
                 }
                 
                 console.log('GOOD RESPONSE'.green)
@@ -261,6 +253,7 @@ router.get('/getTown/:id', async (req, res) => {
         }
     } else {
         await pool.query("INSERT INTO searches (id_town, date) VALUES (?,?);", [req.params.id, today])
+        await pool.query("UPDATE restaurants, jobs SET restaurants.date = ?, jobs.date = ? WHERE restaurants.id_town = ? AND jobs.id_town = ?", [today, today, req.params.id, req.params.id])
 
         try {
             var resultTown = await pool.query("SELECT * FROM towns WHERE towns.id_town = ?;", [req.params.id])
@@ -300,69 +293,6 @@ router.get('/getTown/:id', async (req, res) => {
             })
         }
     }
-})
-
-router.get('/prueba/:id', async (req, res) => {
-    console.log('GET /prueba')
-
-    try {
-        let promiseNews = new Promise((resolve, reject) => {
-            const child = spawn('python', ['./WebScrapers/20minutos.py', req.body.town]);
-            child.stdout.on('data', (data) => {
-                var jsonContent = JSON.parse(data);
-                resolve(jsonContent);
-            });
-            child.on("error", (error) => {
-                reject(error)
-            })
-        })
-
-        var responses = await Promise.all([promiseNews])
-
-        if (responses[0] !== 0){
-            var classification = []
-            classification[0] = 0
-            classification[1] = 0
-            numClass = 0
-
-            for (let i = 0; i < responses[0].length; i++) {
-                try {
-                    //var townid = req.params.id
-                    var emptied = ""
-
-                    let promiseNews = new Promise((resolve, reject) => {
-                        const child = spawn('python',  ['./MLModel/sorter.py', responses[0][i].content])
-                        child.stdout.on('data', (data) => {
-                            var jsonContent = JSON.parse(data);
-                            resolve(parseInt(jsonContent.predict))
-                            classification[parseInt(jsonContent.predict)] += 1
-                        });
-                        child.on("error", (error) => {
-                            reject(error)
-                        })
-                    })
-
-                    var r = await Promise.all([promiseNews])
-                    console.log(r[0])
-
-                    //await pool.query("INSERT INTO news (id_town,date,content,title,emptied) VALUES (?,?,?,?,?);", [townid, today, responses[2].content, responses[2].title, r[0]])
-                    console.log(('INSERTED NEW ' + i).green)
-                } catch {
-                    console.log(('NOT INSERTED NEW ' + i).red)
-                } 
-            }
-
-            //var res = await pool.query("UPDATE towns SET emptied = ? WHERE id_town = ?", [classification[0] > classification[1], req.params.id])
-
-            //console.log(res)
-        }
-    } catch {
-        console.log('BAD RESPONSE'.red)
-        return res.status(500).send({
-            status: "ko"
-        })
-    }
-    //console.log(classification)
 })
 
 module.exports = router;
