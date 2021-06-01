@@ -226,34 +226,53 @@ router.get('/getUser', async (req, res) => {
 router.get('/getUsers', async (req, res) => {
     console.log('GET /user/getUsers')
 
-    if (await middleware.authenticateToken(req.body.token) === false) {
-        console.log('BAD RESPONSE'.red)
-        return res.status(401).send({
-            status: "ko"
-        })
-    } else {
-        try {
-            var result = await pool.query("SELECT id_user, name, surnames, email FROM users;")
-    
-            if (result.length === 0) {
-                console.log('BAD RESPONSE'.red)
-                return res.status(500).send({
-                    status: "ko"
-                })
-            } else {
-                console.log('GOOD RESPONSE'.green)
-                return res.status(200).send({
-                    status: "ok",
-                    users: result
-                })
-            }
-        } catch {
+    try {
+        var result = await pool.query("SELECT id_user, name, surnames, email FROM users;")
+
+        if (result.length === 0) {
             console.log('BAD RESPONSE'.red)
             return res.status(500).send({
                 status: "ko"
             })
+        } else {
+            console.log('GOOD RESPONSE'.green)
+            return res.status(200).send(result)
         }
+    } catch {
+        console.log('BAD RESPONSE'.red)
+        return res.status(500).send({
+            status: "ko"
+        })
     }
+
+    // if (await middleware.authenticateToken(req.body.token) === false) {
+    //     console.log('BAD RESPONSE'.yellow)
+    //     return res.status(401).send({
+    //         status: "ko"
+    //     })
+    // } else {
+    //     try {
+    //         var result = await pool.query("SELECT id_user, name, surnames, email FROM users;")
+    
+    //         if (result.length === 0) {
+    //             console.log('BAD RESPONSE'.red)
+    //             return res.status(500).send({
+    //                 status: "ko"
+    //             })
+    //         } else {
+    //             console.log('GOOD RESPONSE'.green)
+    //             return res.status(200).send({
+    //                 status: "ok",
+    //                 users: result
+    //             })
+    //         }
+    //     } catch {
+    //         console.log('BAD RESPONSE'.red)
+    //         return res.status(500).send({
+    //             status: "ko"
+    //         })
+    //     }
+    // }
 })
 
 module.exports = router;
