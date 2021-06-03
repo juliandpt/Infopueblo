@@ -186,7 +186,9 @@ router.get('/getTown/:id', async (req, res) => {
                     town['restaurants'] = []
                 }
 
-                town['topRestaurants'] = await pool.query("SELECT name, location, image_url, sentiment FROM restaurants WHERE restaurants.id_town = ? ORDER BY restaurants.sentiment DESC LIMIT 6;", [req.params.id])
+                //var topRestaurants = await pool.query("SELECT name, location, image_url, sentiment FROM restaurants WHERE restaurants.id_town = ? ORDER BY restaurants.sentiment DESC LIMIT 6;", [req.params.id])
+
+                town['topRestaurants'] = await pool.query("SELECT name, location, image_url, if (sentiment<0.5,'muy malo',if(sentiment<0, 'malo', if(sentiment<0.5, 'normal', if (sentiment<0.75, 'bueno', 'excelente')))) AS sentiment FROM restaurants WHERE restaurants.id_town = ? ORDER BY restaurants.sentiment DESC LIMIT 6;", [req.params.id])
 
                 if (responses[1] !== 0){
                     for (let i = 0; i < responses[1].length; i++) {
@@ -282,7 +284,7 @@ router.get('/getTown/:id', async (req, res) => {
                 town['restaurants'] = resultRetsaurants
             }
             
-            town['topRestaurants'] = await pool.query("SELECT name, location, image_url, sentiment FROM restaurants WHERE id_town = ? AND date >= ? ORDER BY sentiment DESC LIMIT 6;", [req.params.id, past])
+            town['topRestaurants'] = await pool.query("SELECT name, location, image_url, if (sentiment<0.5,'muy malo',if(sentiment<0, 'malo', if(sentiment<0.5, 'normal', if (sentiment<0.75, 'bueno', 'excelente')))) AS sentiment FROM restaurants WHERE restaurants.id_town = ? ORDER BY restaurants.sentiment DESC LIMIT 6;", [req.params.id])
             
             if (resultRetsaurants.length === 0) {
                 town['jobs'] = []

@@ -13,8 +13,8 @@ function createToken(value) {
     return jwt.sign(payload, process.env.SECRET_TOKEN)
 }
 
-function decodeToken(token) {
-    return jwt.decode(token)
+function decodeToken(token, secret) {
+    return jwt.verify(token, secret)
 }
 
 function encyptPassword(password) {

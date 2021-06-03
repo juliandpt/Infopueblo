@@ -51,8 +51,45 @@ async function authenticateToken(token) {
     }
 }
 
+async function verifyToken(req, res, next) {
+    if(!req.headers.authorization) {
+        return res.status(401).send({
+            status: "ko"
+        })
+    }
+
+    const token = req.headers.authorization.split(' ')[1]
+
+    if (!token) {
+        return res.status(401).send({
+            status: "ko"
+        })
+    }
+
+    const payload = service.decodeToken(token, process.env.SECRET_TOKEN)
+    const query = await pool.query("SELECT token FROM users WHERE users.id_user = ?", [payload.sub])
+
+    if (token !== query[0].token) {
+        return res.status(401).send({
+            status: "ko"
+        })
+    }
+
+    const payloadDatabase = service.decodeToken(query[0].token, process.env.SECRET_TOKEN)
+
+    if(moment().unix() > payloadDatabase.exp) {
+        return res.status(401).send({
+            status: "ko"
+        })
+    }
+    
+    req.sub = payload.sub
+    next()
+}
+
 module.exports = {
     existsTown,
     existsEmail,
-    authenticateToken
+    authenticateToken,
+    verifyToken
 }
