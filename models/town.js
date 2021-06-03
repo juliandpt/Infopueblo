@@ -253,7 +253,8 @@ router.get('/getTown/:id', async (req, res) => {
         }
     } else {
         await pool.query("INSERT INTO searches (id_town, date) VALUES (?,?);", [req.params.id, today])
-        await pool.query("UPDATE restaurants, jobs SET restaurants.date = ?, jobs.date = ? WHERE restaurants.id_town = ? AND jobs.id_town = ?", [today, today, req.params.id, req.params.id])
+        await pool.query("UPDATE restaurants SET date = ? WHERE id_town = ?", [today, req.params.id])
+        await pool.query("UPDATE jobs SET date = ? WHERE id_town = ?", [today, req.params.id])
 
         try {
             var resultTown = await pool.query("SELECT * FROM towns WHERE towns.id_town = ?;", [req.params.id])
@@ -268,7 +269,12 @@ router.get('/getTown/:id', async (req, res) => {
             town['aacc'] = resultTown[0].aacc
             town['density'] = resultTown[0].density
             town['population'] = resultTown[0].population
-            town['emptied'] = resultTown[0].emptied
+
+            if (resultTown[0].emptied == 0) {
+                town['emptied'] = "No"
+            } else {
+                town['emptied'] = "Sí"
+            }
 
             if (resultRetsaurants.length === 0) {
                 town['restaurants'] = []
