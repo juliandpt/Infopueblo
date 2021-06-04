@@ -193,7 +193,7 @@ router.get('/getUser', middleware.verifyToken, async (req, res) => {
 
 router.get('/getUsers', middleware.verifyToken, async (req, res) => {
     console.log('GET /user/getUsers')
-    
+
     try {
         var result = await pool.query("SELECT id_user, name, surnames, email FROM users;")
 
@@ -202,14 +202,10 @@ router.get('/getUsers', middleware.verifyToken, async (req, res) => {
             return res.status(500).send({
                 status: "ko"
             })
+        } else {
+            console.log('GOOD RESPONSE'.green)
+            return res.status(200).send(result)
         }
-
-        console.log('GOOD RESPONSE'.green)
-        return res.status(200).send({
-            status: "ok",
-            users: result
-        })
-
     } catch {
         console.log('BAD RESPONSE'.red)
         return res.status(500).send({
