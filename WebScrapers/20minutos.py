@@ -6,7 +6,7 @@ import json
 
 text = sys.argv[1]
 #text = input("Introduce un lugar: ")
-place = text.replace(" ", "-")
+place = text.replace(" ", "+")
 
 news = []
 
@@ -44,10 +44,10 @@ try:
         doc['content'] = articleContent
 
         news.append(doc)
-    newsJson = json.dumps(news)
+    news = json.dumps(news)
 except:
     news = []
 
-print(newsJson)
+print(news)
 # with open('./WebScrapers/resultado/20minutos.json', 'w',  encoding='utf-8') as f:
 #     json.dump(news, f, ensure_ascii=False, indent=4)

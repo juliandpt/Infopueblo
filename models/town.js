@@ -129,6 +129,7 @@ router.get('/getTown/:id', async (req, res) => {
 
         if (resultTown != 0) {
             try {
+                console.log('CREATING PROMISES...'.yellow)
                 let promiseRestaurants = new Promise((resolve, reject) => {
                     const child = spawn('python', ['./WebScrapers/buscorestaurantes.py', resultTown[0].name]);
                     child.stdout.on('data', (data) => {
@@ -161,6 +162,7 @@ router.get('/getTown/:id', async (req, res) => {
                 })
 
                 var responses = await Promise.all([promiseRestaurants, promiseJobs, promiseNews])
+                console.log('CREATED PROMISES'.green)
 
                 town = {}
                 town['name'] = resultTown[0].name
@@ -172,6 +174,7 @@ router.get('/getTown/:id', async (req, res) => {
                 town['population'] = resultTown[0].population
 
                 if (responses[0] !== 0) {
+                    console.log('INSERTING RESTAURANTS...'.yellow)
                     for (let i = 0; i < responses[0].length; i++) {
                         try {
                             await pool.query("INSERT INTO restaurants (id_town,name,location,image_url,sentiment,date) VALUES (?,?,?,?,?,?);", [req.params.id, responses[0][i].name, responses[0][i].location, responses[0][i].image_url, responses[0][i].sentiment, today])
@@ -186,11 +189,10 @@ router.get('/getTown/:id', async (req, res) => {
                     town['restaurants'] = []
                 }
 
-                //var topRestaurants = await pool.query("SELECT name, location, image_url, sentiment FROM restaurants WHERE restaurants.id_town = ? ORDER BY restaurants.sentiment DESC LIMIT 6;", [req.params.id])
-
                 town['topRestaurants'] = await pool.query("SELECT name, location, image_url, if (sentiment<0.5,'muy malo',if(sentiment<0, 'malo', if(sentiment<0.5, 'normal', if (sentiment<0.75, 'bueno', 'excelente')))) AS sentiment FROM restaurants WHERE restaurants.id_town = ? ORDER BY restaurants.sentiment DESC LIMIT 6;", [req.params.id])
 
                 if (responses[1] !== 0){
+                    console.log('INSERTING JOBS...'.yellow)
                     for (let i = 0; i < responses[1].length; i++) {
                         try {
                             await pool.query("INSERT INTO jobs (id_town,work,title,description,date) VALUES (?,?,?,?,?);", [req.params.id, responses[1][i].work, responses[1][i].title, responses[1][i].description, today])
@@ -209,9 +211,9 @@ router.get('/getTown/:id', async (req, res) => {
                     var classification = []
                     classification[0] = 0
                     classification[1] = 0
-                    numClass = 0
+                    console.log('INSERTING NEWS...'.yellow)
         
-                    for (let i = 0; i < responses[2].length; i++) {
+                    for (let i = 0; i < responses[0].length; i++) {
                         try {
                             let promiseNews = new Promise((resolve, reject) => {
                                 const child = spawn('python',  ['./MLModel/sorter.py', responses[2][i].content])
@@ -227,7 +229,7 @@ router.get('/getTown/:id', async (req, res) => {
         
                             var emptied = await Promise.all([promiseNews])
         
-                            await pool.query("INSERT INTO news (id_town,date,content,title,emptied) VALUES (?,?,?,?,?);", [req.params.id, today, responses[2].content, responses[2].title, emptied[0]])
+                            await pool.query("INSERT INTO news (id_town,title,content,date,emptied) VALUES (?,?,?,?,?);", [req.params.id, responses[2][i].title, responses[2][i].content, today, emptied[0]])
                             console.log(('INSERTED NEW ' + i).green)
                         } catch {
                             console.log(('NOT INSERTED NEW ' + i).red)
@@ -235,7 +237,7 @@ router.get('/getTown/:id', async (req, res) => {
                     }
         
                     await pool.query("UPDATE towns SET emptied = ? WHERE id_town = ?", [classification[0] > classification[1], req.params.id])
-
+    
                     town['emptied'] = classification[0] > classification[1]
                 }
                 
