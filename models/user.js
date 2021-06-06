@@ -54,7 +54,7 @@ router.post('/register', middleware.verifyToken, async(req, res) => {
             function getMessage() {
                 const body = 'Haz click en el siguiente link para validar tu cuenta: ' + url;
                 return {
-                    to: req.body.name,
+                    to: req.body.email,
                     from: 'correoguapisimo@outlook.com',
                     subject: 'Valida tu cuenta!',
                     templateId: 'd-8170e316f5b542dda528d66c79116be8',
@@ -102,10 +102,9 @@ router.post('/register', middleware.verifyToken, async(req, res) => {
     }
 })
 
-router.get('/validate', async (req, res) => {
+router.post('/validate', async (req, res) => {
     console.log('GET /user/validate')
-
-    var result = await pool.query("UPDATE users SET validate=true where email = ? and token = ?;", [req.query.email, req.query.token])
+    var result = await pool.query("UPDATE users SET isActive=1 where email = ? and verificationToken = ?;", [req.body.email, req.body.token])
 
     if (result.length === 0) {
         console.log('BAD RESPONSE'.red)

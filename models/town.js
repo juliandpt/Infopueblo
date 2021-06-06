@@ -102,10 +102,10 @@ router.get('/getTopTowns', async (req, res) => {
     }
 })
 
-router.post('/like/:id', async (req, res) => {
+router.post('/like', async (req, res) => {
     console.log('POST /town/like')
 
-    var result = await pool.query("UPDATE towns SET likes = likes+1 WHERE towns.id_town = ?;", [req.params.id])
+    var result = await pool.query("UPDATE towns SET likes = likes+1 WHERE towns.id_town = ?;", [req.body.id_town])
 
     if (result.affectedRows !== 0) {
         console.log('GOOD RESPONSE'.green)
@@ -188,6 +188,7 @@ router.get('/getTown/:id', async (req, res) => {
                 console.log('CREATED PROMISES'.green)
 
                 town = {}
+                town['id_town'] = resultTown[0].id_town
                 town['name'] = resultTown[0].name
                 town['region'] = resultTown[0].region
                 town['province'] = resultTown[0].province
@@ -212,7 +213,7 @@ router.get('/getTown/:id', async (req, res) => {
                     town['restaurants'] = []
                 }
 
-                town['topRestaurants'] = await pool.query("SELECT name, location, image_url, if (sentiment<0.5,'muy malo',if(sentiment<0, 'malo', if(sentiment<0.5, 'normal', if (sentiment<0.75, 'bueno', 'excelente')))) AS sentiment FROM restaurants WHERE restaurants.id_town = ? ORDER BY restaurants.sentiment DESC LIMIT 6;", [req.params.id])
+                town['topRestaurants'] = await pool.query("SELECT name, location, image_url, if (sentiment<-0.7,'muy malo',if(sentiment<-0.3, 'malo', if(sentiment<0.3, 'normal', if (sentiment<0.7, 'bueno', 'excelente')))) AS sentiment FROM restaurants WHERE restaurants.id_town = ? ORDER BY restaurants.sentiment DESC LIMIT 6;", [req.params.id])
 
                 if (responses[1] !== 0){
                     console.log('INSERTING JOBS...'.yellow)
@@ -289,6 +290,7 @@ router.get('/getTown/:id', async (req, res) => {
             var resultJobs = await pool.query("SELECT work, title, description FROM jobs WHERE id_town = ? AND date >= ?;", [req.params.id, past])
 
             town = {}
+            town['id_town'] = resultTown[0].id_town
             town['name'] = resultTown[0].name
             town['region'] = resultTown[0].region
             town['province'] = resultTown[0].province
@@ -309,7 +311,7 @@ router.get('/getTown/:id', async (req, res) => {
                 town['restaurants'] = resultRetsaurants
             }
             
-            town['topRestaurants'] = await pool.query("SELECT name, location, image_url, if (sentiment<0.5,'muy malo',if(sentiment<0, 'malo', if(sentiment<0.5, 'normal', if (sentiment<0.75, 'bueno', 'excelente')))) AS sentiment FROM restaurants WHERE restaurants.id_town = ? ORDER BY restaurants.sentiment DESC LIMIT 6;", [req.params.id])
+            town['topRestaurants'] = await pool.query("SELECT name, location, image_url, if (sentiment<-0.7,'muy malo',if(sentiment<-0.3, 'malo', if(sentiment<0.3, 'normal', if (sentiment<0.7, 'bueno', 'excelente')))) AS sentiment FROM restaurants WHERE restaurants.id_town = ? ORDER BY restaurants.sentiment DESC LIMIT 6;", [req.params.id])
             
             if (resultRetsaurants.length === 0) {
                 town['jobs'] = []
