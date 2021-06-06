@@ -10,6 +10,29 @@ const d = new Date()
 const today = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate()
 const past = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + (d.getDate() - 7)
 
+router.get('/getSearchedTowns', async function(req, res) {
+    console.log('GET /town/getSearchedTowns')
+
+    try {
+        var result = await pool.query("SELECT date, count(*) as Busquedas FROM searches GROUP BY date;")
+
+        if (result.length === 0) {
+            console.log('BAD RESPONSE'.red)
+            return res.status(500).send({
+                status: "ko"
+            })
+        } else {
+            console.log('GOOD RESPONSE'.green)
+            return res.status(200).send(result)
+        }
+    } catch {
+        console.log('BAD RESPONSE'.red)
+        return res.status(500).send({
+            status: "ko"
+        })
+    }
+})
+
 router.get('/getTowns', async function(req, res) {
     console.log('GET /town/getTowns')
 
