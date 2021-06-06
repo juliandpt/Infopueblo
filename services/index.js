@@ -17,12 +17,12 @@ function decodeToken(token, secret) {
     return jwt.verify(token, secret)
 }
 
-function encyptPassword(password) {
+function encryptPassword(password) {
     return sha(password)
 }
 
 module.exports = {
     createToken,
     decodeToken,
-    encyptPassword
+    encryptPassword
 }

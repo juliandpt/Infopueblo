@@ -26,31 +26,6 @@ async function existsEmail(email) {
     }
 }
 
-async function authenticateToken(token) {
-    try {
-        var decodedToken = service.decodeToken(token)
-        var query = await pool.query("SELECT token FROM users WHERE users.id_user = ?", [decodedToken.sub])
-
-        if (query.length === 0) {
-            return false
-        } else {
-            if (query[0].token !== token) {
-                return false
-            } else {
-                decodedDatabaseToken = service.decodeToken(query[0].token)
-
-                if(moment().unix() > decodedDatabaseToken.exp) {
-                    return false
-                } else {
-                    return true
-                }
-            }
-        }
-    } catch {
-        return false
-    }
-}
-
 async function verifyToken(req, res, next) {
     if(!req.headers.authorization) {
         return res.status(401).send({
@@ -90,6 +65,5 @@ async function verifyToken(req, res, next) {
 module.exports = {
     existsTown,
     existsEmail,
-    authenticateToken,
     verifyToken
 }

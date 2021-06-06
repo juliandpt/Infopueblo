@@ -14,7 +14,7 @@ router.get('/getSearchedTowns', async function(req, res) {
     console.log('GET /town/getSearchedTowns')
 
     try {
-        var result = await pool.query("SELECT date, count(*) as Busquedas FROM searches GROUP BY date;")
+        var result = await pool.query("SELECT date, count(*) as searches FROM searches WHERE searches.date >= ? GROUP BY date;", [past])
 
         if (result.length === 0) {
             console.log('BAD RESPONSE'.red)
@@ -213,7 +213,7 @@ router.get('/getTown/:id', async (req, res) => {
                     town['restaurants'] = []
                 }
 
-                town['topRestaurants'] = await pool.query("SELECT name, location, image_url, if (sentiment<-0.7,'muy malo',if(sentiment<-0.3, 'malo', if(sentiment<0.3, 'normal', if (sentiment<0.7, 'bueno', 'excelente')))) AS sentiment FROM restaurants WHERE restaurants.id_town = ? ORDER BY restaurants.sentiment DESC LIMIT 6;", [req.params.id])
+                town['topRestaurants'] = await pool.query("SELECT name, location, image_url, if (sentiment<-0.8,'pesimo',if(sentiment<-0.6, 'muy malo', if(sentiment<-0.2, 'malo', if (sentiment<0.2, 'medio', if (sentiment<0.6, 'bueno', if (sentiment<0.8, 'muy bueno', 'excelente')))))) AS sentiment FROM restaurants WHERE restaurants.id_town = ? ORDER BY restaurants.sentiment DESC LIMIT 6;", [req.params.id])
 
                 if (responses[1] !== 0){
                     console.log('INSERTING JOBS...'.yellow)
@@ -311,7 +311,7 @@ router.get('/getTown/:id', async (req, res) => {
                 town['restaurants'] = resultRetsaurants
             }
             
-            town['topRestaurants'] = await pool.query("SELECT name, location, image_url, if (sentiment<-0.7,'muy malo',if(sentiment<-0.3, 'malo', if(sentiment<0.3, 'normal', if (sentiment<0.7, 'bueno', 'excelente')))) AS sentiment FROM restaurants WHERE restaurants.id_town = ? ORDER BY restaurants.sentiment DESC LIMIT 6;", [req.params.id])
+            town['topRestaurants'] = await pool.query("SELECT name, location, image_url, if (sentiment<-0.8,'pesimo',if(sentiment<-0.6, 'muy malo', if(sentiment<-0.2, 'malo', if (sentiment<0.2, 'medio', if (sentiment<0.6, 'bueno', if (sentiment<0.8, 'muy bueno', 'excelente')))))) AS sentiment FROM restaurants WHERE restaurants.id_town = ? ORDER BY restaurants.sentiment DESC LIMIT 6;", [req.params.id])
             
             if (resultRetsaurants.length === 0) {
                 town['jobs'] = []

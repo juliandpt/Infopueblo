@@ -12,7 +12,7 @@ require('dotenv').config()
 router.post('/login', async (req, res) => {
     console.log('POST /user/login')
 
-    var query = await pool.query("SELECT * FROM users WHERE users.email = ? and users.password = ?;", [req.body.email, service.encyptPassword(req.body.password)])
+    var query = await pool.query("SELECT * FROM users WHERE users.email = ? and users.password = ?;", [req.body.email, service.encryptPassword(req.body.password)])
 
     if (query.length === 0) {
         console.log('BAD RESPONSE'.red)
@@ -46,7 +46,7 @@ router.post('/register', middleware.verifyToken, async(req, res) => {
         try {
             const registerToken = service.createToken(req.body.email)
             
-            var result = await pool.query("INSERT INTO users (email,password,name,surnames,admin,verificationToken) VALUES (?,?,?,?,0,?);", [req.body.email, service.encyptPassword(req.body.password), req.body.name, req.body.surnames, registerToken])
+            var result = await pool.query("INSERT INTO users (email,password,name,surnames,admin,verificationToken) VALUES (?,?,?,?,0,?);", [req.body.email, service.encryptPassword(req.body.password), req.body.name, req.body.surnames, registerToken])
             
             sendGridMail.setApiKey('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');
             url = 'http://localhost:4200/confirmation?email='+ req.body.email + '&token=' + registerToken
