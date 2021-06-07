@@ -123,7 +123,7 @@ router.post('/edit/:id', middleware.verifyToken, async (req, res) => {
     console.log('PUT /user/edit')
 
     try {
-        const query = pool.query("UPDATE users SET name = ?, surnames = ?, email = ?, password = ? WHERE id_user = ?;", [req.body.name, req.body.surnames, req.body.email, req.body.password, req.params.id])
+        const query = pool.query("UPDATE users SET name = ?, surnames = ?, email = ?, password = ? WHERE id_user = ?;", [req.body.name, req.body.surnames, req.body.email, service.encryptPassword(req.body.password), req.params.id])
 
         if (query.affectedRows === 0) {
             console.log('BAD RESPONSE'.red)
