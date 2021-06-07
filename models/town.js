@@ -114,7 +114,25 @@ router.post('/like', async (req, res) => {
         })
     } else  {
         console.log('BAD RESPONSE'.red)
-        res.status(400).send({
+        res.status(500).send({
+            status: "ko"
+        })
+    }
+})
+
+router.post('/dislike', async (req, res) => {
+    console.log('POST /town/dislike')
+
+    var result = await pool.query("UPDATE towns SET likes = likes-1 WHERE towns.id_town = ?;", [req.body.id_town])
+
+    if (result.affectedRows !== 0) {
+        console.log('GOOD RESPONSE'.green)
+        res.status(200).send({
+            status: "ok"
+        })
+    } else  {
+        console.log('BAD RESPONSE'.red)
+        res.status(500).send({
             status: "ko"
         })
     }

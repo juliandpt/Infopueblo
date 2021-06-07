@@ -119,11 +119,11 @@ router.post('/validate', async (req, res) => {
     } 
 })
 
-router.put('/edit', middleware.verifyToken, async (req, res) => {
+router.post('/edit/:id', middleware.verifyToken, async (req, res) => {
     console.log('PUT /user/edit')
 
     try {
-        const query = pool.query("UPDATE users SET name = ?, surnames = ?, password = ? WHERE id_user = ?;", [req.body.name, req.body.surnames, req.sub])
+        const query = pool.query("UPDATE users SET name = ?, surnames = ?, email = ?, password = ? WHERE id_user = ?;", [req.body.name, req.body.surnames, req.body.email, req.body.password, req.params.id])
 
         if (query.affectedRows === 0) {
             console.log('BAD RESPONSE'.red)
@@ -173,15 +173,10 @@ router.get('/getUser', middleware.verifyToken, async (req, res) => {
     console.log('GET /user/getUser')
 
     try {
-        var query = await pool.query("SELECT name, surnames, email FROM users WHERE users.id_user = ?;", [req.sub])
+        var result = await pool.query("SELECT id_user, name, surnames, email FROM users WHERE users.id_user = ?;", [req.sub])
 
         console.log('GOOD RESPONSE'.green)
-        return res.status(200).send({
-            status: "ok",
-            name: query[0].name,
-            surnames: query[0].surnames,
-            email: query[0].email
-        })
+        return res.status(200).send(result[0])
     } catch {
         console.log('BAD RESPONSE'.red)
         return res.status(500).send({
