@@ -5,6 +5,14 @@ const colors = require("colors")
 const router = express.Router()
 const pool = require('../database/database')
 const middleware = require('../controllers/middleware')
+const NodeGeocoder = require('node-geocoder');
+const options = {
+    provider: 'google',
+    apiKey: 'AIzaSyDQBd9Kz5c5bDVhsI2M0euX1LAT8vw0ZHg',
+    formatter: null
+  };
+
+const geocoder = NodeGeocoder(options)
 
 const d = new Date()
 const today = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate()
@@ -214,6 +222,10 @@ router.get('/getTown/:id', async (req, res) => {
                 town['aacc'] = resultTown[0].aacc
                 town['density'] = resultTown[0].density
                 town['population'] = resultTown[0].population
+                town['latitude'] = resultTown[0].latitude
+                town['longitude'] = resultTown[0].longitude
+
+
 
                 if (responses[0] !== 0) {
                     console.log('INSERTING RESTAURANTS...'.yellow)
@@ -316,6 +328,8 @@ router.get('/getTown/:id', async (req, res) => {
             town['aacc'] = resultTown[0].aacc
             town['density'] = resultTown[0].density
             town['population'] = resultTown[0].population
+            town['latitude'] = resultTown[0].latitude
+            town['longitude'] = resultTown[0].longitude
 
             if (resultTown[0].emptied == 0) {
                 town['emptied'] = "No"

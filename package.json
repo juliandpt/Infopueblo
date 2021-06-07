@@ -28,6 +28,7 @@
     "jsonwebtoken": "^8.5.1",
     "mariadb": "^2.5.3",
     "moment": "^2.29.1",
+    "node-geocoder": "^3.27.0",
     "node-url-shortener": "^1.1.11",
     "nodemailer": "^6.6.0",
     "nodemailer-sendgrid-transport": "^0.2.0",
