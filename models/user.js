@@ -46,7 +46,7 @@ router.post('/register', middleware.existsEmail ,async(req, res) => {
     try {
         const registerToken = service.createToken(req.body.email)
         
-        var result = await pool.query("INSERT INTO users (email,password,name,surnames,admin,verificationToken) VALUES (?,?,?,?,0,?);", [req.body.email, service.encryptPassword(req.body.password), req.body.name, req.body.surnames, registerToken])
+        await pool.query("INSERT INTO users (email,password,name,surnames,admin,verificationToken) VALUES (?,?,?,?,0,?);", [req.body.email, service.encryptPassword(req.body.password), req.body.name, req.body.surnames, registerToken])
         
         url = 'http://localhost:4200/confirmation?email='+ req.body.email + '&token=' + registerToken
         
@@ -205,6 +205,31 @@ router.delete('/delete/:id', middleware.verifyToken, async (req, res) => {
 
     try {
         var query = await pool.query("DELETE FROM users WHERE users.id_user = ?;", [req.params.id])
+
+        if (query.affectedRows === 0) {
+            console.log('BAD RESPONSE'.red)
+            return res.status(500).send({
+                status: "ko"
+            })
+        } else {
+            console.log('GOOD RESPONSE'.green)
+            return res.status(200).send({
+                status: "ok"
+            })
+        }
+    } catch {
+        console.log('BAD RESPONSE'.red)
+        return res.status(500).send({
+            status: "ko"
+        })
+    }
+})
+
+router.get('/setAdmin/:id', middleware.verifyToken, async (req, res) => {
+    console.log('POST /user/setAdmin/', req.params.id)
+
+    try {
+        var query = await pool.query("UPDATE users SET isAdmin = 1 WHERE id_user = ?;", [req.params.id])
 
         if (query.affectedRows === 0) {
             console.log('BAD RESPONSE'.red)
