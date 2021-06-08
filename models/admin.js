@@ -11,7 +11,7 @@ require('dotenv').config()
 router.post('/login', middleware.validateSecretPassword, async (req, res) => {
     console.log('POST /admin/login')
 
-    var query = await pool.query("SELECT id_user FROM users WHERE users.email = ? and users.password = ?;", [req.body.email, service.encryptPassword(req.body.password)])
+    var query = await pool.query("SELECT id_user FROM users WHERE email = ? AND password = ? AND isAdmin = '0' AND isActive = '1';", [req.body.email, service.encryptPassword(req.body.password)])
 
     if (query.length === 0) {
         console.log('BAD RESPONSE'.red)
@@ -45,6 +45,41 @@ router.post('/register', middleware.verifyToken, middleware.existsEmail, async(r
         const registerToken = service.createToken(req.body.email)
         
         await pool.query("INSERT INTO users (email,password,name,surnames,isAdmin,verificationToken) VALUES (?,?,?,?,1,?);", [req.body.email, service.encryptPassword(req.body.password), req.body.name, req.body.surnames, registerToken])
+
+        url = 'http://localhost:4200/confirmation?email='+ req.body.email + '&token=' + registerToken
+        
+        function getMessage() {
+            const body = 'Haz click en el siguiente link para validar tu cuenta: ' + url;
+            return {
+                to: req.body.email,
+                from: 'correoguapisimo@outlook.com',
+                subject: 'Valida tu cuenta!',
+                templateId: 'd-8170e316f5b542dda528d66c79116be8',
+                dynamicTemplateData: {
+                    subject: 'Valida tu cuenta!',
+                    user: req.body.name,
+                    url: url,
+                },
+            };
+        }
+
+        async function sendEmail() {
+            try {
+                await sendGridMail.send(getMessage());
+                console.log('Test email sent successfully');
+            } catch (error) {
+                console.error('Error sending test email');
+                console.error(error);
+                if (error.response) {
+                    console.error(error.response.body)
+                }
+            }
+        }
+
+        (async () => {
+            console.log('Sending test email');
+            await sendEmail();
+        })();
 
         console.log('GOOD RESPONSE'.green)
         return res.status(200).send({

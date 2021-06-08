@@ -150,7 +150,7 @@ router.get('/getLikedTowns', async (req, res) => {
     console.log('GET /town/getLikedTowns')
 
     try {
-        var result = await pool.query("SELECT likes.id_town, name, image_url FROM searches, towns WHERE likes.id_town = towns.id_town GROUP BY id_town ORDER BY COUNT(*) DESC;")
+        var result = await pool.query("SELECT likes.id_town, name, image_url FROM likes, towns WHERE likes.id_town = towns.id_town GROUP BY id_town ORDER BY COUNT(*) DESC;")
 
         if (result.length === 0) {
             console.log('BAD RESPONSE'.red)

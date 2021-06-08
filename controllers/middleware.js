@@ -29,7 +29,7 @@ async function existsEmail(req, res, next) {
 }
 
 async function existsEmailforgot(req, res, next) {
-    var sql = await pool.query("SELECT email FROM users WHERE users.email = ?", [req.body.email])
+    var sql = await pool.query("SELECT email, name, verificationToken FROM users WHERE users.email = ?", [req.body.email])
 
     if(sql.length === 0) {
         return res.status(500).send({
@@ -37,6 +37,8 @@ async function existsEmailforgot(req, res, next) {
         })
     }
 
+    req.name = sql[0].name
+    req.token = sql[0].verificationToken
     next()
 }
 

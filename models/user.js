@@ -12,7 +12,7 @@ require('dotenv').config()
 router.post('/login', async (req, res) => {
     console.log('POST /user/login')
 
-    var query = await pool.query("SELECT id_user FROM users WHERE email = ? AND password = ? AND isAdmin = '0';", [req.body.email, service.encryptPassword(req.body.password)])
+    var query = await pool.query("SELECT id_user, isAdmin FROM users WHERE email = ? AND password = ? AND isActive = '1';", [req.body.email, service.encryptPassword(req.body.password)])
 
     if (query.length === 0) {
         console.log('BAD RESPONSE'.red)
@@ -46,7 +46,6 @@ router.post('/register', middleware.existsEmail ,async(req, res) => {
         const registerToken = service.createToken(req.body.email)
         
         var result = await pool.query("INSERT INTO users (email,password,name,surnames,admin,verificationToken) VALUES (?,?,?,?,0,?);", [req.body.email, service.encryptPassword(req.body.password), req.body.name, req.body.surnames, registerToken])
-        
         
         url = 'http://localhost:4200/confirmation?email='+ req.body.email + '&token=' + registerToken
         
@@ -112,9 +111,11 @@ router.post('/validate', async (req, res) => {
     } 
 })
 
-router.post('/forgot-password', middleware.existsEmailforgot, async (req, res) => {
-    console.log('POST /user/forgot-password')
-    var result = await pool.query("select * from users where email = ?;", [req.body.email])
+router.post('/changePassword', async (req, res) => {
+    console.log('POST /user/changePassword')
+    console.log(req.body)
+    console.log("UPDATE users SET password = ?  where email = ? and verificationToken = ?", [service.encryptPassword(req.body.password), req.body.email, req.body.token])
+    var result = await pool.query("UPDATE users SET password = ?  where email = ? and verificationToken = ?", [service.encryptPassword(req.body.password), req.body.email, req.body.token])
 
     if (result.length === 0) {
         console.log('BAD RESPONSE'.red)
@@ -125,10 +126,15 @@ router.post('/forgot-password', middleware.existsEmailforgot, async (req, res) =
         console.log('GOOD RESPONSE'.green)
         return res.status(200).send({
             status: "ok"
-        }
-        )
+        })
     } 
-    url = 'http://localhost:4200/confirmation?email='+ req.body.email + '&token=' + registerToken
+})
+
+router.post('/forgot-password', middleware.existsEmailforgot, async (req, res) => {
+    console.log('POST /user/forgot-password')
+
+    url = 'http://localhost:4200/change-password?email='+ req.body.email + '&token=' + req.token
+    console.log(url) 
         
     function getMessage() {
         const body = 'Haz click en el siguiente link para validar tu cuenta: ' + url;
@@ -139,7 +145,7 @@ router.post('/forgot-password', middleware.existsEmailforgot, async (req, res) =
             templateId: 'd-528d2891cb6f4f128fa924297100acaa',
             dynamicTemplateData: {
                 subject: 'Valida tu cuenta!',
-                user: result[0].name,
+                user: req.name,
                 url: url,
             },
         };
@@ -239,7 +245,53 @@ router.get('/getUsers', middleware.verifyToken, async (req, res) => {
     console.log('GET /user/getUsers')
 
     try {
-        var result = await pool.query("SELECT id_user, name, surnames, email FROM users WHERE isAdmin = '0';")
+        var result = await pool.query("SELECT id_user, name, surnames, email FROM users where isAdmin = 0;")
+
+        if (result.length === 0) {
+            console.log('BAD RESPONSE'.red)
+            return res.status(500).send({
+                status: "ko"
+            })
+        } else {
+            console.log('GOOD RESPONSE'.green)
+            return res.status(200).send(result)
+        }
+    } catch {
+        console.log('BAD RESPONSE'.red)
+        return res.status(500).send({
+            status: "ko"
+        })
+    }
+})
+
+router.get('/getAdmins', middleware.verifyToken, async (req, res) => {
+    console.log('GET /user/getUsers')
+
+    try {
+        var result = await pool.query("SELECT id_user, name, surnames, email FROM users where isAdmin = 1;")
+
+        if (result.length === 0) {
+            console.log('BAD RESPONSE'.red)
+            return res.status(500).send({
+                status: "ko"
+            })
+        } else {
+            console.log('GOOD RESPONSE'.green)
+            return res.status(200).send(result)
+        }
+    } catch {
+        console.log('BAD RESPONSE'.red)
+        return res.status(500).send({
+            status: "ko"
+        })
+    }
+})
+
+router.get('/getAllUsers', middleware.verifyToken, async (req, res) => {
+    console.log('GET /user/getUsers')
+
+    try {
+        var result = await pool.query("SELECT id_user, name, surnames, email FROM users")
 
         if (result.length === 0) {
             console.log('BAD RESPONSE'.red)
