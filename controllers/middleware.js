@@ -16,14 +16,26 @@ async function existsTown(town) {
     }
 }
 
-async function existsEmail(email) {
-    var sql = await pool.query("SELECT email FROM users WHERE users.email = ?", [email])
+async function existsEmail(req, res, next) {
+    var sql = await pool.query("SELECT email FROM users WHERE users.email = ?", [req.body.email])
 
-    if(sql.length === 0) {
-        return false
-    } else {
-        return true
+    if(sql.length !== 0) {
+        return res.status(500).send({
+            status: "ko email"
+        })
     }
+
+    next()
+}
+
+async function validateSecretPassword(req, res, next) {
+    if (req.body.secret !== process.env.SECRET_PASSWORD) {
+        return res.status(401).send({
+            status: "ko"
+        })
+    }
+
+    next()
 }
 
 async function verifyToken(req, res, next) {
@@ -65,5 +77,6 @@ async function verifyToken(req, res, next) {
 module.exports = {
     existsTown,
     existsEmail,
-    verifyToken
+    verifyToken,
+    validateSecretPassword
 }
