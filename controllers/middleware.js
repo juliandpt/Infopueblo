@@ -54,16 +54,6 @@ async function existsLike(req, res, next) {
     next()
 }
 
-async function validateSecretPassword(req, res, next) {
-    if (req.body.secret !== process.env.SECRET_PASSWORD) {
-        return res.status(401).send({
-            status: "ko"
-        })
-    }
-
-    next()
-}
-
 async function verifyToken(req, res, next) {
     if(!req.headers.authorization) {
         return res.status(401).send({
@@ -105,6 +95,5 @@ module.exports = {
     existsEmail,
     existsLike,
     verifyToken,
-    validateSecretPassword,
     existsEmailforgot
 }

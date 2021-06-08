@@ -18,11 +18,11 @@ const d = new Date()
 const today = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate()
 const past = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + (d.getDate() - 7)
 
-router.get('/getSearchedTowns', async function(req, res) {
-    console.log('GET /town/getSearchedTowns')
+router.get('/getTowns', async function(req, res) {
+    console.log('GET /town/getTowns')
 
     try {
-        var result = await pool.query("SELECT date, count(*) as searches FROM searches WHERE searches.date >= ? GROUP BY date;", [past])
+        var result = await pool.query("SELECT id_town, name FROM towns;")
 
         if (result.length === 0) {
             console.log('BAD RESPONSE'.red)
@@ -41,11 +41,11 @@ router.get('/getSearchedTowns', async function(req, res) {
     }
 })
 
-router.get('/getTowns', async function(req, res) {
-    console.log('GET /town/getTowns')
+router.get('/getSearchedTowns', async function(req, res) {
+    console.log('GET /town/getSearchedTowns')
 
     try {
-        var result = await pool.query("SELECT id_town, name FROM towns;")
+        var result = await pool.query("SELECT date, count(*) as searches FROM searches WHERE searches.date >= ? GROUP BY date;", [past])
 
         if (result.length === 0) {
             console.log('BAD RESPONSE'.red)

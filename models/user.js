@@ -1,13 +1,14 @@
 const express = require('express')
 const colors = require("colors")
 const sendGridMail = require('@sendgrid/mail')
-sendGridMail.setApiKey('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');
+
 const router = express.Router()
 const pool = require('../database/database')
 const middleware = require('../controllers/middleware')
 const service = require('../services')
 
 require('dotenv').config()
+sendGridMail.setApiKey('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');
 
 router.post('/login', async (req, res) => {
     console.log('POST /user/login')
@@ -113,9 +114,8 @@ router.post('/validate', async (req, res) => {
 
 router.post('/changePassword', async (req, res) => {
     console.log('POST /user/changePassword')
-    console.log(req.body)
-    console.log("UPDATE users SET password = ?  where email = ? and verificationToken = ?", [service.encryptPassword(req.body.password), req.body.email, req.body.token])
-    var result = await pool.query("UPDATE users SET password = ?  where email = ? and verificationToken = ?", [service.encryptPassword(req.body.password), req.body.email, req.body.token])
+
+    var result = await pool.query("UPDATE users SET password = ? WHERE email = ? AND verificationToken = ?", [service.encryptPassword(req.body.password), req.body.email, req.body.token])
 
     if (result.length === 0) {
         console.log('BAD RESPONSE'.red)
@@ -265,7 +265,7 @@ router.get('/getUsers', middleware.verifyToken, async (req, res) => {
 })
 
 router.get('/getAdmins', middleware.verifyToken, async (req, res) => {
-    console.log('GET /user/getUsers')
+    console.log('GET /user/getAdmins')
 
     try {
         var result = await pool.query("SELECT id_user, name, surnames, email FROM users where isAdmin = 1;")
