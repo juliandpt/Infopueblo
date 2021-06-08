@@ -64,29 +64,6 @@ router.get('/getTowns', async function(req, res) {
     }
 })
 
-router.get('/getTopWeekTowns', async (req, res) => {
-    console.log('GET /town/getTopWeekTowns')
-
-    try {
-        var result = await pool.query("SELECT searches.id_town, name, image_url FROM searches, towns WHERE searches.id_town = towns.id_town AND searches.date >= ? GROUP BY id_town ORDER BY COUNT(*) DESC LIMIT 10;", [past])
-
-        if (result.length === 0) {
-            console.log('BAD RESPONSE'.red)
-            res.status(500).send({
-                status: "ko"
-            })
-        } else {
-            console.log('GOOD RESPONSE'.green)
-            return res.status(200).send(result)
-        }
-    } catch {
-        console.log('BAD RESPONSE'.red)
-        return res.status(500).send({
-            status: "ko"
-        })
-    }
-})
-
 router.get('/getTopTowns', async (req, res) => {
     console.log('GET /town/getTopTowns')
 
@@ -110,10 +87,33 @@ router.get('/getTopTowns', async (req, res) => {
     }
 })
 
-router.post('/like', async (req, res) => {
+router.get('/getTopWeekTowns', async (req, res) => {
+    console.log('GET /town/getTopWeekTowns')
+
+    try {
+        var result = await pool.query("SELECT searches.id_town, name, image_url FROM searches, towns WHERE searches.id_town = towns.id_town AND searches.date >= ? GROUP BY id_town ORDER BY COUNT(*) DESC LIMIT 10;", [past])
+
+        if (result.length === 0) {
+            console.log('BAD RESPONSE'.red)
+            res.status(500).send({
+                status: "ko"
+            })
+        } else {
+            console.log('GOOD RESPONSE'.green)
+            return res.status(200).send(result)
+        }
+    } catch {
+        console.log('BAD RESPONSE'.red)
+        return res.status(500).send({
+            status: "ko"
+        })
+    }
+})
+
+router.post('/like/:id', middleware.verifyToken, middleware.existsLike, async (req, res) => {
     console.log('POST /town/like')
 
-    var result = await pool.query("UPDATE towns SET likes = likes+1 WHERE towns.id_town = ?;", [req.body.id_town])
+    var result = await pool.query("INSERT INTO likes (id_town, id_user) VALUES (?, ?)", [req.params.id, req. sub])
 
     if (result.affectedRows !== 0) {
         console.log('GOOD RESPONSE'.green)
@@ -128,10 +128,10 @@ router.post('/like', async (req, res) => {
     }
 })
 
-router.post('/dislike', async (req, res) => {
+router.post('/dislike/:id', middleware.verifyToken, async (req, res) => {
     console.log('POST /town/dislike')
 
-    var result = await pool.query("UPDATE towns SET likes = likes-1 WHERE towns.id_town = ?;", [req.body.id_town])
+    var result = await pool.query("DELETE FROM likes WHERE id_town = ? AND id_user = ?", [req.params.id, req.sub])
 
     if (result.affectedRows !== 0) {
         console.log('GOOD RESPONSE'.green)
@@ -150,7 +150,30 @@ router.get('/getLikedTowns', async (req, res) => {
     console.log('GET /town/getLikedTowns')
 
     try {
-        var result = await pool.query("SELECT id_town, name, image_url, likes FROM towns ORDER BY towns.likes DESC LIMIT 10;")
+        var result = await pool.query("SELECT likes.id_town, name, image_url FROM searches, towns WHERE likes.id_town = towns.id_town GROUP BY id_town ORDER BY COUNT(*) DESC;")
+
+        if (result.length === 0) {
+            console.log('BAD RESPONSE'.red)
+            return res.status(500).send({
+                status: "ko"
+            })
+        } else {
+            console.log('GOOD RESPONSE'.green)
+            res.status(200).send(result)
+        }
+    } catch {
+        console.log('BAD RESPONSE'.red)
+        return res.status(500).send({
+            status: "ko"
+        })
+    }
+})
+
+router.get('/getUserLikedTowns', middleware.verifyToken, async (req, res) => {
+    console.log('GET /town/getUserLikedTowns')
+
+    try {
+        var result = await pool.query("SELECT likes.id_town, name, image_url FROM likes, towns WHERE likes.id_town = towns.id_town AND likes.id_user = ? ORDER BY COUNT(*) DESC;", [req.sub])
 
         if (result.length === 0) {
             console.log('BAD RESPONSE'.red)

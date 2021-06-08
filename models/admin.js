@@ -20,7 +20,7 @@ router.post('/login', middleware.validateSecretPassword, async (req, res) => {
         })
     } else {
         try{
-            const accessToken = service.createToken(query[0].id_admin)
+            const accessToken = service.createToken(query[0].id_user)
             
             await pool.query("UPDATE users SET token = ? WHERE id_user = ?;", [accessToken, query[0].id_user])
             

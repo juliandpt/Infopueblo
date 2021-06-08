@@ -1,7 +1,7 @@
 const express = require('express')
 const colors = require("colors")
 const sendGridMail = require('@sendgrid/mail')
-
+sendGridMail.setApiKey('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');
 const router = express.Router()
 const pool = require('../database/database')
 const middleware = require('../controllers/middleware')
@@ -47,7 +47,7 @@ router.post('/register', middleware.existsEmail ,async(req, res) => {
         
         var result = await pool.query("INSERT INTO users (email,password,name,surnames,admin,verificationToken) VALUES (?,?,?,?,0,?);", [req.body.email, service.encryptPassword(req.body.password), req.body.name, req.body.surnames, registerToken])
         
-        sendGridMail.setApiKey('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');
+        
         url = 'http://localhost:4200/confirmation?email='+ req.body.email + '&token=' + registerToken
         
         function getMessage() {
@@ -110,6 +110,63 @@ router.post('/validate', async (req, res) => {
             status: "ok"
         })
     } 
+})
+
+router.post('/forgot-password', middleware.existsEmailforgot, async (req, res) => {
+    console.log('POST /user/forgot-password')
+    var result = await pool.query("select * from users where email = ?;", [req.body.email])
+
+    if (result.length === 0) {
+        console.log('BAD RESPONSE'.red)
+        return res.status(401).send({
+            status: "ko"
+        })
+    } else {
+        console.log('GOOD RESPONSE'.green)
+        return res.status(200).send({
+            status: "ok"
+        }
+        )
+    } 
+    url = 'http://localhost:4200/confirmation?email='+ req.body.email + '&token=' + registerToken
+        
+    function getMessage() {
+        const body = 'Haz click en el siguiente link para validar tu cuenta: ' + url;
+        return {
+            to: req.body.email,
+            from: 'correoguapisimo@outlook.com',
+            subject: 'Recupera tu contraseña!',
+            templateId: 'd-528d2891cb6f4f128fa924297100acaa',
+            dynamicTemplateData: {
+                subject: 'Valida tu cuenta!',
+                user: result[0].name,
+                url: url,
+            },
+        };
+    }
+
+    async function sendEmail() {
+        try {
+            await sendGridMail.send(getMessage());
+            console.log('Test email sent successfully');
+        } catch (error) {
+            console.error('Error sending test email');
+            console.error(error);
+            if (error.response) {
+                console.error(error.response.body)
+            }
+        }
+    }
+
+    (async () => {
+        console.log('Sending test email');
+        await sendEmail();
+    })();
+
+    console.log('GOOD RESPONSE'.green)
+    return res.status(200).send({
+        status: "ok"
+    });
 })
 
 router.post('/edit/:id', middleware.verifyToken, async (req, res) => {

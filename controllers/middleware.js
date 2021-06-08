@@ -28,6 +28,30 @@ async function existsEmail(req, res, next) {
     next()
 }
 
+async function existsEmailforgot(req, res, next) {
+    var sql = await pool.query("SELECT email FROM users WHERE users.email = ?", [req.body.email])
+
+    if(sql.length === 0) {
+        return res.status(500).send({
+            status: "ko email"
+        })
+    }
+
+    next()
+}
+
+async function existsLike(req, res, next) {
+    var sql = await pool.query("SELECT id_user FROM likes WHERE id_user = ? AND id_town = ?", [req.sub, req.params.id])
+
+    if(sql.length !== 0) {
+        return res.status(500).send({
+            status: "ko user"
+        })
+    }
+
+    next()
+}
+
 async function validateSecretPassword(req, res, next) {
     if (req.body.secret !== process.env.SECRET_PASSWORD) {
         return res.status(401).send({
@@ -77,6 +101,8 @@ async function verifyToken(req, res, next) {
 module.exports = {
     existsTown,
     existsEmail,
+    existsLike,
     verifyToken,
-    validateSecretPassword
+    validateSecretPassword,
+    existsEmailforgot
 }
