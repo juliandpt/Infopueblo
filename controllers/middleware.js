@@ -63,7 +63,7 @@ async function verifyToken(req, res, next) {
 
     const token = req.headers.authorization.split(' ')[1]
 
-    if (!token) {
+    if (token === 'null') {
         return res.status(401).send({
             status: "ko"
         })

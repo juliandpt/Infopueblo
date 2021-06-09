@@ -169,6 +169,29 @@ router.get('/getLikedTowns', async (req, res) => {
     }
 })
 
+router.get('/getUserLikedTown/:id', middleware.verifyToken, async (req, res) => {
+    console.log('GET /town/getUserLikedTown')
+
+    try {
+        var result = await pool.query("SELECT id_town FROM likes WHERE id_town = ? AND likes.id_user = ?;", [req.params.id, req.sub])
+
+        if (result.length === 0) {
+            console.log('BAD RESPONSE'.red)
+            return res.status(500).send({
+                status: "ko"
+            })
+        } else {
+            console.log('GOOD RESPONSE'.green)
+            res.status(200).send(result)
+        }
+    } catch {
+        console.log('BAD RESPONSE'.red)
+        return res.status(500).send({
+            status: "ko"
+        })
+    }
+})
+
 router.get('/getUserLikedTowns', middleware.verifyToken, async (req, res) => {
     console.log('GET /town/getUserLikedTowns')
 
