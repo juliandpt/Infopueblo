@@ -61,6 +61,7 @@ async function verifyToken(req, res, next) {
         })
     }
 
+
     const token = req.headers.authorization.split(' ')[1]
 
     if (token === 'null') {
@@ -88,6 +89,29 @@ async function verifyToken(req, res, next) {
     
     req.sub = payload.sub
     next()
+}
+
+async function verifySearchToken(req, res, next) {
+    console.log('1')
+    if(!req.headers.authorization) {
+        return res.status(401).send({
+            status: "ko"
+        })
+    }
+
+    const token = req.headers.authorization.split(' ')[1]
+    console.log(token)
+
+    if (!token || token === 'null') {
+        req.sub = 0
+        next()
+    } else {
+        const payload = service.decodeToken(token, process.env.SECRET_TOKEN)
+        console.log(payload)
+        
+        req.sub = payload.sub
+        next()
+    }
 }
 
 async function verifyAdminToken(req, res, next) {
@@ -135,5 +159,6 @@ module.exports = {
     existsLike,
     verifyToken,
     verifyAdminToken,
-    existsEmailforgot
+    existsEmailforgot,
+    verifySearchToken
 }

@@ -7,7 +7,7 @@ import sys
 import json
 
 text = sys.argv[1]
-#text = input("Introduce un lugar: ")
+# text = input("Introduce un lugar: ")
 place = text.replace(" ", "+")
 
 restaurants = []

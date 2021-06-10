@@ -5,14 +5,7 @@ const colors = require("colors")
 const router = express.Router()
 const pool = require('../database/database')
 const middleware = require('../controllers/middleware')
-const NodeGeocoder = require('node-geocoder');
-const options = {
-    provider: 'google',
-    apiKey: 'AIzaSyDQBd9Kz5c5bDVhsI2M0euX1LAT8vw0ZHg',
-    formatter: null
-  };
 
-const geocoder = NodeGeocoder(options)
 
 const d = new Date()
 const today = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate()
@@ -196,7 +189,7 @@ router.get('/getUserLikedTowns', middleware.verifyToken, async (req, res) => {
     console.log('GET /town/getUserLikedTowns')
 
     try {
-        var result = await pool.query("SELECT likes.id_town, towns.name, towns.image_url FROM likes, towns WHERE likes.id_town = towns.id_town AND likes.id_user = 1;", [req.sub])
+        var result = await pool.query("SELECT likes.id_town, towns.name, towns.image_url FROM likes, towns WHERE likes.id_town = towns.id_town AND likes.id_user = ?;", [req.sub])
 
         if (result.length === 0) {
             console.log('BAD RESPONSE'.red)
@@ -215,11 +208,34 @@ router.get('/getUserLikedTowns', middleware.verifyToken, async (req, res) => {
     }
 })
 
-router.get('/getTown/:id', async (req, res) => {
+router.get('/getUserSearchedTowns', middleware.verifyToken, async (req, res) => {
+    console.log('GET /town/getUserSearchedTowns')
+
+    try {
+        var result = await pool.query("SELECT searches.id_town, towns.name, towns.image_url FROM searches, towns WHERE searches.id_town = towns.id_town AND likes.id_user = 1;", [req.sub])
+
+        if (result.length === 0) {
+            console.log('BAD RESPONSE'.red)
+            return res.status(500).send({
+                status: "ko"
+            })
+        } else {
+            console.log('GOOD RESPONSE'.green)
+            res.status(200).send(result)
+        }
+    } catch {
+        console.log('BAD RESPONSE'.red)
+        return res.status(500).send({
+            status: "ko"
+        })
+    }
+})
+
+router.get('/getTown/:id', middleware.verifySearchToken, async (req, res) => {
     console.log('GET /town/getTown/', req.params.id)
 
     if (await middleware.existsTown(req.params.id) === false) {
-        await pool.query("INSERT INTO searches (id_town, date) VALUES (?,?);", [req.params.id, today])
+        await pool.query("INSERT INTO searches (id_town, date, id_user) VALUES (?,?,?);", [req.params.id, today, req.sub])
         var resultTown = await pool.query("SELECT * FROM towns WHERE towns.id_town = ?;", [req.params.id])
 
         if (resultTown != 0) {
@@ -356,7 +372,8 @@ router.get('/getTown/:id', async (req, res) => {
             })
         }
     } else {
-        await pool.query("INSERT INTO searches (id_town, date) VALUES (?,?);", [req.params.id, today])
+
+        await pool.query("INSERT INTO searches (id_town, date, id_user) VALUES (?,?,?);", [req.params.id, today, req.sub])
         await pool.query("UPDATE restaurants SET date = ? WHERE id_town = ?", [today, req.params.id])
         await pool.query("UPDATE jobs SET date = ? WHERE id_town = ?", [today, req.params.id])
 

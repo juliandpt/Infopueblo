@@ -1,13 +1,22 @@
 const mariadb = require('mariadb')
 require('dotenv').config()
 
+// const pool = mariadb.createPool({
+//     host: process.env.DB_HOST, 
+//     user: process.env.DB_USER, 
+//     password: process.env.DB_PASS,
+//     database: process.env.DB_NAME,
+//     connectionLimit: 3
+// });
+
 const pool = mariadb.createPool({
-    host: process.env.DB_HOST, 
-    user: process.env.DB_USER, 
-    password: process.env.DB_PASS,
-    database: process.env.DB_NAME,
-    connectionLimit: 3
+    host: 'localhost', 
+    user: 'root', 
+    password: '',
+    database: 'prgrupob',
+    connectionLimit: 100
 });
+
 
 pool.getConnection((err, connection) => {
     if (err) {
