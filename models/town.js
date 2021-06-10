@@ -196,7 +196,7 @@ router.get('/getUserLikedTowns', middleware.verifyToken, async (req, res) => {
     console.log('GET /town/getUserLikedTowns')
 
     try {
-        var result = await pool.query("SELECT likes.id_town, name, image_url FROM likes, towns WHERE likes.id_town = towns.id_town AND likes.id_user = ? ORDER BY COUNT(*) DESC;", [req.sub])
+        var result = await pool.query("SELECT likes.id_town, towns.name, towns.image_url FROM likes, towns WHERE likes.id_town = towns.id_town AND likes.id_user = 1;", [req.sub])
 
         if (result.length === 0) {
             console.log('BAD RESPONSE'.red)

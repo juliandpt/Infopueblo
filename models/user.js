@@ -290,7 +290,7 @@ router.get('/getUsers', middleware.verifyAdminToken, async (req, res) => {
 })
 
 router.get('/getAdmin', middleware.verifyAdminToken, async (req, res) => {
-    console.log('GET /user/getUser')
+    console.log('GET /user/getAdmin')
 
     try {
         var result = await pool.query("SELECT id_user, name, surnames, email FROM users WHERE users.id_user = ? AND isAdmin = 1;", [req.sub])
