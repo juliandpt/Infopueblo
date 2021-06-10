@@ -200,7 +200,7 @@ router.post('/edit/:id', middleware.verifyToken, async (req, res) => {
     }
 })
 
-router.delete('/delete/:id', middleware.verifyToken, async (req, res) => {
+router.delete('/delete/:id', middleware.verifyAdminToken, async (req, res) => {
     console.log('DELETE /user/delete/', req.params.id)
 
     try {
@@ -225,7 +225,7 @@ router.delete('/delete/:id', middleware.verifyToken, async (req, res) => {
     }
 })
 
-router.get('/setAdmin/:id', middleware.verifyToken, async (req, res) => {
+router.get('/setAdmin/:id', middleware.verifyAdminToken, async (req, res) => {
     console.log('POST /user/setAdmin/', req.params.id)
 
     try {
@@ -266,7 +266,7 @@ router.get('/getUser', middleware.verifyToken, async (req, res) => {
     }
 })
 
-router.get('/getUsers', middleware.verifyToken, async (req, res) => {
+router.get('/getUsers', middleware.verifyAdminToken, async (req, res) => {
     console.log('GET /user/getUsers')
 
     try {
@@ -289,7 +289,23 @@ router.get('/getUsers', middleware.verifyToken, async (req, res) => {
     }
 })
 
-router.get('/getAdmins', middleware.verifyToken, async (req, res) => {
+router.get('/getAdmin', middleware.verifyAdminToken, async (req, res) => {
+    console.log('GET /user/getUser')
+
+    try {
+        var result = await pool.query("SELECT id_user, name, surnames, email FROM users WHERE users.id_user = ? AND isAdmin = 1;", [req.sub])
+
+        console.log('GOOD RESPONSE'.green)
+        return res.status(200).send(result[0])
+    } catch {
+        console.log('BAD RESPONSE'.red)
+        return res.status(500).send({
+            status: "ko"
+        })
+    }
+})
+
+router.get('/getAdmins', middleware.verifyAdminToken, async (req, res) => {
     console.log('GET /user/getAdmins')
 
     try {
@@ -312,7 +328,7 @@ router.get('/getAdmins', middleware.verifyToken, async (req, res) => {
     }
 })
 
-router.get('/getAllUsers', middleware.verifyToken, async (req, res) => {
+router.get('/getAllUsers', middleware.verifyAdminToken, async (req, res) => {
     console.log('GET /user/getUsers')
 
     try {

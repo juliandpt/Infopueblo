@@ -20,7 +20,7 @@ async function existsEmail(req, res, next) {
     var sql = await pool.query("SELECT email FROM users WHERE users.email = ?", [req.body.email])
 
     if(sql.length !== 0) {
-        return res.status(500).send({
+        return res.status(401).send({
             status: "ko email"
         })
     }
@@ -90,10 +90,47 @@ async function verifyToken(req, res, next) {
     next()
 }
 
+async function verifyAdminToken(req, res, next) {
+    if(!req.headers.authorization) {
+        return res.status(401).send({
+            status: "ko"
+        })
+    }
+
+    const token = req.headers.authorization.split(' ')[1]
+
+    if (token === 'null') {
+        return res.status(401).send({
+            status: "ko"
+        })
+    }
+
+    const payload = service.decodeToken(token, process.env.SECRET_TOKEN)
+    const query = await pool.query("SELECT token FROM users WHERE users.id_user = ? AND isAdmin = 1", [payload.sub])
+
+    if (token !== query[0].token) {
+        return res.status(401).send({
+            status: "ko"
+        })
+    }
+
+    const payloadDatabase = service.decodeToken(query[0].token, process.env.SECRET_TOKEN)
+
+    if(moment().unix() > payloadDatabase.exp) {
+        return res.status(401).send({
+            status: "ko"
+        })
+    }
+    
+    req.sub = payload.sub
+    next()
+}
+
 module.exports = {
     existsTown,
     existsEmail,
     existsLike,
     verifyToken,
+    verifyAdminToken,
     existsEmailforgot
 }
