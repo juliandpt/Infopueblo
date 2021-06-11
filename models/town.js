@@ -38,7 +38,7 @@ router.get('/getSearchedTowns', async function(req, res) {
     console.log('GET /town/getSearchedTowns')
 
     try {
-        var result = await pool.query("SELECT date, count(*) as searches FROM searches WHERE searches.date >= ? GROUP BY date;", [past])
+        var result = await pool.query("SELECT date, count(*) as searches FROM searches WHERE searches.date >= ? GROUP BY date LIMIT 10;", [past])
 
         if (result.length === 0) {
             console.log('BAD RESPONSE'.red)
@@ -97,6 +97,29 @@ router.get('/getTopWeekTowns', async (req, res) => {
         }
     } catch {
         console.log('BAD RESPONSE'.red)
+        return res.status(500).send({
+            status: "ko"
+        })
+    }
+})
+
+router.get('/getTopLimitedTowns', async (req, res) => {
+    console.log('GET /town/getTopTowns')
+
+    try {
+        var result = await pool.query("SELECT name, towns.id_town AS id_town FROM searches, towns WHERE searches.id_town = towns.id_town GROUP BY id_town ORDER BY COUNT(*) DESC LIMIT 10")
+
+        if (result.length === 0) {
+            console.log('BAD RESPONSE: Database returned no records'.red)
+            res.status(500).send({
+                status: "ko"
+            })
+        } else {
+            console.log('GOOD RESPONSE'.green)
+            return res.status(200).send(result)
+        }
+    } catch(error) {
+        console.log(`BAD RESPONSE: ${error.message}`.red)
         return res.status(500).send({
             status: "ko"
         })

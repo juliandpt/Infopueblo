@@ -92,7 +92,6 @@ async function verifyToken(req, res, next) {
 }
 
 async function verifySearchToken(req, res, next) {
-    console.log('1')
     if(!req.headers.authorization) {
         return res.status(401).send({
             status: "ko"
@@ -115,7 +114,6 @@ async function verifySearchToken(req, res, next) {
 }
 
 async function verifyAdminToken(req, res, next) {
-    console.log('1')
     if(!req.headers.authorization) {
         return res.status(401).send({
             status: "ko"
