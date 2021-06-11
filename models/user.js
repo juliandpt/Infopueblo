@@ -44,13 +44,17 @@ router.post('/register', middleware.existsEmail ,async(req, res) => {
     console.log('POST /user/register')
 
     try {
+        console.log('1')
         const registerToken = service.createToken(req.body.email)
+        console.log(registerToken)
         
-        await pool.query("INSERT INTO users (email,password,name,surnames,admin,verificationToken) VALUES (?,?,?,?,0,?);", [req.body.email, service.encryptPassword(req.body.password), req.body.name, req.body.surnames, registerToken])
-        
+        const result = await pool.query("INSERT INTO users (email,password,name,surnames,admin,verificationToken) VALUES (?,?,?,?,0,?);", [req.body.email, service.encryptPassword(req.body.password), req.body.name, req.body.surnames, registerToken])
+        console.log(result)
         url = 'http://localhost:4200/confirmation?email='+ req.body.email + '&token=' + registerToken
+        console.log(url)
         
         function getMessage() {
+            console.log(url)
             const body = 'Haz click en el siguiente link para validar tu cuenta: ' + url;
             return {
                 to: req.body.email,
