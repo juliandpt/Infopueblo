@@ -212,7 +212,122 @@ router.get('/getUserSearchedTowns', middleware.verifyToken, async (req, res) => 
     console.log('GET /town/getUserSearchedTowns')
 
     try {
-        var result = await pool.query("SELECT searches.id_town, towns.name, towns.image_url FROM searches, towns WHERE searches.id_town = towns.id_town AND likes.id_user = 1;", [req.sub])
+        var result = await pool.query("SELECT DISTINCT searches.id_town, towns.name, towns.image_url FROM searches, towns WHERE searches.id_town = towns.id_town AND searches.id_user = ?;", [req.sub])
+
+        if (result.length === 0) {
+            console.log('BAD RESPONSE'.red)
+            return res.status(500).send({
+                status: "ko"
+            })
+        } else {
+            console.log('GOOD RESPONSE'.green)
+            res.status(200).send(result)
+        }
+    } catch {
+        console.log('BAD RESPONSE'.red)
+        return res.status(500).send({
+            status: "ko"
+        })
+    }
+})
+
+router.get('/getUserMostSearchedTowns', middleware.verifyToken, async (req, res) => {
+    console.log('GET /town/getUserMostSearchedTowns')
+
+    try {
+        var result = await pool.query("SELECT COUNT( s.id_town ) AS total, t.* FROM searches as s inner join towns as t on s.id_town = t.id_town where id_user = ? GROUP BY s.id_town ORDER BY total DESC limit 10", [req.sub])
+
+        if (result.length === 0) {
+            console.log('BAD RESPONSE'.red)
+            return res.status(500).send({
+                status: "ko"
+            })
+        } else {
+            console.log('GOOD RESPONSE'.green)
+            res.status(200).send(result)
+        }
+    } catch {
+        console.log('BAD RESPONSE'.red)
+        return res.status(500).send({
+            status: "ko"
+        })
+    }
+})
+
+router.get('/getDailyChallenge', middleware.verifyToken, async (req, res) => {
+    console.log('GET /town/getDailyChallenge')
+
+    try {
+        var result = await pool.query("select count(distinct id_town) as total from searches where date = ? and id_user = ? ", [today, req.sub])
+
+        if (result.length === 0) {
+            console.log('BAD RESPONSE'.red)
+            return res.status(500).send({
+                status: "ko"
+            })
+        } else {
+            console.log('GOOD RESPONSE'.green)
+            res.status(200).send(result)
+        }
+    } catch {
+        console.log('BAD RESPONSE'.red)
+        return res.status(500).send({
+            status: "ko"
+        })
+    }
+})
+
+router.get('/getTotalSearchedTowns', middleware.verifyToken, async (req, res) => {
+    console.log('GET /town/getTotalSearchedTowns')
+
+    try {
+        var result = await pool.query("select count(distinct id_town) as total from searches where id_user = ? ", [req.sub])
+
+        if (result.length === 0) {
+            console.log('BAD RESPONSE'.red)
+            return res.status(500).send({
+                status: "ko"
+            })
+        } else {
+            console.log('GOOD RESPONSE'.green)
+            res.status(200).send(result)
+        }
+    } catch {
+        console.log('BAD RESPONSE'.red)
+        return res.status(500).send({
+            status: "ko"
+        })
+    }
+})
+
+router.get('/getTotalSearches', middleware.verifyToken, async (req, res) => {
+    console.log('GET /town/getTotalSearches')
+
+    try {
+        var result = await pool.query("select count(distinct id_town) as total from searches")
+
+        if (result.length === 0) {
+            console.log('BAD RESPONSE'.red)
+            return res.status(500).send({
+                status: "ko"
+            })
+        } else {
+            console.log('GOOD RESPONSE'.green)
+            res.status(200).send(result)
+        }
+    } catch {
+        console.log('BAD RESPONSE'.red)
+        return res.status(500).send({
+            status: "ko"
+        })
+    }
+})
+
+router.get('/getUserMostRecentTowns', middleware.verifyToken, async (req, res) => {
+    console.log('GET /town/getUserMostRecentTowns')
+
+    try {
+        var result = await pool.query("select s.id_search, t.* from searches as s inner join towns as t on s.id_town = t.id_town where id_user = ? order by id_search desc limit 10", [req.sub])
 
         if (result.length === 0) {
             console.log('BAD RESPONSE'.red)

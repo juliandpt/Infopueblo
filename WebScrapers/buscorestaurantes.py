@@ -1,6 +1,5 @@
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 from bs4 import BeautifulSoup
-import cssutils
 import statistics
 import requests
 import sys
