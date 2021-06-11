@@ -61,7 +61,6 @@ async function verifyToken(req, res, next) {
         })
     }
 
-
     const token = req.headers.authorization.split(' ')[1]
 
     if (token === 'null') {
@@ -99,14 +98,12 @@ async function verifySearchToken(req, res, next) {
     }
 
     const token = req.headers.authorization.split(' ')[1]
-    console.log(token)
 
     if (!token || token === 'null') {
         req.sub = 0
         next()
     } else {
         const payload = service.decodeToken(token, process.env.SECRET_TOKEN)
-        console.log(payload)
         
         req.sub = payload.sub
         next()
@@ -121,9 +118,8 @@ async function verifyAdminToken(req, res, next) {
     }
 
     const token = req.headers.authorization.split(' ')[1]
-    console.log('1')
 
-    if (token === 'null') {
+    if (!token || token === undefined || token === 'null') {
         return res.status(401).send({
             status: "ko"
         })
@@ -131,9 +127,8 @@ async function verifyAdminToken(req, res, next) {
 
     const payload = service.decodeToken(token, process.env.SECRET_TOKEN)
     const query = await pool.query("SELECT token FROM users WHERE users.id_user = ? AND isAdmin = 1", [payload.sub])
-    console.log('1')
 
-    if (token !== query[0].token) {
+    if (query[0] === undefined) {
         return res.status(401).send({
             status: "ko"
         })

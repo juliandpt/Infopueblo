@@ -13,7 +13,7 @@ sendGridMail.setApiKey('SG.Gl8jUFs5SyyYsRnTUf1qkA.W3Z1k8zSkB8WPksjMrzSPur0lwV764
 router.post('/login', async (req, res) => {
     console.log('POST /user/login')
 
-    var query = await pool.query("SELECT id_user, isAdmin FROM users WHERE email = ? AND password = ? AND isActive = '1';", [req.body.email, service.encryptPassword(req.body.password)])
+    var query = await pool.query("SELECT id_user FROM users WHERE email = ? AND password = ?;", [req.body.email, service.encryptPassword(req.body.password)])
 
     if (query.length === 0) {
         console.log('BAD RESPONSE'.red)
@@ -44,14 +44,11 @@ router.post('/register', middleware.existsEmail ,async(req, res) => {
     console.log('POST /user/register')
 
     try {
-        console.log('1')
         const registerToken = service.createToken(req.body.email)
-        console.log(registerToken)
         
-        const result = await pool.query("INSERT INTO users (email,password,name,surnames,admin,verificationToken) VALUES (?,?,?,?,0,?);", [req.body.email, service.encryptPassword(req.body.password), req.body.name, req.body.surnames, registerToken])
-        console.log(result)
+        await pool.query("INSERT INTO users (email,password,name,surnames,isAdmin,verificationToken) VALUES (?,?,?,?,0,?);", [req.body.email, service.encryptPassword(req.body.password), req.body.name, req.body.surnames, registerToken])
+
         url = 'http://localhost:4200/confirmation?email='+ req.body.email + '&token=' + registerToken
-        console.log(url)
         
         function getMessage() {
             console.log(url)
