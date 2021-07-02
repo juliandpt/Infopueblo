@@ -1,14 +1,15 @@
+import mariadb, sys, os
 from geopy.geocoders import Nominatim
-import mariadb
-import sys
+from dotenv import load_dotenv
+load_dotenv()
+
 try:
     conn = mariadb.connect(
-        user="pr_grupob", 
-        password="PC2-2021",
-        host="2.139.176.212",
-        port=3306,
-        database="prgrupob"
-
+        user=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASS"),
+        host=os.getenv("DB_HOST"),
+        port=os.getenv("DB_PORT"),
+        database=os.getenv("DB_NAME")
     )
 except mariadb.Error as e:
     print(f"Error connecting to MariaDB Platform: {e}")

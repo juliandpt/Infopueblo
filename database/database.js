@@ -9,14 +9,6 @@ const pool = mariadb.createPool({
     connectionLimit: 3
 });
 
-// const pool = mariadb.createPool({
-//     host: 'localhost', 
-//     user: 'root', 
-//     password: '',
-//     database: 'prgrupob',
-//     connectionLimit: 100
-// });
-
 pool.getConnection((err, connection) => {
     if (err) {
         if (err.code === 'PROTOCOL_CONNECTION_LOST'){

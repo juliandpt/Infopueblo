@@ -8,7 +8,7 @@ const middleware = require('../controllers/middleware')
 const service = require('../services')
 
 require('dotenv').config()
-sendGridMail.setApiKey('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');
+sendGridMail.setApiKey(process.env.SENGRID_API_KEY);
 
 router.post('/login', async (req, res) => {
     console.log('POST /user/login')

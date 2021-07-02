@@ -1,7 +1,5 @@
+import requests, sys, json
 from bs4 import *
-import requests
-import sys
-import json
 
 text = sys.argv[1]
 #text = input("Introduce un lugar: ")

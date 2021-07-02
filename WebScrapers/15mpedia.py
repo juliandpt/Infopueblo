@@ -1,17 +1,15 @@
+import requests, mariadb, sys, os
+from dotenv import load_dotenv
 from bs4 import *
-import requests
-import mariadb
-import sys
+load_dotenv() 
 
-# Connect to MariaDB Platform
 try:
     conn = mariadb.connect(
-        user="pr_grupob", 
-        password="PC2-2021",
-        host="2.139.176.212",
-        port=3306,
-        database="prgrupob"
-
+        user=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASS"),
+        host=os.getenv("DB_HOST"),
+        port=os.getenv("DB_PORT"),
+        database=os.getenv("DB_NAME")
     )
 except mariadb.Error as e:
     print(f"Error connecting to MariaDB Platform: {e}")

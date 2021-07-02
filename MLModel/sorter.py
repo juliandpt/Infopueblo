@@ -1,14 +1,7 @@
 
-from nltk.corpus.reader.util import PickleCorpusView
-import pandas as pd
-import numpy as np
-import mariadb
-import nltk
+import joblib, sys, json
 from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer
-import joblib
-import sys
-import json
 
 news = [sys.argv[1]]
 #news = ["texto a clasificar"]

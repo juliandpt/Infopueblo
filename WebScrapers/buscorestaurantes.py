@@ -1,9 +1,6 @@
-from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+import requests, sys, json, statistics
 from bs4 import BeautifulSoup
-import statistics
-import requests
-import sys
-import json
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
 text = sys.argv[1]
 # text = input("Introduce un lugar: ")
