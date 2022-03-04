@@ -1,0 +1,18 @@
+.container {
+    width: 90vh;
+    height: 60vh;
+    position: relative;
+    margin-top: 5%;
+    box-shadow: 0 0 5px 5px rgba(0,0,0, .05);
+    border-radius: 2.5em;
+    padding: 5%;
+
+    .wrapper {
+        justify-content: center;
+        text-align: center;
+    }
+
+    button {
+        margin-top: 2%;
+    }
+}

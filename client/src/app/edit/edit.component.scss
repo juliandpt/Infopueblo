@@ -1,0 +1,135 @@
+.logo {
+    margin-top: 10vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  
+    a:hover {
+      box-shadow: 0 0 5px 5px rgba(0, 0, 0, 0.05);
+      transition: box-shadow 0.3s ease-in-out;
+    }
+  
+    img {
+      width: auto;
+      height: 100%;
+    }
+  }
+  
+  .content {
+    margin: 5vh auto 20px;
+    max-width: 430px;
+    background-color: #fff;
+    padding: 1rem 1rem 1rem 1rem;
+    border-radius: 8px;
+    box-shadow: 0 0 5px 5px rgba(0, 0, 0, 0.05);
+  
+    .alert-success {
+      display: flex;
+      justify-content: center;
+      background-color: #e6ffe6;
+      border-color: #006600;
+      color: #006600;
+    }
+  
+    .alert-danger {
+      display: flex;
+      justify-content: center;
+      background-color: #fdf6f6;
+      border-color: #de7575;
+      color: #c20707;
+    }
+  
+    .alert-warning {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 1.5em;
+  
+      i {
+        margin-right: 0.5em;
+      }
+    }
+  
+    h3 {
+      display: flex;
+      justify-content: center;
+      margin: 2rem auto;
+    }
+  
+    .form-group {
+      margin-bottom: 1.5em;
+    }
+  }
+  
+  .signin-text {
+    font-style: normal;
+    font-weight: 600 !important;
+    margin-bottom: 3;
+  }
+  
+  input.ng-invalid {
+    border-bottom: solid #de7575;
+  }
+  
+  input.ng-untouched {
+    border-bottom: solid grey;
+  }
+  
+  input.ng-valid {
+    border-bottom: solid green;
+  }
+  
+  .form-control {
+    display: block;
+    width: 100%;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    border-style: solid !important;
+    border-width: 0 0 0.063rem 0 !important;
+    color: #495057;
+    height: auto;
+    border-radius: 0;
+    background-color: #fff;
+    background-clip: padding-box;
+  }
+  
+  .form-control:focus {
+    color: #495057;
+    background-color: #fff;
+    outline: 0;
+    box-shadow: none;
+  }
+  
+  .btn:hover {
+    background-color: 0099ff;
+  }
+  
+  .form-control.login-user {
+    border: 0px solid white !important;
+  }
+  
+  .submitButton {
+    display: flex;
+    align-content: center;
+  
+    .btn {
+      width: 100%;
+    }
+  
+    .btn:hover {
+      background-color: 0099ff;
+    }
+  }
+  
+  .link {
+    padding: 2rem 0 0 0;
+  
+    a {
+      border: 0 solid white !important;
+    }
+  }
+  
+  .error {
+    color: #c20707;
+  }

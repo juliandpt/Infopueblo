@@ -1,0 +1,55 @@
+<div fullpage id="fullpage" [options]="config" (ref)="getRef($event)">
+  <div class="section imagenFondo">
+    <div class="search d-flex flex-column justify-content-center align-items-center">
+    <h1 class="title fadein-text">Encuentra un pueblo. Hoy.</h1>
+    <br>
+    <div class="d-flex justify-content-center align-items-center col-md-5 group fadein-search">
+      <div class="input">
+        <input type="text" class="form-control" [(ngModel)]="fieldSearch" placeholder="Introduzca la búsqueda" [ngbTypeahead]="filterTowns">
+      </div>
+      <div class="button">
+        <button class="btn btn-primary bi-search rounded" (click)="getTown()" type="submit"></button>
+      </div>
+    </div>
+  </div>
+  <div class="arrow"></div>
+  </div>
+	<div class="section" (click)="fullpage_api.moveSectionDown()"><div class="container">
+    <div class="row">
+      <div class="popular col-md-12">
+        <h2>Búsquedas populares esta semana</h2>
+        <carousel *ngIf="loadingTopTowns==false" [cellWidth]="300" [loop]="true">
+          <div class="carousel-cell" *ngFor="let town of topTowns">
+            <div class="card card-horizontal">
+              <img class="card-img-top" src="{{town.image_url}}" alt="Card image cap">
+              <div class="card-body">
+                <h5 class="card-title">{{town.name}}</h5>
+                <a routerLink="/town/{{town.id_town}}" class="btn btn-outline-primary btn-block">Ver más...</a>
+              </div>
+            </div>
+          </div>
+        </carousel>
+      </div>
+    </div>
+    <div class="row">
+      <div class="liked col-md-12">
+        <h2>Mejor valorados por los usuarios</h2>
+        <carousel *ngIf="loadingLikedTowns==false" [cellWidth]="300" [loop]="true">
+          <div class="carousel-cell" *ngFor="let town of likedTowns">
+            <div class="card card-horizontal">
+              <img class="card-img-top" src="{{town.image_url}}" alt="Card image cap">
+              <div class="card-body">
+                <div>
+                  <h5 class="card-title">{{town.name}}</h5>
+                </div>
+                <div class="d-flex justify-content-flex-end">
+                  <a routerLink="/town/{{town.id_town}}" class="btn btn-outline-primary btn-block">Ver más...</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </carousel>
+      </div>
+    </div>
+  </div>
+</div>

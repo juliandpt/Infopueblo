@@ -1,0 +1,24 @@
+/* You can add global styles to this file, and also import other style files */
+
+/* Importing Bootstrap SCSS file. */
+@import '~bootstrap/scss/bootstrap';
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap');
+@import "~bootstrap-icons/font/bootstrap-icons.css";
+@import url(~fullpage.js/dist/fullpage.min.css);
+
+html, body {
+  font-family: 'Poppins', sans-serif;
+}
+
+h1 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 120%;
+}
+
+a {
+  color: black;
+}
+
+a:hover { 
+  color: #0d6efd; 
+}

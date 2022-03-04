@@ -1,0 +1,41 @@
+<div class="navbar navbar-expand-lg sticky-top navbar-light flex-nav" [ngClass]="{'navbar-alt': router.url == ('/#firstPage')|| router.url == ('/') }">
+  <div class="container">
+    <div class="col-md-4 title">
+      <a class="navbar-brand" routerLink="/">
+        <img src="/assets/logo-white.png" *ngIf="router.url == ('/') || router.url == ('/#firstPage')" width="200" height="50" class="d-inline-block align-top" alt="">
+        <img src="/assets/logo.png" *ngIf="router.url != ('/') && router.url !=('/#firstPage')" width="200" height="50" class="d-inline-block align-top" alt="">
+      </a>
+    </div>
+    <div class="col-md-4 input">
+      <input *ngIf="router.url != ('/') && router.url !=('/#firstPage')" type="text" class="form-control" [(ngModel)]="fieldSearch" placeholder="Introduzca la busqueda" [ngbTypeahead]="filterTowns">
+    </div>
+    <div class="col-md-1 button">
+      <button *ngIf="router.url != ('/') && router.url !=('/#firstPage')" class="btn btn-light" (click)="getTown()" type="submit"><i class="bi bi-search"></i></button>
+    </div>
+    <div class="col-md-3 user">
+      <div *ngIf="active">
+        <button class="btn btn-primary" mat-button [matMenuTriggerFor]="menu"><i class="bi bi-person user"></i></button>
+          <mat-menu #menu="matMenu">
+            <ng-container *ngIf="!authService.loggedIn(); else profile">
+              <button class="btn register2" [ngClass]="{ 'btn-primary': router.url == ('/#firstPage') || router.url == ('/'), 'btn-outline-primary' : router.url != ('/#firstPage') && router.url != ('/')}" routerLink="/register" routerLinkActive="is-active">Registro</button>
+              <button class="btn btn-primary login2" routerLink="/login" routerLinkActive="is-active">Iniciar Sesión</button>
+            </ng-container>
+            <ng-template #profile>
+              <button class="btn close2" [ngClass]="{ 'btn-danger': router.url == ('/#firstPage') || router.url == ('/'), 'btn-outline-danger' : router.url != ('/#firstPage') && router.url != ('/')}" routerLinkActive="is-active" (click)="exit()">Cerrar Sesión</button>
+              <button class="btn btn-primary profile2" routerLink="/user" routerLinkActive="is-active">Perfil</button>
+            </ng-template>
+          </mat-menu>
+        </div>
+        <div *ngIf="!active">
+          <ng-container *ngIf="!authService.loggedIn(); else profile">
+            <button class="btn register1" [ngClass]="{ 'btn-primary': router.url == ('/#firstPage') || router.url == ('/'), 'btn-outline-primary' : router.url != ('/#firstPage') && router.url != ('/')}" routerLink="/register" routerLinkActive="is-active">Registro</button>
+            <button class="btn btn-primary login1" routerLink="/login" routerLinkActive="is-active">Iniciar Sesión</button>
+          </ng-container>
+          <ng-template #profile>
+            <button class="btn close1" [ngClass]="{ 'btn-danger': router.url == ('/#firstPage') || router.url == ('/'), 'btn-outline-danger' : router.url != ('/#firstPage') && router.url != ('/')}" routerLinkActive="is-active" (click)="exit()">Cerrar Sesión</button>
+            <button class="btn btn-primary profile1" routerLink="/user" routerLinkActive="is-active">Perfil</button>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>

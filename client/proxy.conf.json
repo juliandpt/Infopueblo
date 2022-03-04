@@ -1,0 +1,7 @@
+{
+    "/analisis": {
+        "target":"https://localhost:5000/analisis",
+        "secure":true,
+        "logLevel":"debug"
+        }
+    }  

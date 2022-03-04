@@ -1,0 +1,122 @@
+agm-map {
+  width: 100%;
+  height: 45vh;
+}
+
+.map {
+  padding-top: 9%;
+}
+
+
+.third-row {
+  padding-bottom: 10%;
+}
+
+.title {
+  margin-top: 5%;
+}
+
+.stats {
+  padding-top: 5% !important;
+}
+
+.col-container {
+  display: table;
+  width: 100%;
+}
+
+.card-img-top {
+  width: 100%;
+  height: 15vw;
+  object-fit:scale-down;
+}
+
+.col-4 {
+  display: table-cell;
+}
+
+.progress-bar-padding {
+  padding-top: 1.5em;
+  --bs-gutter-x: 0 !important;
+}
+
+.contenedor {
+  max-width: max-content;
+}
+
+.all {
+    min-height: 100vh;
+  }
+  
+  .container {
+    margin: 0;
+  }
+  
+  .user {
+    margin-top: 5%;
+    width: 75%;
+  }
+  
+  .col-md-9 {
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+  }
+  
+  .admin {
+    background-color: #d7d7d7;
+    min-height: 100vh;
+  }
+  
+  p {
+    font-weight: bold;
+  }
+  
+  .webScraper {
+    margin-top: 5%;
+  }
+  
+  .graph {
+    margin-top: 5%;
+  }
+
+  .card-most-viewed {
+    margin-top: 5%;
+    display:flex;
+  }
+
+  .table-img {
+    position:absolute; width: 20px; height: 20px;
+  }
+  
+  table {
+    counter-reset: rowNumber;
+    margin-top: 5%;
+    margin-bottom: 0 !important;
+  }
+  
+  table tr {
+    counter-increment: rowNumber;
+  }
+  
+  table tr th:first-child::before {
+    content: counter(rowNumber);
+    margin-right: 0.5em;
+  }
+  
+  .vertical {
+    border-left: 1px solid black;
+    margin-top: 20%;
+    height: 125vh;
+  }
+  
+  h5 {
+    margin-top: 10%;
+  }
+  
+  .editButton {
+    width: 100%;
+  }
+  .cards-user {
+    height: 100%;
+  }

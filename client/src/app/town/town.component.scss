@@ -1,0 +1,186 @@
+.all {
+  background-color: #F2F2F2;
+}
+
+.container {
+  padding: 5vh 0;
+}
+
+.numbers {
+  .col-md-4{
+    padding: 0;
+  }
+
+  .x {
+    height: 75%;
+  }
+
+  .y {
+    height: 25%;
+  }
+
+  .image {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 0.5em 0;
+    border-radius: 1%;
+    background-color: white;
+    padding: 1em;
+  
+    img {
+      max-height: 16em;
+      width: auto;
+      height: auto;
+      filter: drop-shadow(0px 0px 10px rgba(0, 0, 0, 0.5))
+    }
+  }
+
+  .population {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 0 0.25em 0 0;
+    border-radius: 5%;
+    height: 100%;
+    padding: 1em;
+    background-color: white;
+  
+    p{
+      margin:0;
+    }
+  }
+}
+
+  .density {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 0 0.25em 0 0.25em;
+    border-radius: 5%;
+    height: 100%;
+    padding: 1em;
+    background-color: white;
+  
+    p{
+      margin:0;
+    }
+  }
+
+  .like {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 0 0 0.25em;
+    border-radius: 5%;
+    background-color: white;
+    padding: 1em;
+    height: 100%;
+
+    a{
+      display: flex;
+      justify-content: center;
+      align-items: center;  
+      min-height: 100%;
+      min-width: 100%;
+
+      .bi-heart {
+        font-size: 2rem;
+      }
+
+      .bi-heart-fill {
+        font-size: 2rem;
+        color: red;
+      }
+
+      .bi-heart-fill:hover {
+        color: #aa0d00;
+      }
+    }
+
+    a:hover {
+      color: red;
+    }
+
+    .like:hover {
+      box-shadow: 0 0 5px 5px rgba(0,0,0, .05);
+    }
+  }
+
+
+.stats {
+  .col-md-4{
+    padding: 0;
+  } 
+  .a {
+    height: 60%;
+  }
+
+  .z {
+    padding-top: 1%;
+    height: 38%;
+  }
+
+  .data {
+    height: 100%;
+    margin: 0.5em 0.5em 0 0.5em;
+    border-radius: 1%;
+    background-color: white;
+    padding: 1em;
+  }
+
+  .info{
+    height: 100%;
+    margin: 0.75em 0.5em 0 0.5em;
+    border-radius: 1%;
+    background-color: white;
+    padding: 1em;
+  }
+}
+
+.map {
+  .row { 
+    height: 45vh;
+  }
+  .map2 {
+    height: 100%;
+    margin: 0.5em 0 0.5em 0.5em;
+    border-radius: 1%;
+  }
+
+  agm-map {
+    width: 100%;
+    height: 45vh;
+  }
+}
+
+.restaurants, .town {
+  margin-top: 5%;
+  height: 100%;
+}
+
+h1 {
+  font-size: 200%;
+  font-weight: bold;
+}
+
+.card {
+  height: 100%;
+
+  h5 {
+    font-weight: bold;
+  }
+  
+  img {
+    width: 100%;
+    height: auto;
+    max-height: 12em;
+  }
+
+  i {
+    margin-right: 0.5em;
+  }
+}

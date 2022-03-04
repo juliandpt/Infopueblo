@@ -1,0 +1,136 @@
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-3 admin">
+            <p align="center">
+                <img src="/assets/user.png" class="user">
+            </p>
+            <hr>
+            <div class="row">
+                <div *ngIf="!loading">
+                    <p> {{user.name}} {{user.surnames}} </p>
+                    <p> {{user.email}} </p>
+                </div>
+                <div *ngIf="!loading">
+                    <button class="btn btn-outline-primary editButton" routerLink="/edit/{{user.id_user}}"><i class="bi bi-pencil"></i> Editar Usuario</button>
+                </div>
+                <ngx-skeleton-loader count="3" appearance="" *ngIf="loading"></ngx-skeleton-loader>
+            </div>
+        </div>
+        <div class="col-md-9 functions">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-4" style="padding:0">
+                        <div class="cards-user">
+                            <h5> Pueblo más visitado</h5>
+                            <div *ngIf="!loading">
+                                <div class="card" routerLink="/town/{{mostSearchedTown[0].id_town}}">
+                                    <img class="card-img-top img-fluid" src="{{mostSearchedTown[0].image_url}}" alt="Card image cap">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{mostSearchedTown[0].name}}</h5>
+                                        <a routerLink="/town/{{mostSearchedTown[0].id_town}}" class="btn btn-outline-primary btn-block">Ver más...</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="cards-user">
+                            <div class="map">
+                                <div class="row">
+                                    <div *ngIf="!loading" class="map2">
+                                        <agm-map [latitude]="mostSearchedTown[0].latitude" [longitude]="mostSearchedTown[0].longitude">
+                                            <agm-marker [latitude]="mostSearchedTown[0].latitude" [longitude]="mostSearchedTown[0].longitude"></agm-marker>
+                                        </agm-map>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" style="padding: 0 ">
+                        <div class="col-12">
+                            <div class="container-fluid">
+                                <h4 class="stats">Estadísticas</h4>
+                                <div class="progress-bar-padding">
+                                    <h6>Reto diario (10 búsquedas distintas)</h6>
+                                    <div *ngIf="!loading" class="progress">
+                                        <div class="progress-bar bg-success" role="progressbar" aria-valuenow="100"
+                                            aria-valuemin="0" aria-valuemax="100" style="width: {{resultado}}%">
+                                            {{resultado}} % Completado
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row progress-bar-padding">
+                                    <h6>Municipios visitados - {{totalTownsUserRaw}} de 8134</h6>
+                                    <div *ngIf="!loading" class="progress">
+                                        <div class="progress-bar bg-danger" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width:{{totalTownsUser}}%">
+                                            {{totalTownsUser}} % Completado
+                                        </div>
+                                    </div>
+                                    <div *ngIf="!loading" class="row progress-bar-padding">
+                                        <h6>Total municipios visitados por los usuarios - {{totalTownsRaw}} de 8134</h6>
+                                        <div class="progress">
+                                            <div class="progress-bar bg-warning" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width:{{totalTowns}}%">
+                                                {{totalTowns}} % Completado
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <ngx-skeleton-loader count="3" appearance="" *ngIf="loading"></ngx-skeleton-loader>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row second-row">
+                    <div class="col-md-6">
+                        <h5>Municipios favoritos</h5>
+                        <table *ngIf="!loading" class="table table-striped">
+                            <tbody>
+                                <tr *ngFor="let town of likedTowns">
+                                    <th></th>
+                                    <td><img class="table-img" src="{{town.image_url}}" alt="Card image cap"></td>
+                                    <th></th>
+                                    <td> {{ town.name }} </td>
+                                    <td> {{ town.aacc }} </td>
+                                    <td><i class="bi bi-arrow-up-right-square" routerLink="/town/{{town.id_town}}"></i></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <ngx-skeleton-loader count="5" appearance="" *ngIf="loading"></ngx-skeleton-loader>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>10 búsquedas más realizadas</h5>
+                        <table *ngIf="!loading" class="table table-striped">
+                            <tbody>
+                                <tr *ngFor="let town of mostSearchedTown">
+                                    <th></th>
+                                    <td><img class="table-img" src="{{town.image_url}}" alt="Card image cap"></td>
+                                    <th></th>
+                                    <td> {{ town.name }} </td>
+                                    <td> {{ town.aacc }} </td>
+                                    <td><i class="bi bi-arrow-up-right-square" routerLink="/town/{{town.id_town}}"></i></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <ngx-skeleton-loader count="5" appearance="" *ngIf="loading"></ngx-skeleton-loader>
+                    </div>
+                    <div class="row third-row">
+                        <div class="col-md-12">
+                            <h5 class="title">Búsquedas recientes</h5>
+                            <table *ngIf="!loading" class="table table-striped ">
+                                <tbody>
+                                    <tr *ngFor="let town of mostRecentTowns">
+                                        <th></th>
+                                        <td><img class="table-img" src="{{town.image_url}}" alt="Card image cap"></td>
+                                        <td> {{ town.name }} </td>
+                                        <td> {{ town.aacc }} </td>
+                                        <td><i class="bi bi-arrow-up-right-square" routerLink="/town/{{town.id_town}}"></i></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <ngx-skeleton-loader count="5" appearance="" *ngIf="loading"></ngx-skeleton-loader>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>

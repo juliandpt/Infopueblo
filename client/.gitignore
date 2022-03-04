@@ -1,0 +1,4 @@
+# anywhere in .gitignore
+/node_modules/*.json
+/node_modules/
+.DS_Store

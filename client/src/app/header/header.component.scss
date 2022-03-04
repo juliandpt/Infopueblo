@@ -1,0 +1,87 @@
+$margin: 5%;
+
+.navbar {
+    background-color: #ffffff;
+    box-shadow: 0 0.01em 1em #adadad;
+    z-index: 99999;
+    top: 0;
+    width: 100%;
+    padding-top: 1%;
+}
+
+.navbar-alt {
+    background-color: #49505700;
+    box-shadow: 0 0 0 !important;
+    z-index: 99999;
+    position: fixed;
+    top: 0;
+    width: 100%;
+}
+
+input.ng-untouched {
+    border-bottom: solid grey;
+}
+
+::ng-deep .dropdown-menu { width: 40%; }
+
+.form-control {
+    display: block;
+    width: 100%;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    border-style: solid !important;
+    border-width: 0 0 0.063rem 0 !important;
+    color: #495057;
+    height: auto;
+    border-radius: 0;
+    background-color: #fff;
+    background-clip: padding-box;
+}
+
+.form-control:focus {
+    color: #495057;
+    background-color: #fff;
+    outline: 0;
+    box-shadow: none;
+}
+
+.button {
+    margin-left: 0.5%;
+    background-color: transparent;
+}
+
+.user {
+    margin-left: 10%;
+}
+
+.btn-primary, .btn-outline-primary, .btn-danger, .btn-outline-danger {
+    margin: 0 1%;
+}
+
+.btn-danger {
+    margin-left: 3%;
+}
+
+img {
+    height: auto;
+    width: auto;
+    max-width: 7em;
+    max-height: 3em;
+}
+
+.register2 {
+    margin: $margin;
+}
+
+.login2 {
+    margin: $margin;
+}
+
+.close2 {
+    margin: $margin;
+}
+
+.profile2 {
+    margin: $margin;
+}

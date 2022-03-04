@@ -1,0 +1,96 @@
+.all {
+  min-height: 100vh;
+}
+
+.container {
+  margin: 0;
+}
+
+#gradient-0 stop {
+  stop-color: #506ef9;
+}
+
+#gradient-0 stop[offset="0"] {
+  stop-opacity: 0.25;
+}
+
+#gradient-0 stop[offset="1"] {
+  stop-opacity: 0;
+}
+
+.highcharts-color-0 {
+  fill: #506ef9;
+  stroke: #506ef9;
+}
+
+.highcharts-color-0 .highcharts-area {
+  fill-opacity: 1;
+  fill: url(#gradient-0);
+}
+
+.graphContainer {
+  padding: 20px;
+  grid-template-columns: repeat(auto-fit, mimax(350px, 500px));
+  grid-gap: 20px;
+  place-content: center;
+
+  & > * {
+    border-radius: 20px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.user {
+  margin-top: 5%;
+  width: 75%;
+}
+
+.col-md-9 {
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.admin {
+  background-color: #d7d7d7;
+  min-height: 100vh;
+}
+
+p {
+  font-weight: bold;
+}
+
+.webScraper {
+  margin-top: 5%;
+}
+
+.graph {
+  margin-top: 5%;
+}
+
+.vertical {
+  border-left: 1px solid black;
+  margin-top: 20%;
+  height: 125vh;
+}
+
+h5 {
+  margin-top: 10%;
+}
+
+.editButton {
+  width: 100%;
+}
+
+.mat-tab-group {
+  min-width: 100%;
+}
+
+.bi-trash:hover {
+  color: #aa0d00;
+}
+
+p {
+  display: flex;
+  justify-content: center;
+}

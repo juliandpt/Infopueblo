@@ -1,0 +1,31 @@
+<div class="page-wrap">
+  <div class="container">
+    <div class="row logo">
+      <h1 class="d-flex justify-content-center">
+        <a routerLink="/">
+          <img src="../assets/logo.png" alt="logo">
+        </a>
+      </h1>
+    </div>
+    <div class="row content">
+      <div>
+        <h3 class="signin-text">Recuperar contraseña</h3>
+        <form [formGroup]="form" (ngSubmit)="submit()">
+          <div *ngIf="goodreq == true;" class="alert alert-success" role="alert">
+            email enviado
+          </div>
+          <div *ngIf="badreq == true;" class="alert alert-danger" role="alert">
+            email no existe
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" formControlName="email" class="form-control" required>
+          </div>
+          <div class="submitButton">
+            <button type="submit" class="btn btn-lg btn-primary btn-block mx-auto"> Recuperar contraseña </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

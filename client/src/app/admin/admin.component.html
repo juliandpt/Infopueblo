@@ -1,0 +1,115 @@
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-3 admin">
+            <p align="center">
+                <img src="/assets/admin.png" class="user">
+            </p>
+            <hr>
+            <div class="row">
+                <div *ngIf="!loading">
+                    <p> {{admin.name}} {{admin.surnames}} </p>
+                    <p> {{admin.email}} </p>
+                </div>
+                <div *ngIf="!loading">
+                    <button class="btn btn-outline-primary editButton" routerLink="/edit/{{admin.id_user}}"><i class="bi bi-pencil"></i> Editar Usuario</button>
+                </div>
+                <ngx-skeleton-loader count="3" appearance="" *ngIf="loading"></ngx-skeleton-loader>
+            </div>
+        </div>
+        <div class="col-md-9 functions">
+            <mat-tab-group>
+                <mat-tab label="Búsquedas">
+                    <div class="container col-md-12">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>Búsquedas de los últimos 7 días</h5>
+                                <table *ngIf="!loading" class="table table-striped">
+                                    <tbody>
+                                        <tr *ngFor="let topWeekTown of topWeekTowns">
+                                            <td> {{ topWeekTown.name }} </td>
+                                            <td><a routerLink="/town/{{topWeekTown.id_town}}"><i class="bi bi-arrow-up-right-square"></i></a></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <ngx-skeleton-loader count="5" appearance="" *ngIf="loading"></ngx-skeleton-loader>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>10 búsquedas más realizadas</h5>
+                                <table class="table table-striped table-hover">
+                                    <tbody>
+                                        <tr *ngFor="let topTown of topTowns">
+                                            <td> {{ topTown.name }} </td>
+                                            <td><a routerLink="/town/{{topTown.id_town}}"><i class="bi bi-arrow-up-right-square"></i></a></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <ngx-skeleton-loader count="5" appearance="" *ngIf="loading"></ngx-skeleton-loader>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 graphContainer">
+                                <highcharts-chart 
+                                    [Highcharts]="Highcharts" 
+                                    [constructorType]="chartConstructor"
+                                    [options]="chartOptions" 
+                                    [(update)]="updateFlag" 
+                                    [oneToOne]="oneToOneFlag"
+                                    [runOutsideAngular]="runOutsideAngular"
+                                    style="width: 100%; height: 400px; display: block;">
+                                </highcharts-chart>
+                            </div>
+                        </div>
+                    </div>
+                </mat-tab>
+                <mat-tab label="Usuarios">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>Usuarios</h5>
+                                <p *ngIf="noUsers"> No existen Usuarios</p>
+                                <table *ngIf="!noUsers" class="table">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th scope="col">id</th>
+                                            <th scope="col">Nombre</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let user of users">
+                                            <td>{{ user.id_user }}</td>
+                                            <td> {{ user.name }} {{ user.surnames }} </td>
+                                            <td><a routerLink="/edit/{{user.id_user}}"><i class="bi bi-pencil"></i></a></td>
+                                            <td><a routerLink="/admin"><i class="bi bi-trash" (click)="deleteUser(user.id_user)"></i></a></td>
+                                            <td><a routerLink="/admin"><i class="bi bi-person-badge" (click)="setAdmin(user.id_user)"></i></a></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <ngx-skeleton-loader count="5" appearance="" *ngIf="loading"></ngx-skeleton-loader>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>Administradores</h5>
+                                <table class="table col-6">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th scope="col">id</th>
+                                            <th scope="col">Nombre</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let admin of admins">
+                                            <td>{{ admin.id_user }}</td>
+                                            <td> {{ admin.name }} {{ admin.surnames }} </td>
+                                            <td><a routerLink="/edit/{{admin.id_user}}"><i class="bi bi-pencil"></i></a></td>
+                                            <td><a routerLink="/admin"><i class="bi bi-trash" (click)="deleteUser(admin.id_user)"></i></a></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <ngx-skeleton-loader count="5" appearance="" *ngIf="loading"></ngx-skeleton-loader>
+                            </div>
+                        </div>
+                    </div>
+                </mat-tab>
+            </mat-tab-group>
+        </div>
+    </div>
+</div>

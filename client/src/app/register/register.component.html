@@ -1,0 +1,53 @@
+<div class="page-wrap">
+  <div class="container">
+    <div class="row logo">
+      <h1 class="d-flex justify-content-center">
+        <a routerLink="/">
+          <img src="/assets/logo.png" alt="logo">
+        </a>
+      </h1>
+    </div>
+    <div class="row content">
+      <div>
+        <h3 class="signin-text">Registro</h3>
+        <form [formGroup]="form" (ngSubmit)="submit()">
+          <div *ngIf="goodreq == true;" class="alert alert-success" role="alert">
+            usuario registrado
+          </div>
+          <div *ngIf="this.badreq == true" class="alert alert-danger" role="alert">
+            error del servidor
+          </div>
+          <div *ngIf="unauth == true;" class="alert alert-danger" role="alert">
+            email ya existente
+          </div>
+          <div class="form-group">
+            <label for="phone">Nombre</label>
+            <input type="text" formControlName="name" id="name" name="name" class="form-control" required>
+            <span class="error" *ngIf="name?.invalid && name?.touched">Introduzca el nombre</span>
+          </div>
+          <div class="form-group">
+            <label for="phone">Apellidos</label>
+            <input type="text" formControlName="surnames" id="surnames" name="surnames" class="form-control" required>
+            <span class="error" *ngIf="surnames?.invalid && surnames?.touched">Introduzca el/los apellido/s</span>
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" formControlName="email" class="form-control" required>
+            <span class="error" *ngIf="email?.invalid && (email?.touched || email?.dirty)">Introduzca un email valido</span>
+          </div>
+          <div class="form-group">
+            <label for="password">Contraseña</label>
+            <input formControlName="password" type="password" id="password" name="password" class="form-control"
+              required>
+            <span class="error" *ngIf="password?.invalid && (password?.touched || password?.dirty)">Mínimo 6 caracteres</span>
+          </div>
+          <div class="submitButton">
+            <button type="submit" [disabled]="form.invalid" class="btn btn-lg btn-primary btn-block mx-auto">
+              Registrarse
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
